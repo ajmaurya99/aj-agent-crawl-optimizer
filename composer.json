@@ -1,0 +1,33 @@
+{
+    "name": "ajmaurya99/agent-ready",
+    "description": "Make your WordPress site discoverable to AI agents and crawlers.",
+    "homepage": "https://github.com/ajmaurya99/agent-ready",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Ajay Maurya",
+            "homepage": "https://x.com/aalootechie",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.10",
+        "wp-coding-standards/wpcs": "^3.1",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "scripts": {
+        "lint": "phpcs --standard=WordPress --extensions=php --ignore=vendor/ .",
+        "lint:fix": "phpcbf --standard=WordPress --extensions=php --ignore=vendor/ .",
+        "make-pot": "wp i18n make-pot . languages/agent-ready.pot --skip-plugins --skip-themes --slug=agent-ready --domain=agent-ready"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

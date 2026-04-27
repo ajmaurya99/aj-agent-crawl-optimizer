@@ -1,0 +1,417 @@
+/*
+ * Agent-Ready — admin settings page styles.
+ *
+ * Loaded only on the Settings → Agent-Ready screen via admin_enqueue_scripts.
+ * Dynamic per-render values (score color + progress offset) are set as inline
+ * style attributes on the <circle> element in the markup.
+ */
+
+/* Score card */
+.agent-ready-score-card {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    background: linear-gradient(135deg, #1d2327 0%, #2c3e50 100%);
+    padding: 25px 30px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.agent-ready-score-circle {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.agent-ready-score-circle svg {
+    transform: rotate(-90deg);
+}
+
+.agent-ready-score-circle .score-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.agent-ready-score-circle .score-progress {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.agent-ready-score-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.agent-ready-score-value .number {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.agent-ready-score-value .label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+}
+
+.agent-ready-score-info h2 {
+    margin: 0 0 5px 0;
+    color: #fff;
+    font-size: 22px;
+}
+
+.agent-ready-score-info p {
+    margin: 0 0 10px 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.agent-ready-features-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.agent-ready-feature-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    font-size: 11px;
+    color: #fff;
+}
+
+.agent-ready-feature-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.agent-ready-feature-badge .dot.enabled {
+    background: #00a32a;
+}
+
+.agent-ready-feature-badge .dot.disabled {
+    background: #d63638;
+}
+
+/* Read More link next to each feature description */
+.agent-ready-read-more {
+    margin-left: 8px;
+    font-size: 12px;
+    font-style: italic;
+    color: #2271b1;
+    text-decoration: none;
+}
+
+.agent-ready-read-more:hover {
+    text-decoration: underline;
+}
+
+/* Testing section */
+.agent-ready-test-block {
+    margin: 0 0 18px 0;
+    padding: 12px 14px;
+    background: #fbfbfc;
+    border: 1px solid #f0f0f1;
+    border-left: 3px solid #f0f0f1;
+    border-radius: 4px;
+    transition: border-left-color 0.15s ease, background 0.15s ease;
+}
+
+.agent-ready-test-block:hover {
+    background: #fff;
+    border-left-color: #2271b1;
+}
+
+.agent-ready-test-block h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+/* .agent-ready-test-section styles consolidated with .agent-ready-section-heading above. */
+
+.agent-ready-test-block p {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+.agent-ready-code-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.agent-ready-code-wrapper code {
+    flex: 1;
+    display: block;
+    padding: 12px 50px 12px 15px;
+    background: #f6f7f7;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    color: #1d2327;
+    word-break: break-all;
+}
+
+.agent-ready-copy-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px 10px;
+    background: #2271b1;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.agent-ready-copy-btn:hover {
+    background: #135e96;
+}
+
+.agent-ready-copy-btn.copied {
+    background: #00a32a;
+}
+
+.agent-ready-note {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Per-test-block "View output" / "Open in [validator]" links. */
+.agent-ready-validate {
+    margin: 6px 0 0 0;
+    font-size: 12px;
+}
+
+.agent-ready-validate a {
+    color: #2271b1;
+    text-decoration: none;
+}
+
+.agent-ready-validate a:hover {
+    text-decoration: underline;
+}
+
+/* Decorative external-link arrow added via pseudo-element so screen readers
+ * don't read "north east arrow" — pseudo-element content is generally not
+ * announced. */
+.agent-ready-validate a[target="_blank"]::after {
+    content: " \2197";
+    speak: never;
+}
+
+/* First-activation Quick Setup wizard. Replaces the normal settings UI. */
+.agent-ready-wizard-wrap h1 {
+    margin-bottom: 8px;
+    font-size: 24px;
+}
+
+.agent-ready-wizard {
+    max-width: 760px;
+    margin-top: 12px;
+    padding: 24px 28px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.agent-ready-wizard-intro {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #50575e;
+}
+
+.agent-ready-wizard-section {
+    margin: 24px 0 8px;
+    padding: 4px 0 4px 12px;
+    border-left: 4px solid #2271b1;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.agent-ready-wizard-section:first-of-type {
+    margin-top: 12px;
+}
+
+.agent-ready-wizard-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.agent-ready-wizard-row:hover {
+    background: #f6f7f7;
+    border-color: #e5e5e5;
+}
+
+.agent-ready-wizard-row input[type="checkbox"] {
+    margin: 4px 0 0 0;
+    flex-shrink: 0;
+}
+
+.agent-ready-wizard-label {
+    display: block;
+}
+
+.agent-ready-wizard-label strong {
+    display: block;
+    color: #1d2327;
+}
+
+.agent-ready-wizard-description {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    color: #50575e;
+    font-weight: 400;
+}
+
+.agent-ready-wizard-actions {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #f0f0f1;
+    display: flex;
+    gap: 10px;
+}
+
+/* Screen-reader-only utility — used to give the settings page an accessible
+ * heading even though WP doesn't render an h1 for add_options_page() screens. */
+.agent-ready-screen-reader-text {
+    border: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    word-wrap: normal !important;
+}
+
+.agent-ready-validate-sep {
+    margin: 0 6px;
+    color: #8c8f94;
+}
+
+/* Details section */
+.agent-ready-details h4 {
+    margin: 18px 0 6px 0;
+    padding-left: 10px;
+    border-left: 2px solid #c3c4c7;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1d2327;
+    /* Offset for the WP admin bar so Read More anchor jumps don't hide the heading. */
+    scroll-margin-top: 50px;
+}
+
+/* .agent-ready-details-section styles consolidated with .agent-ready-section-heading above. */
+
+.agent-ready-details ul {
+    margin: 0 0 5px 22px;
+    list-style: disc;
+}
+
+.agent-ready-details ul li {
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: #3c434a;
+}
+
+.agent-ready-details code {
+    background: #f0f0f1;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* Section headings shared across Form (h2), Testing (h3), and Details (h3).
+ * Blue left accent bar so they read clearly as group dividers without being
+ * heavy. Same treatment everywhere keeps the page visually coherent. */
+.agent-ready-section-heading,
+.agent-ready-test-section,
+.agent-ready-details-section {
+    margin: 32px 0 6px;
+    padding: 6px 0 6px 14px;
+    border: 0;
+    border-left: 4px solid #2271b1;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1d2327;
+    /* Anchor offset for the WP admin bar so fragment jumps land below it. */
+    scroll-margin-top: 50px;
+}
+
+/* First section in each group shouldn't have huge top margin. */
+.agent-ready-section-heading:first-of-type,
+.agent-ready-details > .agent-ready-details-section:first-of-type {
+    margin-top: 18px;
+}
+
+/* Section description text: indented to align with the heading text, smaller
+ * and softer than the heading so the eye reads them as a unit. */
+.agent-ready-section-heading + .description,
+.agent-ready-test-section + .description,
+.agent-ready-details-section + .description {
+    margin: 0 0 14px 18px;
+    font-size: 13px;
+    color: #50575e;
+}
+
+/* Reset-to-Defaults form. Sits below the main Save button, visually separated. */
+.agent-ready-reset-form {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dcdcde;
+}
+
+.agent-ready-reset-form .description {
+    margin: 0 0 8px 0;
+}
+
+/* Tone the destructive button down — secondary look, but with the WP "delete" red text. */
+.agent-ready-reset-form .button.delete {
+    color: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.agent-ready-reset-form .button.delete:hover {
+    color: #fff;
+    background: #b32d2e;
+    border-color: #b32d2e;
+}

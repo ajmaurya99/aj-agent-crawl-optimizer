@@ -1,0 +1,60 @@
+# .distignore — files/directories excluded from `wp dist-archive`.
+#
+# Anything listed here will NOT be included in the production zip pushed to
+# WordPress.org. Keep this file in sync with what's strictly dev-tooling.
+#
+# Run from the plugin root:
+#   wp dist-archive . ./agent-ready.zip
+# to verify the resulting zip contains only runtime files.
+
+# Source control
+/.git
+/.github
+/.gitignore
+/.gitattributes
+
+# WP.org banner/icon assets (stored in repo for source control,
+# uploaded to /assets in SVN — never shipped to users in the zip).
+/.wordpress-org
+
+# Composer (dev dependencies for PHPCS)
+/vendor
+/composer.json
+/composer.lock
+
+# PHPCS / coding-standards config
+/phpcs.xml
+/phpcs.xml.dist
+/phpcs.cache
+
+# PHPUnit (if added later)
+/phpunit.xml
+/phpunit.xml.dist
+/tests
+
+# Node tooling (if added later)
+/node_modules
+/package.json
+/package-lock.json
+/yarn.lock
+
+# Editor / formatter config
+/.editorconfig
+/.eslintrc
+/.eslintrc.json
+/.prettierrc
+/.prettierrc.json
+/.stylelintrc
+
+# OS / IDE junk
+/.DS_Store
+/.idea
+/.vscode
+
+# This file itself
+/.distignore
+
+# Build artifacts
+*.zip
+*.tar.gz
+*.log

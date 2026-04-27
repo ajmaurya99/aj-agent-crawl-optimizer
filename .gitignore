@@ -1,0 +1,26 @@
+# Composer dependencies — reproduced by `composer install`. Don't track.
+/vendor/
+
+# Node tooling (if ever added)
+/node_modules/
+
+# Build / distribution artifacts
+*.zip
+*.tar.gz
+
+# Logs
+*.log
+
+# Lint / test caches
+.phpcs.cache
+.phpunit.result.cache
+/.phpunit.cache/
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

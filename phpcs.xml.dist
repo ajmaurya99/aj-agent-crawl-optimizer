@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<ruleset name="Agent-Ready">
+    <description>Coding standards for the Agent-Ready plugin.</description>
+
+    <!-- Files / dirs to scan -->
+    <file>.</file>
+    <exclude-pattern>/vendor/</exclude-pattern>
+    <exclude-pattern>/node_modules/</exclude-pattern>
+
+    <!-- Show progress, sniff codes, and use colors -->
+    <arg value="ps"/>
+    <arg name="colors"/>
+
+    <!-- Only PHP files -->
+    <arg name="extensions" value="php"/>
+
+    <!-- Use the WordPress standard (covers WordPress-Core, -Docs, -Extra) -->
+    <rule ref="WordPress">
+        <!-- We use namespaces, so file naming convention isn't WP-classic. -->
+        <exclude name="WordPress.Files.FileName"/>
+        <!-- Procedural functions inside a namespace don't need the wp_ prefix. -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
+    </rule>
+
+    <!-- Plugin text domain -->
+    <config name="text_domain" value="agent-ready"/>
+
+    <!-- Support PHP 7.4+ -->
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Minimum WP version -->
+    <config name="minimum_wp_version" value="5.5"/>
+</ruleset>

@@ -1,5 +1,5 @@
 /**
- * WebMCP Tools for Crawlbridge
+ * WebMCP Tools for AJ Agent Crawl Optimizer
  *
  * Exposes site tools to AI agents via the browser's navigator.modelContext API.
  * @see https://webmachinelearning.github.io/webmcp/
@@ -15,7 +15,7 @@
 
     // Get WordPress REST API root from the localized data PHP exposes via
     // wp_localize_script(). Falls back to the same-origin root if missing.
-    const apiRoot = (window.CrawlbridgeWebMCP && window.CrawlbridgeWebMCP.apiUrl) || '/wp-json/';
+    const apiRoot = (window.AjacoWebMCP && window.AjacoWebMCP.apiUrl) || '/wp-json/';
 
     // Define available tools.
     const tools = [

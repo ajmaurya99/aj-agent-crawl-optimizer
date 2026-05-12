@@ -5,10 +5,10 @@
  * Returns a clean Markdown version of any page when an agent requests it via
  * `Accept: text/markdown`. Browsers (which send `text/html`) are unaffected.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

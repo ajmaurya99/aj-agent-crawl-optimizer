@@ -1,20 +1,20 @@
 /**
- * Crawlbridge — admin settings page JS.
+ * AJ Agent Crawl Optimizer — admin settings page JS.
  *
- * Three concerns, all scoped to the Settings → Crawlbridge screen:
+ * Three concerns, all scoped to the Settings → AJ Agent Crawl Optimizer screen:
  *   1. Smooth-scroll the in-page Read More links to their Detail anchors.
  *   2. Move the WordPress "Settings saved." notice from above the score card
  *      to right below the Save Changes button.
  *   3. Wire up the per-test-block copy buttons.
  *
- * Localized strings (e.g. "Copied!") come in via window.CrawlbridgeAdmin
+ * Localized strings (e.g. "Copied!") come in via window.AjacoAdmin
  * which is set by wp_localize_script() in includes/admin/enqueue.php.
  */
 
 (function () {
     'use strict';
 
-    var i18n = (window.CrawlbridgeAdmin && window.CrawlbridgeAdmin.i18n) || {};
+    var i18n = (window.AjacoAdmin && window.AjacoAdmin.i18n) || {};
 
     // --- Notice relocation + auto-dismiss ---------------------------------
     //
@@ -52,7 +52,7 @@
     // --- Read More smooth scroll + copy buttons ----------------------------
     document.addEventListener('DOMContentLoaded', function () {
         // Smooth-scroll the in-page Read More links instead of jumping.
-        document.querySelectorAll('.crawlbridge-read-more').forEach(function (link) {
+        document.querySelectorAll('.ajaco-read-more').forEach(function (link) {
             link.addEventListener('click', function (e) {
                 var target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -72,10 +72,10 @@
         var liveRegion = document.createElement('div');
         liveRegion.setAttribute('role', 'status');
         liveRegion.setAttribute('aria-live', 'polite');
-        liveRegion.className = 'crawlbridge-screen-reader-text';
+        liveRegion.className = 'ajaco-screen-reader-text';
         document.body.appendChild(liveRegion);
 
-        document.querySelectorAll('.crawlbridge-copy-btn').forEach(function (btn) {
+        document.querySelectorAll('.ajaco-copy-btn').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 var targetId = this.getAttribute('data-target');
                 var codeEl = document.getElementById(targetId);

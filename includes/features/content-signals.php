@@ -6,10 +6,10 @@
  * preferences (per https://contentsignals.org/). Composes with SEO plugins:
  * Yoast/RankMath/AIOSEO additions are preserved, our line is appended last.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,7 +50,7 @@ function filter_robots_txt( string $output, $is_public ): string {
 	 *
 	 * @param string $directive Default `ai-train=no, search=yes, ai-input=no`.
 	 */
-	$directive      = (string) apply_filters( 'crawlbridge_content_signal', 'ai-train=no, search=yes, ai-input=no' );
+	$directive      = (string) apply_filters( 'ajaco_content_signal', 'ai-train=no, search=yes, ai-input=no' );
 	$content_signal = "Content-Signal: {$directive}\n";
 
 	if ( trim( $output ) === '' ) {

@@ -10,10 +10,10 @@
  * @see https://github.com/cloudflare/agent-skills-discovery-rfc
  * @see https://agentskills.io/
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -112,7 +112,7 @@ function get_skill_definitions(): array {
 	 *
 	 * @param array<string, array{type: string, description: string, endpoint: string}> $skills
 	 */
-	return apply_filters( 'crawlbridge_skill_definitions', $skills );
+	return apply_filters( 'ajaco_skill_definitions', $skills );
 }
 
 /**
@@ -123,7 +123,7 @@ function get_skill_definitions(): array {
  * @return string
  */
 function build_skill_md( string $name, array $def ): string {
-	// Skill values come from a filter (`crawlbridge_skill_definitions`), so
+	// Skill values come from a filter (`ajaco_skill_definitions`), so
 	// escape them when interpolating into the markdown template.
 	$name        = esc_html( $name );
 	$type        = esc_html( $def['type'] );

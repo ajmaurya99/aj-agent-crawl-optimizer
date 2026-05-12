@@ -3,19 +3,19 @@
  * Feature: llms.txt — a curated, LLM-readable index of the site.
  *
  * Serves /llms.txt with site identity, a Discovery section auto-linking every
- * other crawlbridge endpoint that's currently enabled, top-level pages, and
+ * other plugin endpoint that's currently enabled, top-level pages, and
  * recent posts. Format follows https://llmstxt.org/.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const LLMS_TXT_CACHE_KEY = 'crawlbridge_llms_txt_cache';
+const LLMS_TXT_CACHE_KEY = 'ajaco_llms_txt_cache';
 
 add_action( 'init', __NAMESPACE__ . '\\handle_llms_txt_request' );
 
@@ -30,7 +30,7 @@ add_action( 'untrashed_post', __NAMESPACE__ . '\\flush_llms_txt_cache' );
 add_action( 'update_option_blogname', __NAMESPACE__ . '\\flush_llms_txt_cache' );
 add_action( 'update_option_blogdescription', __NAMESPACE__ . '\\flush_llms_txt_cache' );
 
-// Invalidate when any Crawlbridge toggle changes — affects the Discovery section.
+// Invalidate when any AJ Agent Crawl Optimizer toggle changes — affects the Discovery section.
 add_action( 'updated_option', __NAMESPACE__ . '\\maybe_flush_llms_txt_on_setting_change' );
 
 /**
@@ -43,7 +43,7 @@ function flush_llms_txt_cache(): void {
 }
 
 /**
- * Flush the cache when an `crawlbridge_*_enabled` option is updated. The
+ * Flush the cache when an `ajaco_*_enabled` option is updated. The
  * Discovery section auto-includes only enabled features, so a toggle change
  * means the cached body is stale.
  *
@@ -51,7 +51,7 @@ function flush_llms_txt_cache(): void {
  * @return void
  */
 function maybe_flush_llms_txt_on_setting_change( string $option ): void {
-	if ( strpos( $option, 'crawlbridge_' ) === 0 ) {
+	if ( strpos( $option, 'ajaco_' ) === 0 ) {
 		flush_llms_txt_cache();
 	}
 }
@@ -60,7 +60,7 @@ function maybe_flush_llms_txt_on_setting_change( string $option ): void {
  * Serve /llms.txt at the root or any multisite subsite path.
  *
  * Cached for one hour in a transient. Invalidates automatically on post/page
- * changes, site name/description changes, and Crawlbridge setting toggles.
+ * changes, site name/description changes, and AJ Agent Crawl Optimizer setting toggles.
  *
  * @return void
  */
@@ -192,7 +192,7 @@ function build_llms_txt(): string {
 	 *
 	 * @param string $out The Markdown body about to be served.
 	 */
-	return (string) apply_filters( 'crawlbridge_llms_txt_content', $out );
+	return (string) apply_filters( 'ajaco_llms_txt_content', $out );
 }
 
 /**

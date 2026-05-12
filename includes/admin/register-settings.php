@@ -2,13 +2,13 @@
 /**
  * Admin: register all plugin settings with the WP Settings API.
  *
- * Settings group: `crawlbridge_settings`. All toggles default to false
+ * Settings group: `ajaco_settings`. All toggles default to false
  * (opt-in). The IndexNow API key is sanitized via sanitize_indexnow_key().
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,21 +23,21 @@ add_action( 'admin_init', __NAMESPACE__ . '\\register_settings' );
  */
 function register_settings(): void {
 	$boolean_options = array(
-		'crawlbridge_markdown_enabled',
-		'crawlbridge_content_signals_enabled',
-		'crawlbridge_api_catalog_enabled',
-		'crawlbridge_mcp_server_card_enabled',
-		'crawlbridge_agent_skills_index_enabled',
-		'crawlbridge_webmcp_enabled',
-		'crawlbridge_json_ld_enabled',
-		'crawlbridge_openapi_enabled',
-		'crawlbridge_indexnow_enabled',
-		'crawlbridge_llms_txt_enabled',
+		'ajaco_markdown_enabled',
+		'ajaco_content_signals_enabled',
+		'ajaco_api_catalog_enabled',
+		'ajaco_mcp_server_card_enabled',
+		'ajaco_agent_skills_index_enabled',
+		'ajaco_webmcp_enabled',
+		'ajaco_json_ld_enabled',
+		'ajaco_openapi_enabled',
+		'ajaco_indexnow_enabled',
+		'ajaco_llms_txt_enabled',
 	);
 
 	foreach ( $boolean_options as $option ) {
 		register_setting(
-			'crawlbridge_settings',
+			'ajaco_settings',
 			$option,
 			array(
 				'type'              => 'boolean',
@@ -48,8 +48,8 @@ function register_settings(): void {
 	}
 
 	register_setting(
-		'crawlbridge_settings',
-		'crawlbridge_indexnow_key',
+		'ajaco_settings',
+		'ajaco_indexnow_key',
 		array(
 			'type'              => 'string',
 			'sanitize_callback' => __NAMESPACE__ . '\\sanitize_indexnow_key',

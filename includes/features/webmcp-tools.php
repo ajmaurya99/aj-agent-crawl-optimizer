@@ -7,10 +7,10 @@
  *
  * @see https://webmachinelearning.github.io/webmcp/
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,7 +28,7 @@ function enqueue_webmcp_script(): void {
 		return;
 	}
 
-	$asset_path = CRAWLBRIDGE_DIR . 'assets/js/webmcp-tools.js';
+	$asset_path = AJACO_DIR . 'assets/js/webmcp-tools.js';
 	if ( ! file_exists( $asset_path ) ) {
 		return;
 	}
@@ -36,16 +36,16 @@ function enqueue_webmcp_script(): void {
 	$version = filemtime( $asset_path );
 
 	wp_enqueue_script(
-		'crawlbridge-webmcp',
-		CRAWLBRIDGE_URL . 'assets/js/webmcp-tools.js',
+		'ajaco-webmcp',
+		AJACO_URL . 'assets/js/webmcp-tools.js',
 		array(),
 		$version,
 		true
 	);
 
 	wp_localize_script(
-		'crawlbridge-webmcp',
-		'CrawlbridgeWebMCP',
+		'ajaco-webmcp',
+		'AjacoWebMCP',
 		array(
 			'apiUrl' => rest_url( '/' ),
 		)

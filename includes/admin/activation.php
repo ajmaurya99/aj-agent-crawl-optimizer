@@ -2,17 +2,17 @@
 /**
  * Admin: plugin lifecycle hooks — activation cache reset + plugins-row Settings link.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-register_activation_hook( CRAWLBRIDGE_FILE, __NAMESPACE__ . '\\on_activation' );
-add_filter( 'plugin_action_links_' . plugin_basename( CRAWLBRIDGE_FILE ), __NAMESPACE__ . '\\plugin_action_links' );
+register_activation_hook( AJACO_FILE, __NAMESPACE__ . '\\on_activation' );
+add_filter( 'plugin_action_links_' . plugin_basename( AJACO_FILE ), __NAMESPACE__ . '\\plugin_action_links' );
 
 /**
  * Activation tasks: arm the one-time Quick Setup wizard for the user's next
@@ -29,8 +29,8 @@ function on_activation(): void {
 
 	// Flush cached endpoint outputs so the first request after (re)activation
 	// always reflects the current plugin code, not a stale pre-update body.
-	delete_transient( 'crawlbridge_openapi_cache' );
-	delete_transient( 'crawlbridge_llms_txt_cache' );
+	delete_transient( 'ajaco_openapi_cache' );
+	delete_transient( 'ajaco_llms_txt_cache' );
 }
 
 /**
@@ -42,8 +42,8 @@ function on_activation(): void {
 function plugin_action_links( array $links ): array {
 	$settings_link = sprintf(
 		'<a href="%s">%s</a>',
-		esc_url( admin_url( 'options-general.php?page=crawlbridge' ) ),
-		esc_html__( 'Settings', 'crawlbridge' )
+		esc_url( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer' ) ),
+		esc_html__( 'Settings', 'aj-agent-crawl-optimizer' )
 	);
 	array_unshift( $links, $settings_link );
 	return $links;

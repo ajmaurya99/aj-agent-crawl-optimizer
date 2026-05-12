@@ -1,13 +1,13 @@
 /*
- * Crawlbridge — admin settings page styles.
+ * AJ Agent Crawl Optimizer — admin settings page styles.
  *
- * Loaded only on the Settings → Crawlbridge screen via admin_enqueue_scripts.
+ * Loaded only on the Settings → AJ Agent Crawl Optimizer screen via admin_enqueue_scripts.
  * Dynamic per-render values (score color + progress offset) are set as inline
  * style attributes on the <circle> element in the markup.
  */
 
 /* Score card */
-.crawlbridge-score-card {
+.ajaco-score-card {
     display: flex;
     align-items: center;
     gap: 25px;
@@ -18,23 +18,23 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.crawlbridge-score-circle {
+.ajaco-score-circle {
     position: relative;
     width: 100px;
     height: 100px;
 }
 
-.crawlbridge-score-circle svg {
+.ajaco-score-circle svg {
     transform: rotate(-90deg);
 }
 
-.crawlbridge-score-circle .score-bg {
+.ajaco-score-circle .score-bg {
     fill: none;
     stroke: rgba(255, 255, 255, 0.1);
     stroke-width: 8;
 }
 
-.crawlbridge-score-circle .score-progress {
+.ajaco-score-circle .score-progress {
     fill: none;
     stroke-width: 8;
     stroke-linecap: round;
@@ -42,7 +42,7 @@
     transition: stroke-dashoffset 1s ease-out;
 }
 
-.crawlbridge-score-value {
+.ajaco-score-value {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -50,7 +50,7 @@
     text-align: center;
 }
 
-.crawlbridge-score-value .number {
+.ajaco-score-value .number {
     display: block;
     font-size: 32px;
     font-weight: 700;
@@ -58,31 +58,31 @@
     line-height: 1;
 }
 
-.crawlbridge-score-value .label {
+.ajaco-score-value .label {
     font-size: 11px;
     color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
 }
 
-.crawlbridge-score-info h2 {
+.ajaco-score-info h2 {
     margin: 0 0 5px 0;
     color: #fff;
     font-size: 22px;
 }
 
-.crawlbridge-score-info p {
+.ajaco-score-info p {
     margin: 0 0 10px 0;
     color: rgba(255, 255, 255, 0.8);
     font-size: 14px;
 }
 
-.crawlbridge-features-summary {
+.ajaco-features-summary {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.crawlbridge-feature-badge {
+.ajaco-feature-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -93,22 +93,22 @@
     color: #fff;
 }
 
-.crawlbridge-feature-badge .dot {
+.ajaco-feature-badge .dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
 }
 
-.crawlbridge-feature-badge .dot.enabled {
+.ajaco-feature-badge .dot.enabled {
     background: #00a32a;
 }
 
-.crawlbridge-feature-badge .dot.disabled {
+.ajaco-feature-badge .dot.disabled {
     background: #d63638;
 }
 
 /* Read More link next to each feature description */
-.crawlbridge-read-more {
+.ajaco-read-more {
     margin-left: 8px;
     font-size: 12px;
     font-style: italic;
@@ -116,12 +116,12 @@
     text-decoration: none;
 }
 
-.crawlbridge-read-more:hover {
+.ajaco-read-more:hover {
     text-decoration: underline;
 }
 
 /* Testing section */
-.crawlbridge-test-block {
+.ajaco-test-block {
     margin: 0 0 18px 0;
     padding: 12px 14px;
     background: #fbfbfc;
@@ -131,33 +131,33 @@
     transition: border-left-color 0.15s ease, background 0.15s ease;
 }
 
-.crawlbridge-test-block:hover {
+.ajaco-test-block:hover {
     background: #fff;
     border-left-color: #2271b1;
 }
 
-.crawlbridge-test-block h4 {
+.ajaco-test-block h4 {
     margin: 0 0 6px 0;
     font-size: 14px;
     font-weight: 600;
     color: #1d2327;
 }
 
-/* .crawlbridge-test-section styles consolidated with .crawlbridge-section-heading above. */
+/* .ajaco-test-section styles consolidated with .ajaco-section-heading above. */
 
-.crawlbridge-test-block p {
+.ajaco-test-block p {
     margin-bottom: 8px;
     font-size: 13px;
     color: #555;
 }
 
-.crawlbridge-code-wrapper {
+.ajaco-code-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.crawlbridge-code-wrapper code {
+.ajaco-code-wrapper code {
     flex: 1;
     display: block;
     padding: 12px 50px 12px 15px;
@@ -170,7 +170,7 @@
     word-break: break-all;
 }
 
-.crawlbridge-copy-btn {
+.ajaco-copy-btn {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -185,50 +185,50 @@
     transition: background 0.2s;
 }
 
-.crawlbridge-copy-btn:hover {
+.ajaco-copy-btn:hover {
     background: #135e96;
 }
 
-.crawlbridge-copy-btn.copied {
+.ajaco-copy-btn.copied {
     background: #00a32a;
 }
 
-.crawlbridge-note {
+.ajaco-note {
     margin-top: 5px;
     font-size: 12px;
     color: #666;
 }
 
 /* Per-test-block "View output" / "Open in [validator]" links. */
-.crawlbridge-validate {
+.ajaco-validate {
     margin: 6px 0 0 0;
     font-size: 12px;
 }
 
-.crawlbridge-validate a {
+.ajaco-validate a {
     color: #2271b1;
     text-decoration: none;
 }
 
-.crawlbridge-validate a:hover {
+.ajaco-validate a:hover {
     text-decoration: underline;
 }
 
 /* Decorative external-link arrow added via pseudo-element so screen readers
  * don't read "north east arrow" — pseudo-element content is generally not
  * announced. */
-.crawlbridge-validate a[target="_blank"]::after {
+.ajaco-validate a[target="_blank"]::after {
     content: " \2197";
     speak: never;
 }
 
 /* First-activation Quick Setup wizard. Replaces the normal settings UI. */
-.crawlbridge-wizard-wrap h1 {
+.ajaco-wizard-wrap h1 {
     margin-bottom: 8px;
     font-size: 24px;
 }
 
-.crawlbridge-wizard {
+.ajaco-wizard {
     max-width: 760px;
     margin-top: 12px;
     padding: 24px 28px;
@@ -238,13 +238,13 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.crawlbridge-wizard-intro {
+.ajaco-wizard-intro {
     margin: 0 0 20px 0;
     font-size: 14px;
     color: #50575e;
 }
 
-.crawlbridge-wizard-section {
+.ajaco-wizard-section {
     margin: 24px 0 8px;
     padding: 4px 0 4px 12px;
     border-left: 4px solid #2271b1;
@@ -253,11 +253,11 @@
     color: #1d2327;
 }
 
-.crawlbridge-wizard-section:first-of-type {
+.ajaco-wizard-section:first-of-type {
     margin-top: 12px;
 }
 
-.crawlbridge-wizard-row {
+.ajaco-wizard-row {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -269,26 +269,26 @@
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.crawlbridge-wizard-row:hover {
+.ajaco-wizard-row:hover {
     background: #f6f7f7;
     border-color: #e5e5e5;
 }
 
-.crawlbridge-wizard-row input[type="checkbox"] {
+.ajaco-wizard-row input[type="checkbox"] {
     margin: 4px 0 0 0;
     flex-shrink: 0;
 }
 
-.crawlbridge-wizard-label {
+.ajaco-wizard-label {
     display: block;
 }
 
-.crawlbridge-wizard-label strong {
+.ajaco-wizard-label strong {
     display: block;
     color: #1d2327;
 }
 
-.crawlbridge-wizard-description {
+.ajaco-wizard-description {
     display: block;
     margin-top: 2px;
     font-size: 13px;
@@ -296,7 +296,7 @@
     font-weight: 400;
 }
 
-.crawlbridge-wizard-actions {
+.ajaco-wizard-actions {
     margin-top: 24px;
     padding-top: 18px;
     border-top: 1px solid #f0f0f1;
@@ -306,7 +306,7 @@
 
 /* Screen-reader-only utility — used to give the settings page an accessible
  * heading even though WP doesn't render an h1 for add_options_page() screens. */
-.crawlbridge-screen-reader-text {
+.ajaco-screen-reader-text {
     border: 0;
     clip: rect(1px, 1px, 1px, 1px);
     -webkit-clip-path: inset(50%);
@@ -320,13 +320,13 @@
     word-wrap: normal !important;
 }
 
-.crawlbridge-validate-sep {
+.ajaco-validate-sep {
     margin: 0 6px;
     color: #8c8f94;
 }
 
 /* Details section */
-.crawlbridge-details h4 {
+.ajaco-details h4 {
     margin: 18px 0 6px 0;
     padding-left: 10px;
     border-left: 2px solid #c3c4c7;
@@ -338,20 +338,20 @@
     scroll-margin-top: 50px;
 }
 
-/* .crawlbridge-details-section styles consolidated with .crawlbridge-section-heading above. */
+/* .ajaco-details-section styles consolidated with .ajaco-section-heading above. */
 
-.crawlbridge-details ul {
+.ajaco-details ul {
     margin: 0 0 5px 22px;
     list-style: disc;
 }
 
-.crawlbridge-details ul li {
+.ajaco-details ul li {
     margin-bottom: 4px;
     font-size: 13px;
     color: #3c434a;
 }
 
-.crawlbridge-details code {
+.ajaco-details code {
     background: #f0f0f1;
     padding: 1px 5px;
     border-radius: 3px;
@@ -361,9 +361,9 @@
 /* Section headings shared across Form (h2), Testing (h3), and Details (h3).
  * Blue left accent bar so they read clearly as group dividers without being
  * heavy. Same treatment everywhere keeps the page visually coherent. */
-.crawlbridge-section-heading,
-.crawlbridge-test-section,
-.crawlbridge-details-section {
+.ajaco-section-heading,
+.ajaco-test-section,
+.ajaco-details-section {
     margin: 32px 0 6px;
     padding: 6px 0 6px 14px;
     border: 0;
@@ -378,39 +378,39 @@
 }
 
 /* First section in each group shouldn't have huge top margin. */
-.crawlbridge-section-heading:first-of-type,
-.crawlbridge-details > .crawlbridge-details-section:first-of-type {
+.ajaco-section-heading:first-of-type,
+.ajaco-details > .ajaco-details-section:first-of-type {
     margin-top: 18px;
 }
 
 /* Section description text: indented to align with the heading text, smaller
  * and softer than the heading so the eye reads them as a unit. */
-.crawlbridge-section-heading + .description,
-.crawlbridge-test-section + .description,
-.crawlbridge-details-section + .description {
+.ajaco-section-heading + .description,
+.ajaco-test-section + .description,
+.ajaco-details-section + .description {
     margin: 0 0 14px 18px;
     font-size: 13px;
     color: #50575e;
 }
 
 /* Reset-to-Defaults form. Sits below the main Save button, visually separated. */
-.crawlbridge-reset-form {
+.ajaco-reset-form {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #dcdcde;
 }
 
-.crawlbridge-reset-form .description {
+.ajaco-reset-form .description {
     margin: 0 0 8px 0;
 }
 
 /* Tone the destructive button down — secondary look, but with the WP "delete" red text. */
-.crawlbridge-reset-form .button.delete {
+.ajaco-reset-form .button.delete {
     color: #b32d2e;
     border-color: #b32d2e;
 }
 
-.crawlbridge-reset-form .button.delete:hover {
+.ajaco-reset-form .button.delete:hover {
     color: #fff;
     background: #b32d2e;
     border-color: #b32d2e;

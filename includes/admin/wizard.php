@@ -6,19 +6,19 @@
  * transient is set. The user applies recommended defaults (environment-aware:
  * skips JSON-LD if an SEO plugin is detected) or skips to manual configuration.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const WIZARD_TRANSIENT    = 'crawlbridge_show_wizard';
-const WIZARD_APPLIED_FLAG = 'crawlbridge_wizard_applied';
+const WIZARD_TRANSIENT    = 'ajaco_show_wizard';
+const WIZARD_APPLIED_FLAG = 'ajaco_wizard_applied';
 
-add_action( 'admin_post_crawlbridge_apply_wizard', __NAMESPACE__ . '\\handle_wizard_submit' );
+add_action( 'admin_post_ajaco_apply_wizard', __NAMESPACE__ . '\\handle_wizard_submit' );
 add_action( 'admin_notices', __NAMESPACE__ . '\\maybe_show_wizard_applied_notice' );
 
 /**
@@ -40,20 +40,20 @@ function recommended_settings(): array {
 
 	return array(
 		// Discovery — all on, low cost, no conflicts.
-		'crawlbridge_api_catalog_enabled'        => true,
-		'crawlbridge_mcp_server_card_enabled'    => true,
-		'crawlbridge_agent_skills_index_enabled' => true,
-		'crawlbridge_llms_txt_enabled'           => true,
+		'ajaco_api_catalog_enabled'        => true,
+		'ajaco_mcp_server_card_enabled'    => true,
+		'ajaco_agent_skills_index_enabled' => true,
+		'ajaco_llms_txt_enabled'           => true,
 		// IndexNow off — requires API key + production environment.
-		'crawlbridge_indexnow_enabled'           => false,
+		'ajaco_indexnow_enabled'           => false,
 		// Presentation — on by default; JSON-LD off when an SEO plugin is active
 		// (auto-suppression would no-op anyway, but turning it off makes the UI honest).
-		'crawlbridge_markdown_enabled'           => true,
-		'crawlbridge_json_ld_enabled'            => ! $seo_active,
-		'crawlbridge_openapi_enabled'            => true,
-		'crawlbridge_webmcp_enabled'             => true,
+		'ajaco_markdown_enabled'           => true,
+		'ajaco_json_ld_enabled'            => ! $seo_active,
+		'ajaco_openapi_enabled'            => true,
+		'ajaco_webmcp_enabled'             => true,
 		// Declarations — on.
-		'crawlbridge_content_signals_enabled'    => true,
+		'ajaco_content_signals_enabled'    => true,
 	);
 }
 
@@ -65,16 +65,16 @@ function recommended_settings(): array {
 function handle_wizard_submit(): void {
 	if ( ! current_user_can( required_capability() ) ) {
 		wp_die(
-			esc_html__( 'You do not have permission to run the Crawlbridge setup wizard.', 'crawlbridge' ),
+			esc_html__( 'You do not have permission to run the AJ Agent Crawl Optimizer setup wizard.', 'aj-agent-crawl-optimizer' ),
 			'',
 			array( 'response' => 403 )
 		);
 	}
 
-	check_admin_referer( 'crawlbridge_apply_wizard' );
+	check_admin_referer( 'ajaco_apply_wizard' );
 
-	$action = isset( $_POST['crawlbridge_wizard_action'] )
-		? sanitize_text_field( wp_unslash( $_POST['crawlbridge_wizard_action'] ) )
+	$action = isset( $_POST['ajaco_wizard_action'] )
+		? sanitize_text_field( wp_unslash( $_POST['ajaco_wizard_action'] ) )
 		: '';
 
 	if ( $action === 'apply' ) {
@@ -90,7 +90,7 @@ function handle_wizard_submit(): void {
 	// Apply or skip — either way, dismiss the wizard.
 	delete_transient( WIZARD_TRANSIENT );
 
-	wp_safe_redirect( admin_url( 'options-general.php?page=crawlbridge' ) );
+	wp_safe_redirect( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer' ) );
 	exit;
 }
 
@@ -101,7 +101,7 @@ function handle_wizard_submit(): void {
  */
 function maybe_show_wizard_applied_notice(): void {
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-	if ( ! $screen || $screen->id !== 'settings_page_crawlbridge' ) {
+	if ( ! $screen || $screen->id !== 'settings_page_aj-agent-crawl-optimizer' ) {
 		return;
 	}
 
@@ -113,8 +113,8 @@ function maybe_show_wizard_applied_notice(): void {
 	?>
 	<div class="notice notice-success settings-error is-dismissible">
 		<p>
-			<strong><?php esc_html_e( 'Recommended Crawlbridge settings applied.', 'crawlbridge' ); ?></strong>
-			<?php esc_html_e( 'Tweak any toggle below if you want to deviate from the defaults.', 'crawlbridge' ); ?>
+			<strong><?php esc_html_e( 'Recommended AJ Agent Crawl Optimizer settings applied.', 'aj-agent-crawl-optimizer' ); ?></strong>
+			<?php esc_html_e( 'Tweak any toggle below if you want to deviate from the defaults.', 'aj-agent-crawl-optimizer' ); ?>
 		</p>
 	</div>
 	<?php
@@ -131,42 +131,42 @@ function render_wizard(): void {
 	$skip_url   = wp_nonce_url(
 		add_query_arg(
 			array(
-				'action'                    => 'crawlbridge_apply_wizard',
-				'crawlbridge_wizard_action' => 'skip',
+				'action'                    => 'ajaco_apply_wizard',
+				'ajaco_wizard_action' => 'skip',
 			),
 			admin_url( 'admin-post.php' )
 		),
-		'crawlbridge_apply_wizard'
+		'ajaco_apply_wizard'
 	);
 
 	$rows = array(
 		// label, option name, recommended-by-default, description.
-		array( 'discovery', __( 'API Catalog', 'crawlbridge' ), 'crawlbridge_api_catalog_enabled', __( '/.well-known/api-catalog manifest plus a Link header on every response (RFC 9727).', 'crawlbridge' ) ),
-		array( 'discovery', __( 'MCP Server Card', 'crawlbridge' ), 'crawlbridge_mcp_server_card_enabled', __( '/.well-known/mcp/server-card.json descriptor for MCP-aware agents.', 'crawlbridge' ) ),
-		array( 'discovery', __( 'Agent Skills Index', 'crawlbridge' ), 'crawlbridge_agent_skills_index_enabled', __( '/.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'crawlbridge' ) ),
-		array( 'discovery', __( 'llms.txt', 'crawlbridge' ), 'crawlbridge_llms_txt_enabled', __( 'A curated, LLM-readable index at /llms.txt (per llmstxt.org).', 'crawlbridge' ) ),
-		array( 'discovery', __( 'IndexNow', 'crawlbridge' ), 'crawlbridge_indexnow_enabled', __( 'Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later.', 'crawlbridge' ) ),
-		array( 'presentation', __( 'Markdown Negotiation', 'crawlbridge' ), 'crawlbridge_markdown_enabled', __( 'Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected.', 'crawlbridge' ) ),
-		array( 'presentation', __( 'JSON-LD Schema', 'crawlbridge' ), 'crawlbridge_json_ld_enabled', __( 'WebSite, Organization, Article, BreadcrumbList, FAQPage structured data.', 'crawlbridge' ) ),
-		array( 'presentation', __( 'OpenAPI Spec', 'crawlbridge' ), 'crawlbridge_openapi_enabled', __( 'OpenAPI 3.0.3 document at /?format=openapi, generated from REST routes.', 'crawlbridge' ) ),
-		array( 'presentation', __( 'WebMCP Tools', 'crawlbridge' ), 'crawlbridge_webmcp_enabled', __( 'Frontend script registering tools via navigator.modelContext (Chrome experimental).', 'crawlbridge' ) ),
-		array( 'declarations', __( 'Content-Signals', 'crawlbridge' ), 'crawlbridge_content_signals_enabled', __( 'Adds a Content-Signal directive to robots.txt declaring AI-usage preferences.', 'crawlbridge' ) ),
+		array( 'discovery', __( 'API Catalog', 'aj-agent-crawl-optimizer' ), 'ajaco_api_catalog_enabled', __( '/.well-known/api-catalog manifest plus a Link header on every response (RFC 9727).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'MCP Server Card', 'aj-agent-crawl-optimizer' ), 'ajaco_mcp_server_card_enabled', __( '/.well-known/mcp/server-card.json descriptor for MCP-aware agents.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ), 'ajaco_agent_skills_index_enabled', __( '/.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'llms.txt', 'aj-agent-crawl-optimizer' ), 'ajaco_llms_txt_enabled', __( 'A curated, LLM-readable index at /llms.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'IndexNow', 'aj-agent-crawl-optimizer' ), 'ajaco_indexnow_enabled', __( 'Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ), 'ajaco_markdown_enabled', __( 'Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ), 'ajaco_json_ld_enabled', __( 'WebSite, Organization, Article, BreadcrumbList, FAQPage structured data.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), 'ajaco_openapi_enabled', __( 'OpenAPI 3.0.3 document at /?format=openapi, generated from REST routes.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'ajaco_webmcp_enabled', __( 'Frontend script registering tools via navigator.modelContext (Chrome experimental).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'declarations', __( 'Content-Signals', 'aj-agent-crawl-optimizer' ), 'ajaco_content_signals_enabled', __( 'Adds a Content-Signal directive to robots.txt declaring AI-usage preferences.', 'aj-agent-crawl-optimizer' ) ),
 	);
 
 	$section_titles = array(
-		'discovery'    => __( 'Discovery', 'crawlbridge' ),
-		'presentation' => __( 'Presentation', 'crawlbridge' ),
-		'declarations' => __( 'Declarations', 'crawlbridge' ),
+		'discovery'    => __( 'Discovery', 'aj-agent-crawl-optimizer' ),
+		'presentation' => __( 'Presentation', 'aj-agent-crawl-optimizer' ),
+		'declarations' => __( 'Declarations', 'aj-agent-crawl-optimizer' ),
 	);
 
 	$current_section = '';
 	?>
-	<div class="wrap crawlbridge-wizard-wrap">
-		<h1><?php esc_html_e( 'Welcome to Crawlbridge', 'crawlbridge' ); ?></h1>
+	<div class="wrap ajaco-wizard-wrap">
+		<h1><?php esc_html_e( 'Welcome to AJ Agent Crawl Optimizer', 'aj-agent-crawl-optimizer' ); ?></h1>
 
-		<div class="crawlbridge-wizard">
-			<p class="crawlbridge-wizard-intro">
-				<?php esc_html_e( 'One-time setup. The toggles below are pre-selected based on your environment — review, adjust, then apply. You can change anything later from the regular settings page.', 'crawlbridge' ); ?>
+		<div class="ajaco-wizard">
+			<p class="ajaco-wizard-intro">
+				<?php esc_html_e( 'One-time setup. The toggles below are pre-selected based on your environment — review, adjust, then apply. You can change anything later from the regular settings page.', 'aj-agent-crawl-optimizer' ); ?>
 			</p>
 
 			<?php if ( $seo_plugin !== null ) : ?>
@@ -175,7 +175,7 @@ function render_wizard(): void {
 						<?php
 						printf(
 							/* translators: %s: detected SEO plugin name. */
-							esc_html__( 'Detected %s — JSON-LD Schema is unchecked below to avoid duplicate structured data. Our schema auto-suppresses anyway when an SEO plugin is active.', 'crawlbridge' ),
+							esc_html__( 'Detected %s — JSON-LD Schema is unchecked below to avoid duplicate structured data. Our schema auto-suppresses anyway when an SEO plugin is active.', 'aj-agent-crawl-optimizer' ),
 							'<strong>' . esc_html( $seo_plugin ) . '</strong>'
 						);
 						?>
@@ -184,33 +184,33 @@ function render_wizard(): void {
 			<?php endif; ?>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="crawlbridge_apply_wizard" />
-				<?php wp_nonce_field( 'crawlbridge_apply_wizard' ); ?>
+				<input type="hidden" name="action" value="ajaco_apply_wizard" />
+				<?php wp_nonce_field( 'ajaco_apply_wizard' ); ?>
 
 				<?php foreach ( $rows as $row ) : ?>
 					<?php
 					list( $section, $label, $option, $description ) = $row;
 					if ( $section !== $current_section ) {
 						$current_section = $section;
-						echo '<h2 class="crawlbridge-wizard-section">' . esc_html( $section_titles[ $section ] ) . '</h2>';
+						echo '<h2 class="ajaco-wizard-section">' . esc_html( $section_titles[ $section ] ) . '</h2>';
 					}
 					$checked = ! empty( $rec[ $option ] );
 					?>
-					<label class="crawlbridge-wizard-row">
+					<label class="ajaco-wizard-row">
 						<input type="checkbox" name="<?php echo esc_attr( $option ); ?>" value="1" <?php checked( $checked ); ?> />
-						<span class="crawlbridge-wizard-label">
+						<span class="ajaco-wizard-label">
 							<strong><?php echo esc_html( $label ); ?></strong>
-							<span class="crawlbridge-wizard-description"><?php echo esc_html( $description ); ?></span>
+							<span class="ajaco-wizard-description"><?php echo esc_html( $description ); ?></span>
 						</span>
 					</label>
 				<?php endforeach; ?>
 
-				<p class="crawlbridge-wizard-actions">
-					<button type="submit" name="crawlbridge_wizard_action" value="apply" class="button button-primary button-large">
-						<?php esc_html_e( 'Apply Recommended Settings', 'crawlbridge' ); ?>
+				<p class="ajaco-wizard-actions">
+					<button type="submit" name="ajaco_wizard_action" value="apply" class="button button-primary button-large">
+						<?php esc_html_e( 'Apply Recommended Settings', 'aj-agent-crawl-optimizer' ); ?>
 					</button>
 					<a href="<?php echo esc_url( $skip_url ); ?>" class="button button-large">
-						<?php esc_html_e( 'Skip — Configure Manually', 'crawlbridge' ); ?>
+						<?php esc_html_e( 'Skip — Configure Manually', 'aj-agent-crawl-optimizer' ); ?>
 					</a>
 				</p>
 			</form>

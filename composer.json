@@ -1,7 +1,7 @@
 {
-    "name": "ajmaurya99/crawlbridge",
+    "name": "ajmaurya99/aj-agent-crawl-optimizer",
     "description": "Make your WordPress site discoverable to AI agents and crawlers.",
-    "homepage": "https://github.com/ajmaurya99/crawlbridge",
+    "homepage": "https://github.com/ajmaurya99/aj-agent-crawl-optimizer",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -23,7 +23,7 @@
     "scripts": {
         "lint": "phpcs --standard=WordPress --extensions=php --ignore=vendor/ .",
         "lint:fix": "phpcbf --standard=WordPress --extensions=php --ignore=vendor/ .",
-        "make-pot": "wp i18n make-pot . languages/crawlbridge.pot --skip-plugins --skip-themes --slug=crawlbridge --domain=crawlbridge"
+        "make-pot": "wp i18n make-pot . languages/aj-agent-crawl-optimizer.pot --skip-plugins --skip-themes --slug=aj-agent-crawl-optimizer --domain=aj-agent-crawl-optimizer"
     },
     "config": {
         "allow-plugins": {

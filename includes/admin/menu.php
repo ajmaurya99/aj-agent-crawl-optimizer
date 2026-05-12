@@ -1,11 +1,11 @@
 <?php
 /**
- * Admin: register the settings page under Settings → Crawlbridge.
+ * Admin: register the settings page under Settings → AJ Agent Crawl Optimizer.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -14,16 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu' );
 
 /**
- * Add the Crawlbridge submenu under Settings.
+ * Add the AJ Agent Crawl Optimizer submenu under Settings.
  *
  * @return void
  */
 function add_admin_menu(): void {
 	add_options_page(
-		__( 'Crawlbridge', 'crawlbridge' ),
-		__( 'Crawlbridge', 'crawlbridge' ),
+		__( 'AJ Agent Crawl Optimizer', 'aj-agent-crawl-optimizer' ),
+		__( 'AJ Agent Crawl Optimizer', 'aj-agent-crawl-optimizer' ),
 		required_capability(),
-		'crawlbridge',
+		'aj-agent-crawl-optimizer',
 		__NAMESPACE__ . '\\render_settings_page'
 	);
 }

@@ -2,10 +2,10 @@
 /**
  * Shared helpers used across feature handlers.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return bool
  */
 function is_feature_enabled( string $feature ): bool {
-	return (bool) get_option( 'crawlbridge_' . $feature . '_enabled', false );
+	return (bool) get_option( 'ajaco_' . $feature . '_enabled', false );
 }
 
 /**
- * Capability required to manage Crawlbridge settings.
+ * Capability required to manage AJ Agent Crawl Optimizer settings.
  *
- * Filterable via `crawlbridge_required_capability` so site admins can delegate
+ * Filterable via `ajaco_required_capability` so site admins can delegate
  * access (e.g. give SEO managers control without granting full `manage_options`).
  * The filter must return a non-empty string capability; invalid returns fall
  * back to `manage_options`.
@@ -33,11 +33,11 @@ function is_feature_enabled( string $feature ): bool {
  */
 function required_capability(): string {
 	/**
-	 * Filter the capability required to view and modify Crawlbridge settings.
+	 * Filter the capability required to view and modify AJ Agent Crawl Optimizer settings.
 	 *
 	 * @param string $capability Default `manage_options`.
 	 */
-	$cap = apply_filters( 'crawlbridge_required_capability', 'manage_options' );
+	$cap = apply_filters( 'ajaco_required_capability', 'manage_options' );
 	return is_string( $cap ) && $cap !== '' ? $cap : 'manage_options';
 }
 
@@ -78,7 +78,7 @@ function request_path_is( string $expected ): bool {
  * data).
  *
  * Detection is cached for the request. Site owners can extend or override
- * detection via the `crawlbridge_active_seo_plugin` filter — return a plugin
+ * detection via the `ajaco_active_seo_plugin` filter — return a plugin
  * display name to force-suppress, or `false` to force our schema on.
  *
  * @return string|null Display name of the active SEO plugin, or null if none.
@@ -121,7 +121,7 @@ function active_seo_plugin(): ?string {
 	 *
 	 * @param string|null $detected Plugin display name, or null if none found.
 	 */
-	$detected = apply_filters( 'crawlbridge_active_seo_plugin', $detected );
+	$detected = apply_filters( 'ajaco_active_seo_plugin', $detected );
 	if ( $detected === false || ! is_string( $detected ) ) {
 		$detected = null;
 	}

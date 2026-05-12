@@ -7,16 +7,16 @@
  * `rest_endpoints` to honor `show_in_index`), so plugin-registered REST
  * routes appear automatically.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
-namespace Crawlbridge;
+namespace Ajaco;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const OPENAPI_CACHE_KEY = 'crawlbridge_openapi_cache';
+const OPENAPI_CACHE_KEY = 'ajaco_openapi_cache';
 
 add_action( 'template_redirect', __NAMESPACE__ . '\\handle_openapi_request', 1 );
 
@@ -168,7 +168,7 @@ function build_openapi_document(): string {
 	 *
 	 * @param array $openapi
 	 */
-	$openapi = apply_filters( 'crawlbridge_openapi_spec', $openapi );
+	$openapi = apply_filters( 'ajaco_openapi_spec', $openapi );
 
 	return (string) wp_json_encode( $openapi, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 }

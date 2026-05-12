@@ -1,12 +1,12 @@
 <?php
 /**
- * Crawlbridge uninstall handler.
+ * AJ Agent Crawl Optimizer uninstall handler.
  *
  * Runs only when the plugin is uninstalled (deleted from the Plugins screen),
  * not on deactivation. Removes every option the plugin created so the database
  * is left clean.
  *
- * @package Crawlbridge
+ * @package Ajaco
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -14,25 +14,25 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 $options = array(
-	'crawlbridge_markdown_enabled',
-	'crawlbridge_content_signals_enabled',
-	'crawlbridge_api_catalog_enabled',
-	'crawlbridge_mcp_server_card_enabled',
-	'crawlbridge_agent_skills_index_enabled',
-	'crawlbridge_webmcp_enabled',
-	'crawlbridge_json_ld_enabled',
-	'crawlbridge_openapi_enabled',
-	'crawlbridge_indexnow_enabled',
-	'crawlbridge_llms_txt_enabled',
-	'crawlbridge_indexnow_key',
+	'ajaco_markdown_enabled',
+	'ajaco_content_signals_enabled',
+	'ajaco_api_catalog_enabled',
+	'ajaco_mcp_server_card_enabled',
+	'ajaco_agent_skills_index_enabled',
+	'ajaco_webmcp_enabled',
+	'ajaco_json_ld_enabled',
+	'ajaco_openapi_enabled',
+	'ajaco_indexnow_enabled',
+	'ajaco_llms_txt_enabled',
+	'ajaco_indexnow_key',
 );
 
 $transients = array(
-	'crawlbridge_reset_notice',
-	'crawlbridge_openapi_cache',
-	'crawlbridge_llms_txt_cache',
-	'crawlbridge_show_wizard',
-	'crawlbridge_wizard_applied',
+	'ajaco_reset_notice',
+	'ajaco_openapi_cache',
+	'ajaco_llms_txt_cache',
+	'ajaco_show_wizard',
+	'ajaco_wizard_applied',
 );
 
 if ( is_multisite() ) {

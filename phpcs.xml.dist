@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="Crawlbridge">
-    <description>Coding standards for the Crawlbridge plugin.</description>
+<ruleset name="AJ Agent Crawl Optimizer">
+    <description>Coding standards for the AJ Agent Crawl Optimizer plugin.</description>
 
     <!-- Files / dirs to scan -->
     <file>.</file>
@@ -23,7 +23,7 @@
     </rule>
 
     <!-- Plugin text domain -->
-    <config name="text_domain" value="crawlbridge"/>
+    <config name="text_domain" value="aj-agent-crawl-optimizer"/>
 
     <!-- Support PHP 7.4+ -->
     <config name="testVersion" value="7.4-"/>

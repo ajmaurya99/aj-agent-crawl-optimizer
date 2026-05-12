@@ -1,4 +1,4 @@
-=== Crawlbridge ===
+=== AJ Agent Crawl Optimizer ===
 Contributors:      ajmaurya
 Tags:              ai, mcp, openapi, structured-data, llms-txt
 Requires at least: 5.5
@@ -12,16 +12,16 @@ Make your WordPress site legible to AI agents — Markdown negotiation, JSON-LD,
 
 == Description ==
 
-**Crawlbridge** is a thin compatibility layer that teaches your site to speak the languages AI agents already use to discover and consume web content. It publishes machine-readable manifests at well-known URLs, serves clean Markdown when an AI requests it, and declares your AI-usage preferences — all without changing anything for human visitors.
+**AJ Agent Crawl Optimizer** is a thin compatibility layer that teaches your site to speak the languages AI agents already use to discover and consume web content. It publishes machine-readable manifests at well-known URLs, serves clean Markdown when an AI requests it, and declares your AI-usage preferences — all without changing anything for human visitors.
 
-Each capability is a separate toggle under **Settings → Crawlbridge** and ships **opt-in** (everything starts off). On first activation, a one-time **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data).
+Each capability is a separate toggle under **Settings → AJ Agent Crawl Optimizer** and ships **opt-in** (everything starts off). On first activation, a one-time **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data).
 
 = Discovery — help agents find what your site offers =
 
 * **API Catalog** (RFC 9727) — `/.well-known/api-catalog` linkset advertising your REST API, plus a `Link: rel="api-catalog"` header on every response so agents discover it from any URL.
 * **MCP Server Card** (SEP-1649 draft) — `/.well-known/mcp/server-card.json` describing the site to MCP-aware agents.
 * **Agent Skills Index** (RFC v0.2.0) — `/.well-known/agent-skills/index.json` listing six skills (search, posts, pages, media, categories, tags) plus per-skill `SKILL.md` artifacts with verifiable sha256 digests.
-* **llms.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other crawlbridge endpoint.
+* **llms.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other plugin endpoint.
 * **IndexNow** — non-blocking ping to Bing and Yandex on every post publish so search engines re-crawl within minutes.
 
 = Presentation — format content for agents =
@@ -48,32 +48,32 @@ Each capability is a separate toggle under **Settings → Crawlbridge** and ship
 
 The plugin exposes nine filter hooks for extension. Examples:
 
-`add_filter( 'crawlbridge_required_capability', function () { return 'edit_posts'; } );`
+`add_filter( 'ajaco_required_capability', function () { return 'edit_posts'; } );`
 Delegate plugin access to a non-admin role.
 
-`add_filter( 'crawlbridge_skill_definitions', function ( $skills ) { return $skills + [ 'products' => [ 'type' => 'information-retrieval', 'description' => 'WooCommerce products', 'endpoint' => rest_url( 'wc/v3/products' ) ] ]; } );`
+`add_filter( 'ajaco_skill_definitions', function ( $skills ) { return $skills + [ 'products' => [ 'type' => 'information-retrieval', 'description' => 'WooCommerce products', 'endpoint' => rest_url( 'wc/v3/products' ) ] ]; } );`
 Register custom skills that ship in the Agent Skills Index and are served as SKILL.md artifacts with verifiable sha256 digests.
 
-`add_filter( 'crawlbridge_content_signal', function () { return 'ai-train=yes, search=yes, ai-input=yes'; } );`
+`add_filter( 'ajaco_content_signal', function () { return 'ai-train=yes, search=yes, ai-input=yes'; } );`
 Customize the Content-Signal directive (e.g. permit AI training).
 
-Other hooks: `crawlbridge_api_catalog_linkset`, `crawlbridge_mcp_server_card`, `crawlbridge_json_ld_graph`, `crawlbridge_openapi_spec`, `crawlbridge_llms_txt_content`, `crawlbridge_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
+Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
 
 == Installation ==
 
 = From the WordPress plugin directory =
 
-1. In your WP admin, go to **Plugins → Add New** and search for "Crawlbridge".
+1. In your WP admin, go to **Plugins → Add New** and search for "AJ Agent Crawl Optimizer".
 2. Click **Install Now**, then **Activate**.
 3. The Quick Setup wizard runs automatically on first activation — review the recommended toggles and click **Apply**.
-4. Adjust any toggle later from **Settings → Crawlbridge**.
+4. Adjust any toggle later from **Settings → AJ Agent Crawl Optimizer**.
 
 = Manual install =
 
 1. Download the plugin zip.
-2. Upload the `crawlbridge` folder to `/wp-content/plugins/`.
-3. Activate **Crawlbridge** from the **Plugins** screen.
-4. Visit **Settings → Crawlbridge** and run the wizard or configure manually.
+2. Upload the `aj-agent-crawl-optimizer` folder to `/wp-content/plugins/`.
+3. Activate **AJ Agent Crawl Optimizer** from the **Plugins** screen.
+4. Visit **Settings → AJ Agent Crawl Optimizer** and run the wizard or configure manually.
 
 = IndexNow setup (optional) =
 
@@ -99,9 +99,9 @@ Yes. Every endpoint resolves at both the root and per-subsite paths automaticall
 
 = How do I delegate plugin access to a non-admin role? =
 
-Use the `crawlbridge_required_capability` filter. The plugin defaults to `manage_options` (admin-only); change it to any capability of your choice, e.g. `edit_pages` for editors:
+Use the `ajaco_required_capability` filter. The plugin defaults to `manage_options` (admin-only); change it to any capability of your choice, e.g. `edit_pages` for editors:
 
-`add_filter( 'crawlbridge_required_capability', function () { return 'edit_pages'; } );`
+`add_filter( 'ajaco_required_capability', function () { return 'edit_pages'; } );`
 
 = I enabled IndexNow but I'm not seeing pings to Bing or Yandex. =
 
@@ -111,12 +111,12 @@ Check three things: (1) the IndexNow API Key field is filled in, (2) you're publ
 
 Yes. Use the relevant filter:
 
-* `crawlbridge_skill_definitions` — register custom Agent Skills.
-* `crawlbridge_json_ld_graph` — add custom Schema.org entries (Product, Recipe, Event, etc.).
-* `crawlbridge_llms_txt_content` — append sections to or replace the llms.txt body.
-* `crawlbridge_openapi_spec` — add `securitySchemes`, custom tags, additional servers.
-* `crawlbridge_api_catalog_linkset` — add anchors or rels (e.g. for a GraphQL endpoint).
-* `crawlbridge_mcp_server_card` — override transport / capabilities for a real MCP implementation.
+* `ajaco_skill_definitions` — register custom Agent Skills.
+* `ajaco_json_ld_graph` — add custom Schema.org entries (Product, Recipe, Event, etc.).
+* `ajaco_llms_txt_content` — append sections to or replace the llms.txt body.
+* `ajaco_openapi_spec` — add `securitySchemes`, custom tags, additional servers.
+* `ajaco_api_catalog_linkset` — add anchors or rels (e.g. for a GraphQL endpoint).
+* `ajaco_mcp_server_card` — override transport / capabilities for a real MCP implementation.
 
 The Help tab's "For Developers" section on the settings page lists every hook.
 
@@ -130,7 +130,7 @@ Minimal. The OpenAPI document is cached for a day in a transient and only regene
 
 = How do I see if AI agents are actually using my site? =
 
-The plugin doesn't include a built-in access log. To verify activity, check your server access log for User-Agents like `GPTBot`, `ClaudeBot`, `OAI-SearchBot`, `Google-Extended`, `PerplexityBot`, `CCBot`, `Bytespider`, etc. hitting any of the crawlbridge endpoints.
+The plugin doesn't include a built-in access log. To verify activity, check your server access log for User-Agents like `GPTBot`, `ClaudeBot`, `OAI-SearchBot`, `Google-Extended`, `PerplexityBot`, `CCBot`, `Bytespider`, etc. hitting any of the plugin endpoints.
 
 = Can I disable a feature without deactivating the plugin? =
 
@@ -189,7 +189,7 @@ This service is provided by Microsoft (Bing) and the IndexNow project. Their ter
 
 == Privacy ==
 
-Crawlbridge stores data **only on your own server** — there is no telemetry, no analytics, and no third-party logging. Specifically:
+AJ Agent Crawl Optimizer stores data **only on your own server** — there is no telemetry, no analytics, and no third-party logging. Specifically:
 
 = Local data =
 

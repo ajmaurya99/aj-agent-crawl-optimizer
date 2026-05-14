@@ -184,8 +184,8 @@ This service is provided by Microsoft (Bing) and the IndexNow project. Their ter
 
 * IndexNow protocol documentation: https://www.indexnow.org/documentation
 * IndexNow FAQ and terms: https://www.indexnow.org/faq
-* Microsoft Bing Webmaster Tools terms of use: https://www.bing.com/webmasters/help/microsoft-bing-webmaster-terms-of-use-72df21d2
-* Microsoft Privacy Statement: https://privacy.microsoft.com/privacystatement
+* Microsoft Bing Webmaster Guidelines : https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a
+* Microsoft Privacy Statement: https://www.microsoft.com/en-us/privacy/privacystatement
 
 == Privacy ==
 

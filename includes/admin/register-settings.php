@@ -52,7 +52,7 @@ function register_settings(): void {
 		'ajaco_indexnow_key',
 		array(
 			'type'              => 'string',
-			'sanitize_callback' => __NAMESPACE__ . '\\sanitize_indexnow_key',
+			'sanitize_callback' => 'Ajaco\\sanitize_indexnow_key',
 			'default'           => '',
 		)
 	);

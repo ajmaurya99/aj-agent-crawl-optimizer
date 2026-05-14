@@ -350,5 +350,11 @@ function output_json_ld_schema(): void {
 	 */
 	$schema['@graph'] = apply_filters( 'ajaco_json_ld_graph', $schema['@graph'] );
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	// JSON-LD is embedded in an HTML <script> element. JSON_HEX_TAG escapes
+	// every angle bracket to its \u00XX form so user-controlled values (post
+	// titles, excerpts, author names, extracted FAQ text) cannot emit a literal
+	// `</script>` and break out of the block. JSON_UNESCAPED_SLASHES is kept so
+	// the many URLs in the graph stay readable.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG ) . '</script>' . "\n";
 }

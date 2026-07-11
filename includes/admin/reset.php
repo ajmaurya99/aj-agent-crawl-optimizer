@@ -48,6 +48,7 @@ function handle_reset_request(): void {
 		'ajaco_ai_bot_rules_enabled',
 		'ajaco_auth_md_enabled',
 		'ajaco_ai_bot_policy',
+		'ajaco_content_signal_prefs',
 		'ajaco_indexnow_key',
 		// The stored self-scan — reset must not leave a stale score behind.
 		'ajaco_last_scan',

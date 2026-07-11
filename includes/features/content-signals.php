@@ -27,6 +27,50 @@ add_filter( 'robots_txt', __NAMESPACE__ . '\\filter_robots_txt', PHP_INT_MAX, 2 
 add_action( 'init', __NAMESPACE__ . '\\handle_robots_request' );
 
 /**
+ * Effective Content-Signal preferences: stored option over conservative
+ * defaults, every value coerced to yes|no.
+ *
+ * @return array{ai_train: string, search: string, ai_input: string}
+ */
+function content_signal_prefs(): array {
+	$stored = get_option( 'ajaco_content_signal_prefs', array() );
+	if ( ! is_array( $stored ) ) {
+		$stored = array();
+	}
+
+	$defaults = array(
+		'ai_train' => 'no',
+		'search'   => 'yes',
+		'ai_input' => 'no',
+	);
+
+	$prefs = array();
+	foreach ( $defaults as $key => $default ) {
+		$value         = isset( $stored[ $key ] ) ? $stored[ $key ] : $default;
+		$prefs[ $key ] = ( 'yes' === $value ) ? 'yes' : 'no';
+	}
+	return $prefs;
+}
+
+/**
+ * Sanitize the `ajaco_content_signal_prefs` option: known keys, yes|no values.
+ *
+ * @param mixed $value Raw option value.
+ * @return array{ai_train: string, search: string, ai_input: string}
+ */
+function sanitize_content_signal_prefs( $value ): array {
+	if ( ! is_array( $value ) ) {
+		$value = array();
+	}
+
+	$clean = array();
+	foreach ( array( 'ai_train', 'search', 'ai_input' ) as $key ) {
+		$clean[ $key ] = ( isset( $value[ $key ] ) && 'yes' === $value[ $key ] ) ? 'yes' : 'no';
+	}
+	return $clean;
+}
+
+/**
  * Append `Content-Signal` to the robots.txt output.
  *
  * @param string $output    The robots.txt content WP is about to serve.
@@ -39,18 +83,20 @@ function filter_robots_txt( string $output, $is_public ): string {
 		return $output;
 	}
 
+	$prefs   = content_signal_prefs();
+	$default = sprintf( 'ai-train=%s, search=%s, ai-input=%s', $prefs['ai_train'], $prefs['search'], $prefs['ai_input'] );
+
 	/**
 	 * Filter the Content-Signal directive value.
 	 *
-	 * Default declares the conservative `ai-train=no, search=yes, ai-input=no`
-	 * stance. Sites that want to allow AI training can return e.g.
-	 * `ai-train=yes, search=yes, ai-input=yes`. Return value should be the
-	 * directive value only — the `Content-Signal:` prefix and trailing newline
-	 * are added by the plugin.
+	 * The default is built from the Content-Signal preferences configured on
+	 * the settings page (falling back to `ai-train=no, search=yes,
+	 * ai-input=no`). Return value should be the directive value only — the
+	 * `Content-Signal:` prefix and trailing newline are added by the plugin.
 	 *
-	 * @param string $directive Default `ai-train=no, search=yes, ai-input=no`.
+	 * @param string $directive Directive value from the stored preferences.
 	 */
-	$directive = (string) apply_filters( 'ajaco_content_signal', 'ai-train=no, search=yes, ai-input=no' );
+	$directive = (string) apply_filters( 'ajaco_content_signal', $default );
 
 	// Emit the directive inside an explicit `User-agent: *` group. Appending a
 	// bare Content-Signal line after other plugins' output would attach it to

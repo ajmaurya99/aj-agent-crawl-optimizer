@@ -186,7 +186,7 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * NEW: /auth.md — agent authentication documentation for Application Passwords.
 * NEW: /llms-full.txt — full recent content as Markdown alongside /llms.txt; password-protected content excluded from all agent-facing endpoints.
 * NEW: Hosting diagnosis — when a feature is enabled but the server blocks its endpoint (nginx dot-path 403s, static-file 404s), the scan flags it and the Dashboard offers copy-paste nginx/Apache fixes.
-* Settings page moved under Agent Ready → Settings (URLs, help tabs, and reset flow updated accordingly).
+* Settings page moved under Agent Ready → Settings and streamlined: the toggle-count score card is replaced by the scan-verified Level banner (one source of truth with the Dashboard), a per-bot AI crawler policy table with presets ("Allow search & user requests, block training"), Content-Signal yes/no selectors, inline dependency warnings (keyless IndexNow, catalog without OpenAPI), and the curl Testing/Details sections replaced by a pointer to the scanner plus external validators.
 * New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_commerce_signals, ajaco_scan_sslverify.
 
 = 1.0.1 =

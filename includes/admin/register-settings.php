@@ -59,9 +59,27 @@ function register_settings(): void {
 		)
 	);
 
-	// NOTE: ajaco_ai_bot_policy (per-bot allow|block map) is deliberately NOT
-	// registered in the `ajaco_settings` group — the settings form renders no
-	// field for it, and options.php force-updates every registered option of a
-	// submitted group, which would wipe the stored policy on every Save.
-	// Writes to it are sanitized at the write sites via sanitize_ai_bot_policy().
+	// Array options in the `ajaco_settings` group are safe to register ONLY
+	// because the settings page ALWAYS renders their fields (options.php
+	// force-updates every registered option of a submitted group — an option
+	// without form fields would be wiped on each Save).
+	register_setting(
+		'ajaco_settings',
+		'ajaco_ai_bot_policy',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'Ajaco\\sanitize_ai_bot_policy',
+			'default'           => array(),
+		)
+	);
+
+	register_setting(
+		'ajaco_settings',
+		'ajaco_content_signal_prefs',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'Ajaco\\sanitize_content_signal_prefs',
+			'default'           => array(),
+		)
+	);
 }

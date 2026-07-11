@@ -27,6 +27,7 @@ $options = array(
 	'ajaco_ai_bot_rules_enabled',
 	'ajaco_auth_md_enabled',
 	'ajaco_ai_bot_policy',
+	'ajaco_content_signal_prefs',
 	'ajaco_indexnow_key',
 	// Wizard state (persistent options since 1.0.1).
 	'ajaco_show_wizard',

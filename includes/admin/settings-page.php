@@ -1,13 +1,21 @@
 <?php
 /**
- * Admin: render the AJ Agent Crawl Optimizer settings page.
+ * Admin: render the Agent Ready settings page.
  *
- * Score card → form → Testing → Details.
+ * Structure: readiness banner (real scan Level, not a toggle count) → feature
+ * toggles (Discovery / Presentation / Declarations, with per-bot AI crawler
+ * policy and Content-Signal preferences) → verification pointer → danger zone.
+ *
+ * Verification lives on the Dashboard — this page only configures what the
+ * plugin publishes. One source of truth: the only score shown here is the
+ * scan-verified Level.
  *
  * @package Ajaco
  */
 
 namespace Ajaco;
+
+use Ajaco\Scan\Scanner;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -42,109 +50,14 @@ function render_settings_page(): void {
 	$llms_txt_enabled           = (bool) get_option( 'ajaco_llms_txt_enabled', false );
 	$ai_bot_rules_enabled       = (bool) get_option( 'ajaco_ai_bot_rules_enabled', false );
 	$auth_md_enabled            = (bool) get_option( 'ajaco_auth_md_enabled', false );
-
-	// Calculate AJ Agent Crawl Optimizer score.
-	$features       = array(
-		'markdown'        => $markdown_enabled,
-		'content_signals' => $content_signals_enabled,
-		'api_catalog'     => $api_catalog_enabled,
-		'mcp_card'        => $mcp_server_card_enabled,
-		'skills_index'    => $agent_skills_index_enabled,
-		'webmcp'          => $webmcp_enabled,
-		'json_ld'         => $json_ld_enabled,
-		'openapi'         => $openapi_enabled,
-		'llms_txt'        => $llms_txt_enabled,
-		'indexnow'        => $indexnow_enabled,
-		'ai_bot_rules'    => $ai_bot_rules_enabled,
-		'auth_md'         => $auth_md_enabled,
-	);
-	$enabled_count  = count( array_filter( $features ) );
-	$total_features = count( $features );
-	$score          = (int) round( ( $enabled_count / $total_features ) * 100 );
-
-	if ( $score >= 80 ) {
-		$score_label = __( 'Excellent', 'aj-agent-crawl-optimizer' );
-		$score_color = '#00a32a';
-	} elseif ( $score >= 60 ) {
-		$score_label = __( 'Good', 'aj-agent-crawl-optimizer' );
-		$score_color = '#2271b1';
-	} elseif ( $score >= 40 ) {
-		$score_label = __( 'Needs Work', 'aj-agent-crawl-optimizer' );
-		$score_color = '#dba617';
-	} else {
-		$score_label = __( 'Poor', 'aj-agent-crawl-optimizer' );
-		$score_color = '#d63638';
-	}
-	$score_aria_label = sprintf(
-		/* translators: 1: numeric score 0-100. 2: qualitative label e.g. "Excellent". */
-		__( 'AJ Agent Crawl Optimizer score: %1$d out of 100, %2$s.', 'aj-agent-crawl-optimizer' ),
-		$score,
-		$score_label
-	);
 	?>
 	<div class="wrap">
-		<h1 class="ajaco-screen-reader-text"><?php esc_html_e( 'AJ Agent Crawl Optimizer Settings', 'aj-agent-crawl-optimizer' ); ?></h1>
+		<h1 class="ajaco-screen-reader-text"><?php esc_html_e( 'Agent Ready Settings', 'aj-agent-crawl-optimizer' ); ?></h1>
 
-		<div class="ajaco-score-card">
-			<div class="ajaco-score-circle">
-				<svg width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="<?php echo esc_attr( $score_aria_label ); ?>">
-					<circle class="score-bg" cx="50" cy="50" r="40" />
-					<circle
-						class="score-progress"
-						cx="50"
-						cy="50"
-						r="40"
-						style="stroke: <?php echo esc_attr( $score_color ); ?>; stroke-dashoffset: <?php echo (int) ( 251.2 - ( 251.2 * $score / 100 ) ); ?>;"
-					/>
-				</svg>
-				<div class="ajaco-score-value">
-					<span class="number"><?php echo esc_html( $score ); ?></span>
-					<span class="label"><?php esc_html_e( 'Score', 'aj-agent-crawl-optimizer' ); ?></span>
-				</div>
-			</div>
-			<div class="ajaco-score-info">
-				<h2><?php echo esc_html( $score_label ); ?></h2>
-				<p>
-				<?php
-				echo esc_html(
-					sprintf(
-					/* translators: 1: enabled count. 2: total features. */
-						__( '%1$d of %2$d AJ Agent Crawl Optimizer features enabled', 'aj-agent-crawl-optimizer' ),
-						$enabled_count,
-						$total_features
-					)
-				);
-				?>
-				</p>
-				<div class="ajaco-features-summary">
-					<?php
-					foreach ( $features as $key => $enabled ) :
-						$labels = array(
-							'markdown'        => __( 'Markdown', 'aj-agent-crawl-optimizer' ),
-							'content_signals' => __( 'Content-Signals', 'aj-agent-crawl-optimizer' ),
-							'api_catalog'     => __( 'API Catalog', 'aj-agent-crawl-optimizer' ),
-							'mcp_card'        => __( 'MCP Card', 'aj-agent-crawl-optimizer' ),
-							'skills_index'    => __( 'Skills Index', 'aj-agent-crawl-optimizer' ),
-							'webmcp'          => __( 'WebMCP', 'aj-agent-crawl-optimizer' ),
-							'json_ld'         => __( 'JSON-LD', 'aj-agent-crawl-optimizer' ),
-							'openapi'         => __( 'OpenAPI', 'aj-agent-crawl-optimizer' ),
-							'llms_txt'        => __( 'llms.txt', 'aj-agent-crawl-optimizer' ),
-							'indexnow'        => __( 'IndexNow', 'aj-agent-crawl-optimizer' ),
-							'ai_bot_rules'    => __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ),
-							'auth_md'         => __( 'auth.md', 'aj-agent-crawl-optimizer' ),
-						);
-						?>
-						<span class="ajaco-feature-badge">
-							<span class="dot <?php echo $enabled ? 'enabled' : 'disabled'; ?>"></span>
-							<?php echo esc_html( $labels[ $key ] ); ?>
-						</span>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</div>
+		<?php render_settings_level_banner(); ?>
 
 		<p>
-			<?php esc_html_e( 'AJ Agent Crawl Optimizer improves your site\'s compatibility with AI agents and crawlers.', 'aj-agent-crawl-optimizer' ); ?>
+			<?php esc_html_e( 'These toggles control what the plugin publishes for AI agents. Whether it actually works on your site is verified by the scanner on the Dashboard.', 'aj-agent-crawl-optimizer' ); ?>
 		</p>
 
 		<form method="post" action="options.php">
@@ -160,7 +73,11 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_api_catalog_enabled" name="ajaco_api_catalog_enabled" value="1" <?php checked( $api_catalog_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish an API catalog at /.well-known/api-catalog for automated API discovery (RFC 9727). Also emits a Link header advertising the catalog on every response.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-api-catalog"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php if ( $api_catalog_enabled && ! $openapi_enabled ) : ?>
+							<p class="description ajaco-hint">
+								<?php esc_html_e( 'OpenAPI Spec is off, so the catalog is published without a service-desc link. Enable OpenAPI below for a complete catalog.', 'aj-agent-crawl-optimizer' ); ?>
+							</p>
+						<?php endif; ?>
 					</td>
 				</tr>
 				<tr>
@@ -170,7 +87,6 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_mcp_server_card_enabled" name="ajaco_mcp_server_card_enabled" value="1" <?php checked( $mcp_server_card_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish MCP Server Card at /.well-known/mcp/server-card.json for AI agent tool discovery.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-mcp-server-card"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -180,7 +96,6 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_agent_skills_index_enabled" name="ajaco_agent_skills_index_enabled" value="1" <?php checked( $agent_skills_index_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish Agent Skills Index at /.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-agent-skills-index"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -197,9 +112,8 @@ function render_settings_page(): void {
 					<td>
 						<label for="ajaco_llms_txt_enabled">
 							<input type="checkbox" id="ajaco_llms_txt_enabled" name="ajaco_llms_txt_enabled" value="1" <?php checked( $llms_txt_enabled, true ); ?> />
-							<?php esc_html_e( 'Publish a curated, LLM-readable index of the site at /llms.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ); ?>
+							<?php esc_html_e( 'Publish a curated, LLM-readable index at /llms.txt plus full recent content at /llms-full.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-llms-txt"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -209,8 +123,12 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_indexnow_enabled" name="ajaco_indexnow_enabled" value="1" <?php checked( $indexnow_enabled, true ); ?> />
 							<?php esc_html_e( 'Ping Bing and Yandex instantly when content is published or updated via IndexNow.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-indexnow"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
-						<p class="description" style="color: #d63638; margin-top: 5px;">
+						<?php if ( $indexnow_enabled && '' === trim( $indexnow_key ) ) : ?>
+							<p class="description ajaco-warn">
+								<?php esc_html_e( 'IndexNow is enabled but no API key is set below — no pings are being sent.', 'aj-agent-crawl-optimizer' ); ?>
+							</p>
+						<?php endif; ?>
+						<p class="description ajaco-warn">
 							<?php esc_html_e( 'Recommended for production only — do not enable on local or staging environments.', 'aj-agent-crawl-optimizer' ); ?>
 						</p>
 					</td>
@@ -254,7 +172,6 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_markdown_enabled" name="ajaco_markdown_enabled" value="1" <?php checked( $markdown_enabled, true ); ?> />
 							<?php esc_html_e( 'Serve clean Markdown content when AI agents request it via Accept header.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-markdown"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -264,12 +181,11 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_json_ld_enabled" name="ajaco_json_ld_enabled" value="1" <?php checked( $json_ld_enabled, true ); ?> />
 							<?php esc_html_e( 'Add Schema.org structured data (WebSite, Organization, Article, BreadcrumbList, FAQPage) for better content understanding by LLMs.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-json-ld"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php
 						$active_seo = active_seo_plugin();
 						if ( null !== $active_seo ) :
 							?>
-							<p class="description" style="color: #d63638; margin-top: 5px;">
+							<p class="description ajaco-warn">
 								<?php
 								printf(
 									/* translators: %s: SEO plugin display name. */
@@ -288,7 +204,6 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_openapi_enabled" name="ajaco_openapi_enabled" value="1" <?php checked( $openapi_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish OpenAPI 3.0 specification at /openapi.json for API documentation.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-openapi"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -298,7 +213,6 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_webmcp_enabled" name="ajaco_webmcp_enabled" value="1" <?php checked( $webmcp_enabled, true ); ?> />
 							<?php esc_html_e( 'Expose site tools to AI agents via WebMCP browser API (Chrome experimental).', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-webmcp"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 			</table>
@@ -311,8 +225,9 @@ function render_settings_page(): void {
 					<td>
 						<label for="ajaco_ai_bot_rules_enabled">
 							<input type="checkbox" id="ajaco_ai_bot_rules_enabled" name="ajaco_ai_bot_rules_enabled" value="1" <?php checked( $ai_bot_rules_enabled, true ); ?> />
-							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for (GPTBot, Claude-Web, PerplexityBot, …). Per-bot allow/block policy is filterable via ajaco_ai_bot_policy.', 'aj-agent-crawl-optimizer' ); ?>
+							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for, using the per-bot policy below.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<?php render_ai_bot_policy_table(); ?>
 					</td>
 				</tr>
 				<tr>
@@ -320,9 +235,9 @@ function render_settings_page(): void {
 					<td>
 						<label for="ajaco_content_signals_enabled">
 							<input type="checkbox" id="ajaco_content_signals_enabled" name="ajaco_content_signals_enabled" value="1" <?php checked( $content_signals_enabled, true ); ?> />
-							<?php esc_html_e( 'Add Content-Signals directives to robots.txt declaring AI usage preferences.', 'aj-agent-crawl-optimizer' ); ?>
+							<?php esc_html_e( 'Add a Content-Signal directive to robots.txt declaring AI usage preferences.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
-						<a class="ajaco-read-more" href="#detail-content-signals"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_content_signal_fields(); ?>
 					</td>
 				</tr>
 			</table>
@@ -330,370 +245,161 @@ function render_settings_page(): void {
 			<?php submit_button(); ?>
 		</form>
 
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="ajaco-reset-form" onsubmit="return confirm('<?php echo esc_js( __( 'Reset all AJ Agent Crawl Optimizer settings to defaults? This will turn every feature off and clear the IndexNow API key.', 'aj-agent-crawl-optimizer' ) ); ?>');">
-			<input type="hidden" name="action" value="ajaco_reset" />
-			<?php wp_nonce_field( 'ajaco_reset' ); ?>
-			<p class="description"><?php esc_html_e( 'Restores every toggle to off and clears the IndexNow API key. Cached endpoint outputs are also cleared.', 'aj-agent-crawl-optimizer' ); ?></p>
-			<?php submit_button( __( 'Reset to Defaults', 'aj-agent-crawl-optimizer' ), 'secondary delete', 'ajaco-reset-submit', false ); ?>
-		</form>
+		<hr />
 
+		<h2><?php esc_html_e( 'Verification', 'aj-agent-crawl-optimizer' ); ?></h2>
+		<p class="description">
+			<?php esc_html_e( 'Don’t trust the toggles — verify. The Dashboard scans your live site over real HTTP (catching caches, CDNs, and server rules) and shows evidence for every check.', 'aj-agent-crawl-optimizer' ); ?>
+		</p>
+		<p>
+			<a class="button button-primary" href="<?php echo esc_url( dashboard_page_url() ); ?>"><?php esc_html_e( 'Run a scan on the Dashboard', 'aj-agent-crawl-optimizer' ); ?></a>
+		</p>
+		<p class="description">
+			<?php esc_html_e( 'External validators:', 'aj-agent-crawl-optimizer' ); ?>
+			<a href="<?php echo esc_url( 'https://search.google.com/test/rich-results?url=' . rawurlencode( home_url( '/' ) ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Google Rich Results Test', 'aj-agent-crawl-optimizer' ); ?></a>
+			·
+			<a href="<?php echo esc_url( 'https://editor.swagger.io/?url=' . rawurlencode( home_url( '/openapi.json' ) ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Swagger Editor (OpenAPI)', 'aj-agent-crawl-optimizer' ); ?></a>
+			·
+			<a href="https://isitagentready.com/" target="_blank" rel="noopener"><?php esc_html_e( 'isitagentready.com', 'aj-agent-crawl-optimizer' ); ?></a>
+		</p>
+
+		<hr />
+
+		<h2><?php esc_html_e( 'Setup & reset', 'aj-agent-crawl-optimizer' ); ?></h2>
 		<p>
 			<a href="<?php echo esc_url( add_query_arg( 'ajaco-wizard', '1', settings_page_url() ) ); ?>">
 				<?php esc_html_e( 'Run the setup wizard again', 'aj-agent-crawl-optimizer' ); ?>
 			</a>
 		</p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="ajaco-reset-form" onsubmit="return confirm('<?php echo esc_js( __( 'Reset all Agent Ready settings to defaults? This turns every feature off, clears the IndexNow API key and bot policy, and deletes the stored scan.', 'aj-agent-crawl-optimizer' ) ); ?>');">
+			<input type="hidden" name="action" value="ajaco_reset" />
+			<?php wp_nonce_field( 'ajaco_reset' ); ?>
+			<p class="description"><?php esc_html_e( 'Restores every toggle to off, clears the IndexNow API key and per-bot policy, deletes the stored scan result, and flushes cached endpoint outputs.', 'aj-agent-crawl-optimizer' ); ?></p>
+			<?php submit_button( __( 'Reset to Defaults', 'aj-agent-crawl-optimizer' ), 'secondary delete', 'ajaco-reset-submit', false ); ?>
+		</form>
+	</div>
+	<?php
+}
 
-		<hr />
+/**
+ * Readiness banner: the scan-verified Level (the only score this page shows),
+ * or a run-your-first-scan prompt. One source of truth with the Dashboard.
+ *
+ * @return void
+ */
+function render_settings_level_banner(): void {
+	$scan   = Scanner::get_last_scan();
+	$colors = array( '#d63638', '#d97706', '#dba617', '#2271b1', '#00a32a', '#008a20' );
+	?>
+	<div class="ajaco-level-banner">
+		<?php if ( is_array( $scan ) && isset( $scan['level'], $scan['levelName'] ) ) : ?>
+			<?php $level = (int) $scan['level']; ?>
+			<span class="ajaco-level-pill" style="background: <?php echo esc_attr( isset( $colors[ $level ] ) ? $colors[ $level ] : '#8c8f94' ); ?>;">
+				<?php
+				/* translators: %d: readiness level 0-5. */
+				printf( esc_html__( 'Level %d', 'aj-agent-crawl-optimizer' ), (int) $level );
+				?>
+			</span>
+			<span class="ajaco-level-name"><?php echo esc_html( $scan['levelName'] ); ?></span>
+			<span class="ajaco-level-meta">
+				<?php
+				printf(
+					/* translators: %s: date/time of the last scan. */
+					esc_html__( 'Last verified by scan: %s', 'aj-agent-crawl-optimizer' ),
+					esc_html( isset( $scan['scannedAt'] ) ? gmdate( 'M j, Y H:i', strtotime( (string) $scan['scannedAt'] ) ) . ' UTC' : '' )
+				);
+				?>
+			</span>
+			<a class="button button-small" href="<?php echo esc_url( dashboard_page_url() ); ?>"><?php esc_html_e( 'Open Dashboard', 'aj-agent-crawl-optimizer' ); ?></a>
+		<?php else : ?>
+			<span class="ajaco-level-name"><?php esc_html_e( 'No scan yet — your real agent-readiness Level is measured on the Dashboard, not by counting toggles.', 'aj-agent-crawl-optimizer' ); ?></span>
+			<a class="button button-primary button-small" href="<?php echo esc_url( dashboard_page_url() ); ?>"><?php esc_html_e( 'Run your first scan', 'aj-agent-crawl-optimizer' ); ?></a>
+		<?php endif; ?>
+	</div>
+	<?php
+}
 
-		<h2><?php esc_html_e( 'Testing', 'aj-agent-crawl-optimizer' ); ?></h2>
-		<p class="description" style="margin-bottom: 15px;">
-			<?php esc_html_e( 'One-click curl commands grouped by section.', 'aj-agent-crawl-optimizer' ); ?>
+/**
+ * Per-bot AI crawler policy table with preset buttons. Fields are ALWAYS
+ * rendered (whether or not the feature is enabled) so a settings save never
+ * loses the stored policy — options.php updates every registered option in
+ * the submitted group.
+ *
+ * @return void
+ */
+function render_ai_bot_policy_table(): void {
+	$bots   = ai_bot_list();
+	$policy = ai_bot_policy();
+
+	$purpose_labels = array(
+		'training'    => __( 'Training', 'aj-agent-crawl-optimizer' ),
+		'search'      => __( 'AI search', 'aj-agent-crawl-optimizer' ),
+		'user-action' => __( 'User requests', 'aj-agent-crawl-optimizer' ),
+	);
+	?>
+	<div class="ajaco-bot-policy">
+		<p class="description">
+			<?php esc_html_e( 'Per-crawler policy (applies when the toggle above is on). Purpose: Training = model training crawls; AI search = answer-engine indexing; User requests = fetches made for a live user.', 'aj-agent-crawl-optimizer' ); ?>
 		</p>
-
-		<h3 class="ajaco-test-section"><?php esc_html_e( 'Discovery', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'API Catalog', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check API catalog for automated discovery:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-api-catalog">curl <?php echo esc_url( home_url( '/.well-known/api-catalog' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-api-catalog"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/.well-known/api-catalog' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'API Catalog Link Header', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Confirm every page advertises the catalog via a Link header (RFC 9727 §3):', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-link-header">curl -sI <?php echo esc_url( home_url( '/' ) ); ?> | grep -i '^link:'</code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-link-header"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-note"><?php esc_html_e( 'Requires the API Catalog toggle above to be enabled.', 'aj-agent-crawl-optimizer' ); ?></p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'MCP Server Card', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check MCP Server Card for AI agent tool discovery:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-mcp">curl <?php echo esc_url( home_url( '/.well-known/mcp/server-card.json' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-mcp"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/.well-known/mcp/server-card.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check Agent Skills Index for skill discovery:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-skills">curl <?php echo esc_url( home_url( '/.well-known/agent-skills/index.json' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-skills"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/.well-known/agent-skills/index.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'llms.txt', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Fetch the LLM-readable site index:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-llms-txt">curl <?php echo esc_url( home_url( '/llms.txt' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-llms-txt"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'IndexNow', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'IndexNow pings Bing and Yandex when content changes. Test by publishing or updating a post — check your server logs for requests to api.indexnow.org.', 'aj-agent-crawl-optimizer' ); ?></p>
-			<p class="ajaco-validate">
-				<a href="https://www.bing.com/webmasters/" target="_blank" rel="noopener"><?php esc_html_e( 'Open Bing Webmaster Tools', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<h3 class="ajaco-test-section"><?php esc_html_e( 'Presentation', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Test the Markdown negotiation feature:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-markdown">curl -H "Accept: text/markdown" <?php echo esc_url( home_url( '/' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-markdown"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check for JSON-LD structured data in page source:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-jsonld">curl <?php echo esc_url( home_url( '/' ) ); ?> | grep "application/ld+json"</code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-jsonld"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="https://search.google.com/test/rich-results?url=<?php echo rawurlencode( home_url( '/' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open in Google Rich Results Test', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check OpenAPI specification:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-openapi">curl "<?php echo esc_url( home_url( '/openapi.json' ) ); ?>" | head -30</code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-openapi"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/openapi.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-				<span class="ajaco-validate-sep">·</span>
-				<a href="https://editor.swagger.io/?url=<?php echo rawurlencode( home_url( '/openapi.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open in Swagger Editor', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'WebMCP tools are loaded via JavaScript on the frontend. Check the page source to verify the script is enqueued:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-webmcp">curl -s <?php echo esc_url( home_url( '/' ) ); ?> | grep webmcp</code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-webmcp"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-note"><?php esc_html_e( 'Note: WebMCP requires Chrome with the experimental AI features enabled.', 'aj-agent-crawl-optimizer' ); ?></p>
-		</div>
-
-		<h3 class="ajaco-test-section"><?php esc_html_e( 'Declarations', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-		<div class="ajaco-test-block">
-			<h4><?php esc_html_e( 'Content-Signals', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<p><?php esc_html_e( 'Check robots.txt for Content-Signals:', 'aj-agent-crawl-optimizer' ); ?></p>
-			<div class="ajaco-code-wrapper">
-				<code id="test-robots">curl <?php echo esc_url( home_url( '/robots.txt' ) ); ?></code>
-				<button type="button" class="ajaco-copy-btn" data-target="test-robots"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
-			</div>
-			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/robots.txt' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
-			</p>
-		</div>
-
-		<hr />
-
-		<h2><?php esc_html_e( 'Details', 'aj-agent-crawl-optimizer' ); ?></h2>
-		<p class="description" style="margin-bottom: 15px;">
-			<?php esc_html_e( 'What each feature actually does behind the scenes when its checkbox is enabled.', 'aj-agent-crawl-optimizer' ); ?>
+		<p class="ajaco-bot-presets">
+			<button type="button" class="button button-small" data-ajaco-preset="allow-all"><?php esc_html_e( 'Allow all', 'aj-agent-crawl-optimizer' ); ?></button>
+			<button type="button" class="button button-small" data-ajaco-preset="block-training"><?php esc_html_e( 'Allow search & user requests, block training', 'aj-agent-crawl-optimizer' ); ?></button>
+			<button type="button" class="button button-small" data-ajaco-preset="block-all"><?php esc_html_e( 'Block all', 'aj-agent-crawl-optimizer' ); ?></button>
 		</p>
+		<table class="ajaco-bot-table">
+			<thead>
+				<tr>
+					<th scope="col"><?php esc_html_e( 'Crawler', 'aj-agent-crawl-optimizer' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Purpose', 'aj-agent-crawl-optimizer' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Policy', 'aj-agent-crawl-optimizer' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $bots as $token => $purpose ) : ?>
+					<tr>
+						<td><code><?php echo esc_html( $token ); ?></code></td>
+						<td><?php echo esc_html( isset( $purpose_labels[ $purpose ] ) ? $purpose_labels[ $purpose ] : $purpose ); ?></td>
+						<td>
+							<select name="ajaco_ai_bot_policy[<?php echo esc_attr( $token ); ?>]" data-ajaco-purpose="<?php echo esc_attr( $purpose ); ?>" aria-label="<?php echo esc_attr( $token ); ?>">
+								<option value="allow" <?php selected( isset( $policy[ $token ] ) ? $policy[ $token ] : 'allow', 'allow' ); ?>><?php esc_html_e( 'Allow', 'aj-agent-crawl-optimizer' ); ?></option>
+								<option value="block" <?php selected( isset( $policy[ $token ] ) ? $policy[ $token ] : 'allow', 'block' ); ?>><?php esc_html_e( 'Block', 'aj-agent-crawl-optimizer' ); ?></option>
+							</select>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
 
-		<div class="ajaco-details">
-			<h3 class="ajaco-details-section"><?php esc_html_e( 'Discovery', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-			<h4 id="detail-api-catalog"><?php esc_html_e( 'API Catalog', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: 1: well-known URL path. 2: MIME type. */
-						esc_html__( 'Serves %1$s as %2$s per RFC 9727.', 'aj-agent-crawl-optimizer' ),
-						'<code>/.well-known/api-catalog</code>',
-						'<code>application/linkset+json</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Each linkset entry advertises service-desc (OpenAPI spec), service-doc (WordPress REST API handbook), and status (REST root).', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: HTTP Link header example, code-formatted. */
-						esc_html__( 'Also emits %s on every frontend response so agents discover the catalog without having to know about /.well-known/.', 'aj-agent-crawl-optimizer' ),
-						'<code>Link: &lt;url&gt;; rel="api-catalog"</code>'
-					);
-				?>
-				</li>
-			</ul>
-
-			<h4 id="detail-mcp-server-card"><?php esc_html_e( 'MCP Server Card', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: well-known URL path, code-formatted. */
-						esc_html__( 'Serves %s per the SEP-1649 draft so MCP-aware agents can discover the site.', 'aj-agent-crawl-optimizer' ),
-						'<code>/.well-known/mcp/server-card.json</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'serverInfo (name, version, description, websiteUrl) is generated dynamically from get_bloginfo() so it stays accurate per subsite.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Declares transport, MCP capability flag objects, protocolVersion, and instructions pointing agents at the API catalog and OpenAPI spec.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h4 id="detail-agent-skills-index"><?php esc_html_e( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: well-known URL path, code-formatted. */
-						esc_html__( 'Serves %s listing 6 skills (content-query, posts-read, pages-read, media-library, categories, tags) per Agent Skills Discovery RFC v0.2.0.', 'aj-agent-crawl-optimizer' ),
-						'<code>/.well-known/agent-skills/index.json</code>'
-					);
-				?>
-				</li>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: URL pattern for SKILL.md artifacts, code-formatted. */
-						esc_html__( 'For each skill, also serves a deterministic SKILL.md artifact at %s with a how-to-use guide.', 'aj-agent-crawl-optimizer' ),
-						'<code>/.well-known/agent-skills/{name}/SKILL.md</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Each index entry includes a real sha256 digest of the served SKILL.md bytes so agents can verify the artifact has not been tampered with.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h4 id="detail-llms-txt"><?php esc_html_e( 'llms.txt', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: URL path of /llms.txt, code-formatted. */
-						esc_html__( 'Serves %s — a curated, Markdown index of the site that LLMs read to find your most important pages, per llmstxt.org.', 'aj-agent-crawl-optimizer' ),
-						'<code>/llms.txt</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Generated dynamically per site/subsite from get_bloginfo() plus your top-level published pages and recent posts (excerpts cleaned, read-more markers stripped).', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'A Discovery section auto-links every other plugin endpoint that is currently enabled (API Catalog, OpenAPI, Skills Index, MCP Card) so an LLM can crawl from llms.txt to everything else.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h4 id="detail-indexnow"><?php esc_html_e( 'IndexNow', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: IndexNow API endpoint URL, code-formatted. */
-						esc_html__( 'Hooks transition_post_status; when a post moves to publish, fires a non-blocking POST to %s.', 'aj-agent-crawl-optimizer' ),
-						'<code>https://api.indexnow.org/indexnow</code>'
-					);
-				?>
-				</li>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: JSON payload shape, code-formatted. */
-						esc_html__( 'Payload is exactly %s — Bing and Yandex begin re-crawling the URL within minutes.', 'aj-agent-crawl-optimizer' ),
-						'<code>' . esc_html( '{ host, key, urlList }' ) . '</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Skips revisions, autosaves, and post types that are not public. The ping is non-blocking so page saves stay fast.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: URL pattern for the IndexNow key file, code-formatted. */
-						esc_html__( 'Reads the key from the IndexNow API Key field above; also serves the key file at %s so search engines can verify ownership.', 'aj-agent-crawl-optimizer' ),
-						'<code>/{key}.txt</code>'
-					);
-				?>
-				</li>
-			</ul>
-
-			<h3 class="ajaco-details-section"><?php esc_html_e( 'Presentation', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-			<h4 id="detail-markdown"><?php esc_html_e( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li><?php esc_html_e( 'Watches every page request for the Accept: text/markdown header; browsers asking for HTML get the normal response.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Buffers the rendered HTML, extracts the main content region, and converts it to clean Markdown.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li>
-				<?php
-					printf(
-						/* translators: 1: response Content-Type header. 2: X-Markdown-Tokens header name. */
-						esc_html__( 'Returns %1$s and emits %2$s (≈ chars/4) so AI agents can budget context size.', 'aj-agent-crawl-optimizer' ),
-						'<code>' . esc_html( 'Content-Type: text/markdown; charset=UTF-8' ) . '</code>',
-						'<code>X-Markdown-Tokens</code>'
-					);
-				?>
-				</li>
-			</ul>
-
-			<h4 id="detail-json-ld"><?php esc_html_e( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: HTML script tag opening, code-formatted. */
-						esc_html__( 'Outputs %s in the head on every page so search engines and LLMs understand the content.', 'aj-agent-crawl-optimizer' ),
-						'<code>&lt;script type="application/ld+json"&gt;</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Always includes WebSite (with SearchAction) and Organization (logo resolved from theme custom logo or site icon).', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'On singular posts/pages of public REST-enabled post types, adds Article (cleaned excerpt, author, datePublished/dateModified, image, mainEntityOfPage).', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'On non-front singular pages, adds BreadcrumbList (Home → Category → Post).', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Auto-detects FAQ content (definition-list pairs or question-shaped headings) and emits FAQPage with Question/Answer pairs.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Auto-suppresses when an SEO plugin (Yoast, Rank Math, AIOSEO, etc.) is active to prevent duplicate structured data.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h4 id="detail-openapi"><?php esc_html_e( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: 1: /openapi.json path, code-formatted. 2: legacy query string parameter, code-formatted. */
-						esc_html__( 'Serves %1$s (with %2$s as a legacy alias) — a complete OpenAPI 3.0.3 document as application/json.', 'aj-agent-crawl-optimizer' ),
-						'<code>/openapi.json</code>',
-						'<code>?format=openapi</code>'
-					);
-				?>
-				</li>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: WordPress function name, code-formatted. */
-						esc_html__( 'Iterates every route from %s (filtered through rest_endpoints to honor show_in_index), so plugin-registered routes appear automatically.', 'aj-agent-crawl-optimizer' ),
-						'<code>rest_get_server()</code>'
-					);
-				?>
-				</li>
-				<li>
-				<?php
-					printf(
-						/* translators: 1: regex named-capture pattern. 2: OpenAPI templated-path pattern. */
-						esc_html__( 'Converts WordPress regex placeholders such as %1$s into OpenAPI templated paths like %2$s and splits args into path parameters, query parameters, and requestBody for write methods.', 'aj-agent-crawl-optimizer' ),
-						'<code>(?P&lt;id&gt;[\\d]+)</code>',
-						'<code>{id}</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Includes Post, Page, Media, Term, and User component schemas, with info pulled from site name, description, and WordPress version.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h4 id="detail-webmcp"><?php esc_html_e( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li><?php esc_html_e( 'Enqueues a frontend script that registers tools via navigator.modelContext.provideContext() — the W3C WebMCP draft API.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Exposes 4 tools to AI agents: search_content, get_posts, get_pages, get_site_info — each with name, description, JSON-Schema inputSchema, and an execute callback that wraps the WP REST API.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Subsite-aware via wp_localize_script — the script reads the right REST URL for whichever site it is running on.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'The tools only register in browsers with the experimental WebMCP feature enabled (currently Chrome behind a flag). Other browsers no-op silently.', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-
-			<h3 class="ajaco-details-section"><?php esc_html_e( 'Declarations', 'aj-agent-crawl-optimizer' ); ?></h3>
-
-			<h4 id="detail-content-signals"><?php esc_html_e( 'Content-Signals', 'aj-agent-crawl-optimizer' ); ?></h4>
-			<ul>
-				<li>
-				<?php
-					printf(
-						/* translators: %s: /robots.txt path, code-formatted. */
-						esc_html__( 'Intercepts %s (and any subsite path ending in it) and serves WordPress-default robots rules plus a Content-Signal directive.', 'aj-agent-crawl-optimizer' ),
-						'<code>/robots.txt</code>'
-					);
-				?>
-				</li>
-				<li><?php esc_html_e( 'Composes with SEO plugins: Yoast/Rank Math/AIOSEO additions are preserved, our Content-Signal is appended last.', 'aj-agent-crawl-optimizer' ); ?></li>
-				<li><?php esc_html_e( 'Honors the "Discourage search engines" reading setting (switches to Disallow: / when that is on).', 'aj-agent-crawl-optimizer' ); ?></li>
-			</ul>
-		</div>
-
+/**
+ * Content-Signal preference selects (ai-train / search / ai-input). Always
+ * rendered for the same save-safety reason as the bot policy table.
+ *
+ * @return void
+ */
+function render_content_signal_fields(): void {
+	$prefs  = content_signal_prefs();
+	$fields = array(
+		'ai_train' => __( 'AI training (ai-train)', 'aj-agent-crawl-optimizer' ),
+		'search'   => __( 'Search (search)', 'aj-agent-crawl-optimizer' ),
+		'ai_input' => __( 'AI input / grounding (ai-input)', 'aj-agent-crawl-optimizer' ),
+	);
+	?>
+	<div class="ajaco-signal-fields">
+		<?php foreach ( $fields as $key => $label ) : ?>
+			<label class="ajaco-signal-field">
+				<?php echo esc_html( $label ); ?>
+				<select name="ajaco_content_signal_prefs[<?php echo esc_attr( $key ); ?>]">
+					<option value="yes" <?php selected( $prefs[ $key ], 'yes' ); ?>><?php esc_html_e( 'yes', 'aj-agent-crawl-optimizer' ); ?></option>
+					<option value="no" <?php selected( $prefs[ $key ], 'no' ); ?>><?php esc_html_e( 'no', 'aj-agent-crawl-optimizer' ); ?></option>
+				</select>
+			</label>
+		<?php endforeach; ?>
+		<p class="description">
+			<?php esc_html_e( 'Emitted as e.g. "Content-Signal: ai-train=no, search=yes, ai-input=no". A declaration of preference, not enforcement.', 'aj-agent-crawl-optimizer' ); ?>
+		</p>
 	</div>
 	<?php
 }

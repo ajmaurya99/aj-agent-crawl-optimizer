@@ -1,32 +1,21 @@
 /**
  * AJ Agent Crawl Optimizer — admin settings page JS.
  *
- * Three concerns, all scoped to the Settings → AJ Agent Crawl Optimizer screen:
- *   1. Smooth-scroll the in-page Read More links to their Detail anchors.
- *   2. Move the WordPress "Settings saved." notice from above the score card
- *      to right below the Save Changes button.
- *   3. Wire up the per-test-block copy buttons.
- *
- * Localized strings (e.g. "Copied!") come in via window.AjacoAdmin
- * which is set by wp_localize_script() in includes/admin/enqueue.php.
+ * Two concerns, both scoped to the Agent Ready → Settings screen:
+ *   1. Move the WordPress "Settings saved." notice to below the Save button.
+ *      (Notices persist until the user dismisses them — no auto-dismiss.)
+ *   2. AI bot policy preset buttons (Allow all / Block training / Block all).
  */
 
 (function () {
     'use strict';
 
-    var i18n = (window.AjacoAdmin && window.AjacoAdmin.i18n) || {};
-
-    // --- Notice relocation + auto-dismiss ---------------------------------
+    // --- Notice relocation --------------------------------------------------
     //
     // wp-admin/js/common.js moves admin notices to right after the first
-    // h1/h2 in jQuery.ready. Our first h2 is "Excellent" inside the score
-    // card, so the notice ends up squashed against the dark gradient. We
-    // run on `load` (not DOMContentLoaded) so we move *after* WP's mover.
-    //
-    // We match `.notice.settings-error` only — it's set by both the WP
-    // "Settings saved." notice and our own "Reset to defaults" notice. Other
-    // admin notices (network upgrade nags, etc.) are intentionally left
-    // where WP put them.
+    // h1/h2 in jQuery.ready; we run on `load` so we move *after* WP's mover.
+    // `.notice.settings-error` covers WP's "Settings saved." and our reset
+    // notice; other admin notices are intentionally left where WP put them.
     window.addEventListener('load', function () {
         var notices = document.querySelectorAll('.notice.settings-error');
         var submitP = document.querySelector('.wrap form p.submit');
@@ -35,67 +24,23 @@
             if (submitP && submitP.parentNode) {
                 submitP.parentNode.insertBefore(notice, submitP.nextSibling);
             }
-
-            // Auto-dismiss after 3 seconds with a brief fade.
-            setTimeout(function () {
-                notice.style.transition = 'opacity 0.4s ease-out';
-                notice.style.opacity = '0';
-                setTimeout(function () {
-                    if (notice.parentNode) {
-                        notice.parentNode.removeChild(notice);
-                    }
-                }, 400);
-            }, 3000);
         });
     });
 
-    // --- Read More smooth scroll + copy buttons ----------------------------
+    // --- AI bot policy presets ----------------------------------------------
     document.addEventListener('DOMContentLoaded', function () {
-        // Smooth-scroll the in-page Read More links instead of jumping.
-        document.querySelectorAll('.ajaco-read-more').forEach(function (link) {
-            link.addEventListener('click', function (e) {
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // Update the URL hash for back-button / share-link behaviour.
-                    history.replaceState(null, '', this.getAttribute('href'));
-                }
-            });
-        });
-
-        // Per-test-block copy-to-clipboard.
-        var copiedLabel = i18n.copied || 'Copied!';
-
-        // One shared, polite aria-live region announces copy results to
-        // assistive tech without changing focus or visual layout.
-        var liveRegion = document.createElement('div');
-        liveRegion.setAttribute('role', 'status');
-        liveRegion.setAttribute('aria-live', 'polite');
-        liveRegion.className = 'ajaco-screen-reader-text';
-        document.body.appendChild(liveRegion);
-
-        document.querySelectorAll('.ajaco-copy-btn').forEach(function (btn) {
+        document.querySelectorAll('[data-ajaco-preset]').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                var targetId = this.getAttribute('data-target');
-                var codeEl = document.getElementById(targetId);
-                if (!codeEl) {
-                    return;
-                }
-                var text = codeEl.textContent || codeEl.innerText;
-                navigator.clipboard.writeText(text).then(function () {
-                    var originalText = btn.textContent;
-                    btn.textContent = copiedLabel;
-                    btn.classList.add('copied');
-                    // Announce to screen readers.
-                    liveRegion.textContent = copiedLabel;
-                    setTimeout(function () {
-                        btn.textContent = originalText;
-                        btn.classList.remove('copied');
-                        liveRegion.textContent = '';
-                    }, 2000);
-                }).catch(function (err) {
-                    console.error('Copy failed:', err);
+                var preset = btn.getAttribute('data-ajaco-preset');
+                document.querySelectorAll('select[data-ajaco-purpose]').forEach(function (select) {
+                    var purpose = select.getAttribute('data-ajaco-purpose');
+                    if ('allow-all' === preset) {
+                        select.value = 'allow';
+                    } else if ('block-all' === preset) {
+                        select.value = 'block';
+                    } else if ('block-training' === preset) {
+                        select.value = ('training' === purpose) ? 'block' : 'allow';
+                    }
                 });
             });
         });

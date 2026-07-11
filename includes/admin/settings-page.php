@@ -75,6 +75,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish an API catalog at /.well-known/api-catalog for automated API discovery (RFC 9727). Also emits a Link header advertising the catalog on every response.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="api-catalog"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/.well-known/api-catalog' ), $api_catalog_enabled ); ?>
 						<?php if ( $api_catalog_enabled && ! $openapi_enabled ) : ?>
 							<p class="description ajaco-hint">
 								<?php esc_html_e( 'OpenAPI Spec is off, so the catalog is published without a service-desc link. Enable OpenAPI below for a complete catalog.', 'aj-agent-crawl-optimizer' ); ?>
@@ -90,6 +91,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish MCP Server Card at /.well-known/mcp/server-card.json for AI agent tool discovery.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="mcp-server-card"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/.well-known/mcp/server-card.json' ), $mcp_server_card_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -100,6 +102,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish Agent Skills Index at /.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="agent-skills-index"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/.well-known/agent-skills/index.json' ), $agent_skills_index_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -110,6 +113,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish /auth.md documenting how agents authenticate to the REST API via Application Passwords.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="auth-md"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/auth.md' ), $auth_md_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -120,6 +124,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish a curated, LLM-readable index at /llms.txt plus full recent content at /llms-full.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="llms-txt"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/llms.txt', '/llms-full.txt' ), $llms_txt_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -130,6 +135,9 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Ping Bing and Yandex instantly when content is published or updated via IndexNow.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="indexnow"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php if ( $indexnow_enabled && '' !== trim( $indexnow_key ) ) : ?>
+							<?php render_view_links( array( '/' . trim( $indexnow_key ) . '.txt' ), true ); ?>
+						<?php endif; ?>
 						<?php if ( $indexnow_enabled && '' === trim( $indexnow_key ) ) : ?>
 							<p class="description ajaco-warn">
 								<?php esc_html_e( 'IndexNow is enabled but no API key is set below — no pings are being sent.', 'aj-agent-crawl-optimizer' ); ?>
@@ -180,6 +188,14 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Serve clean Markdown content when AI agents request it via Accept header.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="markdown-negotiation"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php if ( $markdown_enabled ) : ?>
+							<p class="description ajaco-view-links">
+								<span class="ajaco-view-label"><?php esc_html_e( 'Test:', 'aj-agent-crawl-optimizer' ); ?></span>
+								<code id="ajaco-md-curl">curl -H "Accept: text/markdown" <?php echo esc_url( home_url( '/' ) ); ?></code>
+								<button type="button" class="button button-small ajaco-copy-btn" data-target="ajaco-md-curl"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
+								<span class="ajaco-view-note"><?php esc_html_e( 'Browsers can’t send this header — the Dashboard scan verifies it for you.', 'aj-agent-crawl-optimizer' ); ?></span>
+							</p>
+						<?php endif; ?>
 					</td>
 				</tr>
 				<tr>
@@ -190,6 +206,16 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Add Schema.org structured data (WebSite, Organization, Article, BreadcrumbList, FAQPage) for better content understanding by LLMs.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="json-ld-schema"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php if ( $json_ld_enabled && null === active_seo_plugin() ) : ?>
+							<p class="description ajaco-view-links">
+								<span class="ajaco-view-label"><?php esc_html_e( 'View:', 'aj-agent-crawl-optimizer' ); ?></span>
+								<a href="<?php echo esc_url( 'https://search.google.com/test/rich-results?url=' . rawurlencode( home_url( '/' ) ) ); ?>" target="_blank" rel="noopener">
+									<?php esc_html_e( 'Google Rich Results Test', 'aj-agent-crawl-optimizer' ); ?>
+									<span class="ajaco-ext" aria-hidden="true">↗</span>
+								</a>
+								<span class="ajaco-view-note"><?php esc_html_e( 'The markup lives in your page source, not at a URL.', 'aj-agent-crawl-optimizer' ); ?></span>
+							</p>
+						<?php endif; ?>
 						<?php
 						$active_seo = active_seo_plugin();
 						if ( null !== $active_seo ) :
@@ -214,6 +240,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish OpenAPI 3.0 specification at /openapi.json for API documentation.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="openapi-spec"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/openapi.json' ), $openapi_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -239,6 +266,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for, using the per-bot policy below.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="ai-bot-rules"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/robots.txt' ), $ai_bot_rules_enabled ); ?>
 						<?php render_ai_bot_policy_table(); ?>
 					</td>
 				</tr>
@@ -250,6 +278,7 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Add a Content-Signal directive to robots.txt declaring AI usage preferences.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="content-signals"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/robots.txt' ), $content_signals_enabled ); ?>
 						<?php render_content_signal_fields(); ?>
 					</td>
 				</tr>
@@ -291,6 +320,53 @@ function render_settings_page(): void {
 			<?php submit_button( __( 'Reset to Defaults', 'aj-agent-crawl-optimizer' ), 'secondary delete', 'ajaco-reset-submit', false ); ?>
 		</form>
 	</div>
+	<?php
+}
+
+/**
+ * Live-endpoint links for a feature: "View: /llms.txt ↗ · /llms-full.txt ↗".
+ *
+ * Only rendered when the feature is enabled — a link to an endpoint the
+ * plugin isn't serving would just open a 404 (a real complaint about the v1
+ * "View output" links). When disabled we show the paths as plain text so the
+ * user still knows what turning it on will publish.
+ *
+ * @param string[] $paths   Site-relative paths, e.g. array( '/llms.txt' ).
+ * @param bool     $enabled Whether the owning feature is currently enabled.
+ * @return void
+ */
+function render_view_links( array $paths, bool $enabled ): void {
+	if ( empty( $paths ) ) {
+		return;
+	}
+	?>
+	<p class="description ajaco-view-links">
+		<?php if ( $enabled ) : ?>
+			<span class="ajaco-view-label"><?php esc_html_e( 'View:', 'aj-agent-crawl-optimizer' ); ?></span>
+			<?php foreach ( $paths as $i => $path ) : ?>
+				<?php echo $i > 0 ? '<span class="ajaco-view-sep">·</span>' : ''; ?>
+				<a href="<?php echo esc_url( home_url( $path ) ); ?>" target="_blank" rel="noopener">
+					<code><?php echo esc_html( $path ); ?></code>
+					<span class="ajaco-ext" aria-hidden="true">↗</span>
+					<span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'aj-agent-crawl-optimizer' ); ?></span>
+				</a>
+			<?php endforeach; ?>
+		<?php else : ?>
+			<span class="ajaco-view-label ajaco-view-off">
+				<?php
+				$list = '<code>' . implode( '</code>, <code>', array_map( 'esc_html', $paths ) ) . '</code>';
+				echo wp_kses(
+					sprintf(
+						/* translators: %s: comma-separated list of endpoint paths. */
+						__( 'Publishes: %s', 'aj-agent-crawl-optimizer' ),
+						$list
+					),
+					array( 'code' => array() )
+				);
+				?>
+			</span>
+		<?php endif; ?>
+	</p>
 	<?php
 }
 

@@ -76,6 +76,36 @@
         });
     });
 
+    // --- Copy-to-clipboard (test commands) -----------------------------------
+    document.addEventListener('DOMContentLoaded', function () {
+        var copiedLabel = (window.AjacoAdmin && window.AjacoAdmin.i18n && window.AjacoAdmin.i18n.copied) || 'Copied!';
+
+        // One shared, polite live region announces the result to screen readers.
+        var liveRegion = document.createElement('div');
+        liveRegion.setAttribute('role', 'status');
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.className = 'ajaco-screen-reader-text';
+        document.body.appendChild(liveRegion);
+
+        document.querySelectorAll('.ajaco-copy-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var source = document.getElementById(btn.getAttribute('data-target'));
+                if (!source || !navigator.clipboard) {
+                    return;
+                }
+                navigator.clipboard.writeText(source.textContent || '').then(function () {
+                    var original = btn.textContent;
+                    btn.textContent = copiedLabel;
+                    liveRegion.textContent = copiedLabel;
+                    window.setTimeout(function () {
+                        btn.textContent = original;
+                        liveRegion.textContent = '';
+                    }, 2000);
+                });
+            });
+        });
+    });
+
     // --- AI bot policy presets ----------------------------------------------
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('[data-ajaco-preset]').forEach(function (btn) {

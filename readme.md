@@ -1,214 +1,82 @@
-=== AJ Agent Crawl Optimizer ===
-Contributors:      ajmaurya
-Tags:              ai, mcp, openapi, structured-data, llms-txt
-Requires at least: 5.5
-Tested up to:      6.9
-Requires PHP:      7.4
-Stable tag:        1.0.0
-License:           GPL-2.0-or-later
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+# AJ Agent Crawl Optimizer
 
-Make your WordPress site legible to AI agents — Markdown negotiation, JSON-LD, OpenAPI, MCP server card, llms.txt, IndexNow, and more.
+Make your WordPress site legible to AI agents — Markdown negotiation, MCP server card, Agent Skills, llms.txt, API catalog, OpenAPI, Content Signals, JSON-LD, IndexNow.
 
-== Description ==
+[![WordPress plugin](https://img.shields.io/wordpress/plugin/v/aj-agent-crawl-optimizer)](https://wordpress.org/plugins/aj-agent-crawl-optimizer/)
+[![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 
 **AJ Agent Crawl Optimizer** is a thin compatibility layer that teaches your site to speak the languages AI agents already use to discover and consume web content. It publishes machine-readable manifests at well-known URLs, serves clean Markdown when an AI requests it, and declares your AI-usage preferences — all without changing anything for human visitors.
 
-Each capability is a separate toggle under **Settings → AJ Agent Crawl Optimizer** and ships **opt-in** (everything starts off). On first activation, a one-time **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data).
-
-= Discovery — help agents find what your site offers =
-
-* **API Catalog** (RFC 9727) — `/.well-known/api-catalog` linkset advertising your REST API, plus a `Link: rel="api-catalog"` header on every response so agents discover it from any URL.
-* **MCP Server Card** (SEP-1649 draft) — `/.well-known/mcp/server-card.json` describing the site to MCP-aware agents.
-* **Agent Skills Index** (RFC v0.2.0) — `/.well-known/agent-skills/index.json` listing six skills (search, posts, pages, media, categories, tags) plus per-skill `SKILL.md` artifacts with verifiable sha256 digests.
-* **llms.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other plugin endpoint.
-* **IndexNow** — non-blocking ping to Bing and Yandex on every post publish so search engines re-crawl within minutes.
-
-= Presentation — format content for agents =
-
-* **Markdown Negotiation** — when a request includes `Accept: text/markdown`, the page is served as clean Markdown with `X-Markdown-Tokens` for context budgeting. Browsers (which send `text/html`) are completely unaffected.
-* **JSON-LD Schema** — Schema.org structured data: WebSite, Organization, Article, BreadcrumbList, and auto-detected FAQPage. Logo resolved from your theme's custom logo or site icon.
-* **OpenAPI 3.0.3** — `/?format=openapi` returns a complete spec generated dynamically from `rest_get_server()`, including plugin-registered REST routes.
-* **WebMCP Tools** — registers four tools (search, posts, pages, site info) via `navigator.modelContext.provideContext()` for browsers that support the W3C WebMCP draft.
-
-= Declarations =
-
-* **Content-Signals** — appends a `Content-Signal: ai-train=no, search=yes, ai-input=no` directive to robots.txt declaring your AI-usage preferences (per contentsignals.org). Composes with Yoast/Rank Math/AIOSEO — their additions are preserved, our line lands at the very end.
-
-= Why use it =
-
-* **No conflicts with your SEO plugin.** JSON-LD auto-suppresses when Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly SEO, Schema Pro, or SASWP is active.
-* **Multisite-aware.** Every endpoint also resolves at `/{subsite}/...` paths automatically.
-* **Cached.** OpenAPI is cached for a day, llms.txt for an hour, with proper invalidation on plugin activation, theme switch, post changes, and setting toggles.
-* **Performance-conscious.** Markdown handler runs at `PHP_INT_MAX` priority so it doesn't break object-cache flushes or Query Monitor. IndexNow pings are non-blocking.
-* **Extensible.** Nine filter hooks let you customize skills, schemas, capabilities, and content. See "For Developers" below.
-* **Accessible.** Score-card SVG has dynamic `aria-label`, copy buttons announce success via `aria-live`, decorative arrows hidden from screen readers via CSS pseudo-elements.
-
-= For developers =
-
-The plugin exposes nine filter hooks for extension. Examples:
-
-`add_filter( 'ajaco_required_capability', function () { return 'edit_posts'; } );`
-Delegate plugin access to a non-admin role.
-
-`add_filter( 'ajaco_skill_definitions', function ( $skills ) { return $skills + [ 'products' => [ 'type' => 'information-retrieval', 'description' => 'WooCommerce products', 'endpoint' => rest_url( 'wc/v3/products' ) ] ]; } );`
-Register custom skills that ship in the Agent Skills Index and are served as SKILL.md artifacts with verifiable sha256 digests.
-
-`add_filter( 'ajaco_content_signal', function () { return 'ai-train=yes, search=yes, ai-input=yes'; } );`
-Customize the Content-Signal directive (e.g. permit AI training).
-
-Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
-
-== Installation ==
-
-= From the WordPress plugin directory =
-
-1. In your WP admin, go to **Plugins → Add New** and search for "AJ Agent Crawl Optimizer".
-2. Click **Install Now**, then **Activate**.
-3. The Quick Setup wizard runs automatically on first activation — review the recommended toggles and click **Apply**.
-4. Adjust any toggle later from **Settings → AJ Agent Crawl Optimizer**.
-
-= Manual install =
-
-1. Download the plugin zip.
-2. Upload the `aj-agent-crawl-optimizer` folder to `/wp-content/plugins/`.
-3. Activate **AJ Agent Crawl Optimizer** from the **Plugins** screen.
-4. Visit **Settings → AJ Agent Crawl Optimizer** and run the wizard or configure manually.
-
-= IndexNow setup (optional) =
-
-If you want Bing and Yandex to re-crawl your content within minutes of publish:
-
-1. Generate a key at https://www.bing.com/webmasters/indexnow.
-2. Paste it into the **IndexNow API Key** field on the settings page.
-3. Enable the IndexNow toggle. The plugin hosts the key file at `/{key}.txt` for ownership verification automatically.
-
-== Frequently Asked Questions ==
-
-= Will this conflict with my SEO plugin? =
-
-No. JSON-LD output auto-suppresses when Yoast SEO, Rank Math, All in One SEO, SEOPress, The SEO Framework, Slim SEO, Squirrly SEO, Schema Pro, or SASWP is active. The settings page shows a clear notice when this happens. Our `robots_txt` filter runs at `PHP_INT_MAX` priority, so any rules your SEO plugin adds (sitemap URLs, custom Disallow, etc.) are preserved — our `Content-Signal` line is appended last.
-
-= Does this change anything for my regular site visitors? =
-
-No. Browsers send `Accept: text/html` and get the normal HTML response. The `.well-known/...`, `/llms.txt`, and `?format=openapi` endpoints are paths a normal user never visits. The only thing added to the page HTML is a single JSON-LD `<script>` block (when no SEO plugin is active) and a small WebMCP script tag (which no-ops in browsers without the experimental flag).
-
-= My site is multisite. Does it work? =
-
-Yes. Every endpoint resolves at both the root and per-subsite paths automatically — `/llms.txt`, `/blog/llms.txt`, `/.well-known/api-catalog`, `/blog/.well-known/api-catalog`, etc. Each subsite has its own settings.
-
-= How do I delegate plugin access to a non-admin role? =
-
-Use the `ajaco_required_capability` filter. The plugin defaults to `manage_options` (admin-only); change it to any capability of your choice, e.g. `edit_pages` for editors:
-
-`add_filter( 'ajaco_required_capability', function () { return 'edit_pages'; } );`
-
-= I enabled IndexNow but I'm not seeing pings to Bing or Yandex. =
-
-Check three things: (1) the IndexNow API Key field is filled in, (2) you're publishing a post of a public post type — revisions and autosaves are skipped, (3) you're on production. Pings are non-blocking, so failures are silent. Tail your server log for outbound requests to `api.indexnow.org`.
-
-= Can I add custom skills, schemas, or sections to llms.txt? =
-
-Yes. Use the relevant filter:
-
-* `ajaco_skill_definitions` — register custom Agent Skills.
-* `ajaco_json_ld_graph` — add custom Schema.org entries (Product, Recipe, Event, etc.).
-* `ajaco_llms_txt_content` — append sections to or replace the llms.txt body.
-* `ajaco_openapi_spec` — add `securitySchemes`, custom tags, additional servers.
-* `ajaco_api_catalog_linkset` — add anchors or rels (e.g. for a GraphQL endpoint).
-* `ajaco_mcp_server_card` — override transport / capabilities for a real MCP implementation.
-
-The Help tab's "For Developers" section on the settings page lists every hook.
-
-= How do I undo everything and start over? =
-
-Use the **Reset to Defaults** button under the Save Changes button on the settings page. It clears every plugin option, wipes cached endpoint outputs, and shows a confirmation dialog before wiping anything.
-
-= Performance impact? =
-
-Minimal. The OpenAPI document is cached for a day in a transient and only regenerates on plugin activation/deactivation or theme switch. The llms.txt body is cached for an hour and invalidates on post edits, site name/description changes, and setting toggles. Endpoint handlers run on `init` only when the request path matches; on every other request they early-return after one regex check. The Markdown handler runs at `PHP_INT_MAX` priority on shutdown so it never breaks object-cache writes or other shutdown hooks.
-
-= How do I see if AI agents are actually using my site? =
-
-The plugin doesn't include a built-in access log. To verify activity, check your server access log for User-Agents like `GPTBot`, `ClaudeBot`, `OAI-SearchBot`, `Google-Extended`, `PerplexityBot`, `CCBot`, `Bytespider`, etc. hitting any of the plugin endpoints.
-
-= Can I disable a feature without deactivating the plugin? =
-
-Yes. Every feature is an independent toggle. Uncheck what you don't want and Save Changes. The corresponding behavior reverts immediately on the next request — no rewrite flush, no cache flush needed (the plugin handles cache invalidation itself).
-
-== Screenshots ==
-
-1. Settings page — score card, three grouped sections (Discovery / Presentation / Declarations), Read More links to inline details.
-2. Quick Setup wizard on first activation — environment-aware recommendations.
-3. Testing section — one-click curl commands, View output and Open in [validator] links per endpoint.
-4. Help tab → For Developers — built-in API reference for the nine filter hooks.
-
-== Changelog ==
-
-= 1.0.0 =
-* Initial release.
-* Ten feature toggles: Markdown Negotiation, Content-Signals, API Catalog (+ Link header), MCP Server Card, Agent Skills Index (+ SKILL.md artifacts), WebMCP Tools, JSON-LD Schema, OpenAPI Spec, IndexNow, llms.txt.
-* Score card with 0–100 percentage and per-feature status badges.
-* Quick Setup wizard on first activation, environment-aware defaults.
-* Auto-suppression of JSON-LD when Yoast / Rank Math / AIOSEO / SEOPress / The SEO Framework / Slim SEO / Squirrly SEO / Schema Pro / SASWP is active.
-* Section grouping: Discovery / Presentation / Declarations.
-* Inline Read More navigation, Testing section with View output and validator links (Google Rich Results, Swagger Editor).
-* Built-in Help tabs (Overview, Features, For Developers, Troubleshooting) with reference sidebar.
-* Reset to Defaults button.
-* Plugins-row Settings link.
-* Multisite-aware path matching for every endpoint.
-* Transient caching: 1 day for OpenAPI, 1 hour for llms.txt, with smart invalidation.
-* Nine filter hooks for extending or overriding plugin behavior.
-* Translation-ready (.pot file shipped) and accessibility-ready (screen-reader h1, dynamic SVG aria-label, aria-live success announcements).
-
-== Upgrade Notice ==
-
-= 1.0.0 =
-Initial release.
-
-== External services ==
-
-This plugin connects to one external service, and only when the corresponding feature is explicitly enabled by the site administrator.
-
-= IndexNow (api.indexnow.org) =
-
-What it is and what it's used for: IndexNow is an open protocol (originally from Microsoft Bing and Yandex) that lets sites notify search engines the moment a URL is published or updated, so search engines can re-crawl within minutes instead of days.
-
-When data is sent: only when the **IndexNow** feature toggle is turned on AND an IndexNow API Key is configured on the settings page. In that case, every time a post of a public post type transitions to the `publish` status, the plugin fires a single non-blocking HTTPS POST to `https://api.indexnow.org/indexnow`.
-
-What data is sent: the request body is a JSON document containing exactly three fields — your site's host (e.g. `example.com`), your IndexNow API key (which you generated yourself at Bing Webmaster Tools), and the permalink URL of the post that was just published. No visitor information, IP addresses, user-agents, or post content is sent.
-
-If the IndexNow feature toggle is off (the default), the plugin makes no outbound network requests of any kind.
-
-This service is provided by Microsoft (Bing) and the IndexNow project. Their terms and privacy policies apply:
-
-* IndexNow protocol documentation: https://www.indexnow.org/documentation
-* IndexNow FAQ and terms: https://www.indexnow.org/faq
-* Microsoft Bing Webmaster Guidelines : https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a
-* Microsoft Privacy Statement: https://www.microsoft.com/en-us/privacy/privacystatement
-
-== Privacy ==
-
-AJ Agent Crawl Optimizer stores data **only on your own server** — there is no telemetry, no analytics, and no third-party logging. Specifically:
-
-= Local data =
-
-* Plugin **option rows** in the WordPress options table store toggle states and the IndexNow API Key (stored as plain text — keep your database secure).
-* **Transients** cache the OpenAPI document and llms.txt body. These are deleted on plugin uninstall.
-* No request data, IP addresses, User-Agents, or visitor information is recorded by the plugin.
-
-= Outbound network calls =
-
-The plugin makes exactly **one** outbound HTTP request, and only when explicitly enabled:
-
-* **IndexNow** — when the IndexNow toggle is on and a key is configured, the plugin sends a non-blocking POST to `https://api.indexnow.org/indexnow` on every post publish. The payload contains the site host, the IndexNow key, and the URL of the published post (no visitor data).
-
-If the IndexNow toggle is off (the default), the plugin makes zero outbound network requests. All other features (manifests, JSON-LD, robots.txt) only respond to incoming HTTP requests; they never call out.
-
-= Cookies =
-
-The plugin does not set any cookies.
-
-= Uninstall =
-
-When the plugin is **deleted** (not just deactivated), all plugin options, the IndexNow key, and all transients are removed from the database. Multisite networks have every site cleaned in turn.
+Every capability is a separate toggle and ships **opt-in**. A one-time Quick Setup wizard suggests environment-aware defaults (it skips JSON-LD when an SEO plugin is detected, for example).
+
+## What it publishes
+
+| Feature | Endpoint / behavior | Standard |
+|---|---|---|
+| Markdown Negotiation | `Accept: text/markdown` → clean Markdown + `X-Markdown-Tokens`, with `Vary: Accept` | [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) |
+| llms.txt | `/llms.txt` — curated LLM-readable site index | [llmstxt.org](https://llmstxt.org/) |
+| API Catalog | `/.well-known/api-catalog` linkset + `Link: rel="api-catalog"` header | [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) |
+| MCP Server Card | `/.well-known/mcp/server-card.json` | [MCP SEP-1649](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) |
+| Agent Skills Index | `/.well-known/agent-skills/index.json` + per-skill `SKILL.md` with sha256 digests | [Agent Skills Discovery RFC v0.2.0](https://github.com/cloudflare/agent-skills-discovery-rfc) |
+| WebMCP Tools | 4 in-page tools via `navigator.modelContext` (search, posts, pages, site info) | [W3C WebMCP draft](https://webmachinelearning.github.io/webmcp/) |
+| OpenAPI | `/openapi.json` (and `/?format=openapi`) — generated from live REST routes | OpenAPI 3.0.3 |
+| Content Signals | `Content-Signal: ai-train=no, search=yes, ai-input=no` in robots.txt, inside a `User-agent: *` group | [contentsignals.org](https://contentsignals.org/) |
+| JSON-LD Schema | WebSite, Organization, Article, BreadcrumbList, FAQPage — auto-suppressed next to Yoast/Rank Math/AIOSEO/etc. | schema.org |
+| IndexNow | Non-blocking ping to Bing/Yandex on publish | [indexnow.org](https://www.indexnow.org/) |
+
+## Install
+
+From wp-admin: **Plugins → Add New → search "AJ Agent Crawl Optimizer" → Install → Activate**, then follow the Quick Setup wizard under **Settings → AJ Agent Crawl Optimizer**.
+
+From source:
+
+```bash
+cd wp-content/plugins
+git clone https://github.com/ajmaurya99/aj-agent-crawl-optimizer.git
+wp plugin activate aj-agent-crawl-optimizer
+```
+
+## Verify it works
+
+```bash
+curl -H "Accept: text/markdown" https://example.com/          # markdown + X-Markdown-Tokens
+curl https://example.com/.well-known/api-catalog              # RFC 9727 linkset
+curl https://example.com/.well-known/agent-skills/index.json  # skills + digests
+curl https://example.com/llms.txt                             # LLM-readable index
+curl https://example.com/openapi.json                         # OpenAPI 3.0.3
+curl https://example.com/robots.txt                           # Content-Signal line
+```
+
+Or scan the whole site with Cloudflare's [Agent Readiness scanner](https://isitagentready.com/).
+
+## For developers
+
+Nine filter hooks let you extend or override behavior — `ajaco_skill_definitions`, `ajaco_json_ld_graph`, `ajaco_llms_txt_content`, `ajaco_openapi_spec`, `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_content_signal`, `ajaco_active_seo_plugin`, `ajaco_required_capability`. Examples in the Help tab → For Developers, or see [readme.txt](readme.txt).
+
+```php
+// Register a WooCommerce products skill in the Agent Skills index.
+add_filter( 'ajaco_skill_definitions', function ( $skills ) {
+    $skills['products'] = array(
+        'type'        => 'information-retrieval',
+        'description' => 'WooCommerce products',
+        'endpoint'    => rest_url( 'wc/v3/products' ),
+    );
+    return $skills;
+} );
+```
+
+## Development
+
+```bash
+composer install
+composer lint     # PHPCS (WordPress Coding Standards)
+composer lint:fix # PHPCBF
+```
+
+## Privacy
+
+No telemetry, no analytics, no cookies. The only outbound request is the (opt-in) IndexNow ping. Full details in [readme.txt](readme.txt) → Privacy.
+
+## License
+
+GPL-2.0-or-later.

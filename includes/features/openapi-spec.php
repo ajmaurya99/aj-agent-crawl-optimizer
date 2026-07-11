@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const OPENAPI_CACHE_KEY = 'ajaco_openapi_cache';
 
 add_action( 'template_redirect', __NAMESPACE__ . '\\handle_openapi_request', 1 );
+add_action( 'init', __NAMESPACE__ . '\\handle_openapi_json_path_request' );
 
 // Invalidate the cache when REST route registration could have changed.
 add_action( 'activated_plugin', __NAMESPACE__ . '\\flush_openapi_cache' );
@@ -35,7 +36,7 @@ function flush_openapi_cache(): void {
 }
 
 /**
- * Serve the OpenAPI document at /?format=openapi.
+ * Serve the OpenAPI document at /?format=openapi (legacy query-var form).
  *
  * Cached for one day in a transient. Invalidates automatically on plugin
  * activation/deactivation and theme switch (the events that can change
@@ -51,6 +52,30 @@ function handle_openapi_request(): void {
 		return;
 	}
 
+	serve_openapi_document();
+}
+
+/**
+ * Serve the OpenAPI document at /openapi.json — the conventional path that
+ * agents (and scanners: MPP payment discovery probes exactly this path)
+ * actually look for. The query-var form stays as an alias.
+ *
+ * @return void
+ */
+function handle_openapi_json_path_request(): void {
+	if ( ! request_path_is( '/openapi.json' ) ) {
+		return;
+	}
+
+	serve_openapi_document();
+}
+
+/**
+ * Shared responder: emit the (cached) OpenAPI JSON document and exit.
+ *
+ * @return void
+ */
+function serve_openapi_document(): void {
 	if ( ! is_feature_enabled( 'openapi' ) ) {
 		return;
 	}

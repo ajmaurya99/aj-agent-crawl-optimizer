@@ -41,18 +41,22 @@ function handle_agent_skills_index_request(): void {
 
 	$skills = array();
 	foreach ( get_skill_definitions() as $name => $def ) {
-		$md       = build_skill_md( $name, $def );
+		$md = build_skill_md( $name, $def );
+		// `type` and `digest` per the Agent Skills Discovery RFC v0.2.0: the
+		// index `type` is the artifact type (`skill-md` | `archive`), not the
+		// skill's semantic category, and the hash field is named `digest` with
+		// a `sha256:` prefix.
 		$skills[] = array(
 			'name'        => $name,
-			'type'        => $def['type'],
+			'type'        => 'skill-md',
 			'description' => $def['description'],
 			'url'         => home_url( '/.well-known/agent-skills/' . $name . '/SKILL.md' ),
-			'sha256'      => hash( 'sha256', $md ),
+			'digest'      => 'sha256:' . hash( 'sha256', $md ),
 		);
 	}
 
 	$skills_index = array(
-		'$schema' => 'https://agentskills.io/schema/v0.2.0',
+		'$schema' => 'https://schemas.agentskills.io/discovery/0.2.0/schema.json',
 		'skills'  => $skills,
 	);
 
@@ -123,12 +127,14 @@ function get_skill_definitions(): array {
  * @return string
  */
 function build_skill_md( string $name, array $def ): string {
-	// Skill values come from a filter (`ajaco_skill_definitions`), so
-	// escape them when interpolating into the markdown template.
-	$name        = esc_html( $name );
-	$type        = esc_html( $def['type'] );
-	$description = esc_html( $def['description'] );
-	$endpoint    = esc_url( $def['endpoint'] );
+	// Skill values come from a filter (`ajaco_skill_definitions`). This body
+	// is served as text/markdown, so HTML entity escaping would corrupt it
+	// (e.g. `Tom&#039;s`); instead sanitize for the markdown/YAML context by
+	// stripping tags and newlines. esc_url_raw() keeps the URL un-entity-encoded.
+	$name        = markdown_safe_text( $name );
+	$type        = markdown_safe_text( $def['type'] );
+	$description = markdown_safe_text( $def['description'] );
+	$endpoint    = esc_url_raw( $def['endpoint'] );
 
 	return "---\n"
 		. "name: {$name}\n"
@@ -148,7 +154,7 @@ function build_skill_md( string $name, array $def ): string {
 		. "{$endpoint}\n"
 		. "```\n"
 		. "\n"
-		. 'The endpoint follows the WordPress REST API conventions. Fetch the full schema at `/?format=openapi`.';
+		. 'The endpoint follows the WordPress REST API conventions. Fetch the full schema at `/openapi.json`.';
 }
 
 /**
@@ -182,9 +188,8 @@ function handle_agent_skill_md_request(): void {
 
 	nocache_headers();
 	header( 'Content-Type: text/markdown; charset=utf-8' );
-	// Plain-text Markdown served as text/markdown. Body is built from a
-	// hardcoded template plus values pre-escaped via esc_html/esc_url in
-	// build_skill_md().
+	// Plain-text Markdown served as text/markdown (never rendered as HTML).
+	// Values are sanitized for the markdown context in build_skill_md().
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo build_skill_md( $m[1], $skills[ $m[1] ] );
 	exit;

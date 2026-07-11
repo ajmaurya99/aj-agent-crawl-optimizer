@@ -271,7 +271,7 @@ function render_settings_page(): void {
 					<td>
 						<label for="ajaco_openapi_enabled">
 							<input type="checkbox" id="ajaco_openapi_enabled" name="ajaco_openapi_enabled" value="1" <?php checked( $openapi_enabled, true ); ?> />
-							<?php esc_html_e( 'Publish OpenAPI 3.0 specification at /?format=openapi for API documentation.', 'aj-agent-crawl-optimizer' ); ?>
+							<?php esc_html_e( 'Publish OpenAPI 3.0 specification at /openapi.json for API documentation.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-read-more" href="#detail-openapi"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
@@ -312,6 +312,12 @@ function render_settings_page(): void {
 			<p class="description"><?php esc_html_e( 'Restores every toggle to off and clears the IndexNow API key. Cached endpoint outputs are also cleared.', 'aj-agent-crawl-optimizer' ); ?></p>
 			<?php submit_button( __( 'Reset to Defaults', 'aj-agent-crawl-optimizer' ), 'secondary delete', 'ajaco-reset-submit', false ); ?>
 		</form>
+
+		<p>
+			<a href="<?php echo esc_url( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer&ajaco-wizard=1' ) ); ?>">
+				<?php esc_html_e( 'Run the setup wizard again', 'aj-agent-crawl-optimizer' ); ?>
+			</a>
+		</p>
 
 		<hr />
 
@@ -415,13 +421,13 @@ function render_settings_page(): void {
 			<h4><?php esc_html_e( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ); ?></h4>
 			<p><?php esc_html_e( 'Check OpenAPI specification:', 'aj-agent-crawl-optimizer' ); ?></p>
 			<div class="ajaco-code-wrapper">
-				<code id="test-openapi">curl "<?php echo esc_url( home_url( '/?format=openapi' ) ); ?>" | head -30</code>
+				<code id="test-openapi">curl "<?php echo esc_url( home_url( '/openapi.json' ) ); ?>" | head -30</code>
 				<button type="button" class="ajaco-copy-btn" data-target="test-openapi"><?php esc_html_e( 'Copy', 'aj-agent-crawl-optimizer' ); ?></button>
 			</div>
 			<p class="ajaco-validate">
-				<a href="<?php echo esc_url( home_url( '/?format=openapi' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/openapi.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View output', 'aj-agent-crawl-optimizer' ); ?></a>
 				<span class="ajaco-validate-sep">·</span>
-				<a href="https://editor.swagger.io/?url=<?php echo rawurlencode( home_url( '/?format=openapi' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open in Swagger Editor', 'aj-agent-crawl-optimizer' ); ?></a>
+				<a href="https://editor.swagger.io/?url=<?php echo rawurlencode( home_url( '/openapi.json' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open in Swagger Editor', 'aj-agent-crawl-optimizer' ); ?></a>
 			</p>
 		</div>
 
@@ -609,8 +615,9 @@ function render_settings_page(): void {
 				<li>
 				<?php
 					printf(
-						/* translators: %s: query string parameter, code-formatted. */
-						esc_html__( 'Intercepts %s and returns a complete OpenAPI 3.0.3 document as application/json.', 'aj-agent-crawl-optimizer' ),
+						/* translators: 1: /openapi.json path, code-formatted. 2: legacy query string parameter, code-formatted. */
+						esc_html__( 'Serves %1$s (with %2$s as a legacy alias) — a complete OpenAPI 3.0.3 document as application/json.', 'aj-agent-crawl-optimizer' ),
+						'<code>/openapi.json</code>',
 						'<code>?format=openapi</code>'
 					);
 				?>

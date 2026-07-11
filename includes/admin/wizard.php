@@ -15,8 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const WIZARD_TRANSIENT    = 'ajaco_show_wizard';
-const WIZARD_APPLIED_FLAG = 'ajaco_wizard_applied';
+const WIZARD_PENDING_OPTION = 'ajaco_show_wizard';
+const WIZARD_DONE_OPTION    = 'ajaco_wizard_done';
+const WIZARD_APPLIED_FLAG   = 'ajaco_wizard_applied';
 
 add_action( 'admin_post_ajaco_apply_wizard', __NAMESPACE__ . '\\handle_wizard_submit' );
 add_action( 'admin_notices', __NAMESPACE__ . '\\maybe_show_wizard_applied_notice' );
@@ -24,10 +25,19 @@ add_action( 'admin_notices', __NAMESPACE__ . '\\maybe_show_wizard_applied_notice
 /**
  * Whether the first-activation wizard should be displayed.
  *
+ * Persistent option, not a transient — a 5-minute window silently lost the
+ * wizard for WP-CLI/bulk activations and anyone who didn't navigate over
+ * immediately. Also honors an explicit re-run request from the settings page
+ * (`&ajaco-wizard=1` — read-only view switch, no state change, no nonce needed).
+ *
  * @return bool
  */
 function should_show_wizard(): bool {
-	return (bool) get_transient( WIZARD_TRANSIENT );
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['ajaco-wizard'] ) && $_GET['ajaco-wizard'] === '1' ) {
+		return true;
+	}
+	return (bool) get_option( WIZARD_PENDING_OPTION );
 }
 
 /**
@@ -87,8 +97,10 @@ function handle_wizard_submit(): void {
 		set_transient( WIZARD_APPLIED_FLAG, 1, 60 );
 	}
 
-	// Apply or skip — either way, dismiss the wizard.
-	delete_transient( WIZARD_TRANSIENT );
+	// Apply or skip — either way, dismiss the wizard (re-runnable any time
+	// from the settings page link).
+	delete_option( WIZARD_PENDING_OPTION );
+	update_option( WIZARD_DONE_OPTION, 1, false );
 
 	wp_safe_redirect( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer' ) );
 	exit;
@@ -148,7 +160,7 @@ function render_wizard(): void {
 		array( 'discovery', __( 'IndexNow', 'aj-agent-crawl-optimizer' ), 'ajaco_indexnow_enabled', __( 'Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ), 'ajaco_markdown_enabled', __( 'Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ), 'ajaco_json_ld_enabled', __( 'WebSite, Organization, Article, BreadcrumbList, FAQPage structured data.', 'aj-agent-crawl-optimizer' ) ),
-		array( 'presentation', __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), 'ajaco_openapi_enabled', __( 'OpenAPI 3.0.3 document at /?format=openapi, generated from REST routes.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), 'ajaco_openapi_enabled', __( 'OpenAPI 3.0.3 document at /openapi.json, generated from REST routes.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'ajaco_webmcp_enabled', __( 'Frontend script registering tools via navigator.modelContext (Chrome experimental).', 'aj-agent-crawl-optimizer' ) ),
 		array( 'declarations', __( 'Content-Signals', 'aj-agent-crawl-optimizer' ), 'ajaco_content_signals_enabled', __( 'Adds a Content-Signal directive to robots.txt declaring AI-usage preferences.', 'aj-agent-crawl-optimizer' ) ),
 	);

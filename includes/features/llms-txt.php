@@ -83,9 +83,8 @@ function handle_llms_txt_request(): void {
 
 	$cached = get_transient( LLMS_TXT_CACHE_KEY );
 	if ( is_string( $cached ) && $cached !== '' ) {
-		// Plain-text Markdown served as text/markdown. Body is built from a
-		// hardcoded template plus values pre-escaped via esc_html/esc_url in
-		// build_llms_txt(); the cache stores that already-escaped string.
+		// Plain-text Markdown served as text/markdown (never rendered as HTML).
+		// Values are sanitized for the markdown context in build_llms_txt().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $cached;
 		exit;
@@ -94,9 +93,8 @@ function handle_llms_txt_request(): void {
 	$body = build_llms_txt();
 	set_transient( LLMS_TXT_CACHE_KEY, $body, HOUR_IN_SECONDS );
 
-	// Plain-text Markdown served as text/markdown. Body is built from a
-	// hardcoded template plus values pre-escaped via esc_html/esc_url in
-	// build_llms_txt().
+	// Plain-text Markdown served as text/markdown (never rendered as HTML).
+	// Values are sanitized for the markdown context in build_llms_txt().
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo $body;
 	exit;
@@ -108,8 +106,10 @@ function handle_llms_txt_request(): void {
  * @return string
  */
 function build_llms_txt(): string {
-	$name        = esc_html( get_bloginfo( 'name' ) );
-	$description = esc_html( get_bloginfo( 'description' ) );
+	// text/markdown body — markdown_safe_text() (not esc_html) so agents
+	// receive `Tom's Blog & Café`, not `Tom&#039;s Blog &amp; Café`.
+	$name        = markdown_safe_text( get_bloginfo( 'name' ) );
+	$description = markdown_safe_text( get_bloginfo( 'description' ) );
 
 	$out = "# {$name}\n\n";
 	if ( $description !== '' ) {
@@ -118,21 +118,23 @@ function build_llms_txt(): string {
 	$out .= "An LLM-readable index of {$name}. Follow the links for the full content.\n\n";
 
 	// Discovery endpoints — only list features that are currently enabled.
+	// esc_url_raw (not esc_url) — display escaping would entity-encode
+	// ampersands inside a text/markdown body.
 	$discovery = array();
 	if ( is_feature_enabled( 'api_catalog' ) ) {
-		$discovery[] = '[API Catalog](' . esc_url( home_url( '/.well-known/api-catalog' ) )
+		$discovery[] = '[API Catalog](' . esc_url_raw( home_url( '/.well-known/api-catalog' ) )
 			. '): RFC 9727 link set advertising REST endpoints, documentation, and health.';
 	}
 	if ( is_feature_enabled( 'openapi' ) ) {
-		$discovery[] = '[OpenAPI Spec](' . esc_url( home_url( '/?format=openapi' ) )
+		$discovery[] = '[OpenAPI Spec](' . esc_url_raw( home_url( '/openapi.json' ) )
 			. '): OpenAPI 3.0.3 specification of every REST route on this site.';
 	}
 	if ( is_feature_enabled( 'agent_skills_index' ) ) {
-		$discovery[] = '[Agent Skills Index](' . esc_url( home_url( '/.well-known/agent-skills/index.json' ) )
+		$discovery[] = '[Agent Skills Index](' . esc_url_raw( home_url( '/.well-known/agent-skills/index.json' ) )
 			. '): skills agents can use, each with a verifiable SKILL.md artifact.';
 	}
 	if ( is_feature_enabled( 'mcp_server_card' ) ) {
-		$discovery[] = '[MCP Server Card](' . esc_url( home_url( '/.well-known/mcp/server-card.json' ) )
+		$discovery[] = '[MCP Server Card](' . esc_url_raw( home_url( '/.well-known/mcp/server-card.json' ) )
 			. '): SEP-1649 server descriptor.';
 	}
 
@@ -203,15 +205,18 @@ function build_llms_txt(): string {
  * @return string
  */
 function format_llms_txt_entry( \WP_Post $p, bool $with_date = false ): string {
-	$title   = esc_html( get_the_title( $p ) );
-	$url     = esc_url( get_permalink( $p ) );
-	$excerpt = trim( wp_strip_all_tags( get_the_excerpt( $p ) ) );
+	// markdown_safe_text/esc_url_raw — this is a text/markdown body; HTML
+	// entity escaping would corrupt titles and excerpts for agents.
+	$title = markdown_safe_text( get_the_title( $p ) );
+	// Escape closing brackets so a title can't break out of the [label](url) syntax.
+	$title   = str_replace( ']', '\\]', $title );
+	$url     = esc_url_raw( get_permalink( $p ) );
+	$excerpt = markdown_safe_text( get_the_excerpt( $p ) );
 	$excerpt = preg_replace( '/\s*\[(\.\.\.|…)\]\s*$/u', '', $excerpt );
-	$excerpt = esc_html( $excerpt );
 
 	$line = "[{$title}]({$url})";
 	if ( $with_date ) {
-		$line .= ' (' . esc_html( get_the_date( 'Y-m-d', $p ) ) . ')';
+		$line .= ' (' . get_the_date( 'Y-m-d', $p ) . ')';
 	}
 	if ( $excerpt !== '' ) {
 		$line .= ': ' . $excerpt;

@@ -42,6 +42,25 @@ function required_capability(): string {
 }
 
 /**
+ * Sanitize a text value for interpolation into a text/markdown body.
+ *
+ * Machine-readable markdown endpoints (llms.txt, SKILL.md) must NOT be
+ * HTML-entity-escaped — agents would receive `Tom&#039;s Blog &amp; Café`.
+ * Instead: strip tags, decode any entities WP stored, and collapse
+ * newlines/whitespace so a value can't break the surrounding markdown or
+ * YAML frontmatter structure.
+ *
+ * @param string $text Raw text value.
+ * @return string
+ */
+function markdown_safe_text( string $text ): string {
+	$text = wp_strip_all_tags( $text );
+	$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$text = preg_replace( '/\s+/u', ' ', $text );
+	return trim( (string) $text );
+}
+
+/**
  * Match the current request path against an expected path.
  *
  * Returns true for an exact match OR a multisite subsite-prefixed match

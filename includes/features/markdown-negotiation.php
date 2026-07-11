@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'template_redirect', __NAMESPACE__ . '\\handle_markdown_request', 1 );
+add_action( 'send_headers', __NAMESPACE__ . '\\send_markdown_vary_header' );
 
 /**
  * Check if the current request accepts Markdown.
@@ -27,7 +28,28 @@ function accepts_markdown(): bool {
 	}
 
 	$accept = sanitize_text_field( wp_unslash( $_SERVER['HTTP_ACCEPT'] ) );
-	return str_contains( $accept, 'text/markdown' );
+	// strpos, not str_contains — the WP polyfill only exists since WP 5.9 and
+	// this plugin supports 5.5+.
+	return strpos( $accept, 'text/markdown' ) !== false;
+}
+
+/**
+ * Emit `Vary: Accept` on every frontend response while markdown negotiation
+ * is enabled — the representation varies on the Accept header, so caches and
+ * CDNs must key on it. Without this, a page cache either serves cached HTML
+ * to agents (breaking negotiation) or caches the markdown variant for humans.
+ *
+ * @return void
+ */
+function send_markdown_vary_header(): void {
+	if ( ! is_feature_enabled( 'markdown' ) ) {
+		return;
+	}
+	if ( is_admin() ) {
+		return;
+	}
+
+	header( 'Vary: Accept', false );
 }
 
 /**
@@ -171,6 +193,7 @@ function handle_markdown_request(): void {
 
 	nocache_headers();
 	header( 'Content-Type: text/markdown; charset=UTF-8' );
+	header( 'Vary: Accept', false );
 
 	// Capture output immediately.
 	ob_start();
@@ -183,8 +206,18 @@ function handle_markdown_request(): void {
 		'shutdown',
 		function () {
 			$content = '';
-			while ( ob_get_level() > 0 ) {
-				$content .= ob_get_clean();
+			// Bounded unwind: a non-removable buffer (zlib.output_compression,
+			// another plugin's non-erasable ob_start) makes ob_get_clean()
+			// return false without lowering the level — bail instead of
+			// spinning forever.
+			$level = ob_get_level();
+			while ( $level > 0 ) {
+				$chunk = ob_get_clean();
+				if ( $chunk === false || ob_get_level() >= $level ) {
+					break;
+				}
+				$content .= $chunk;
+				$level    = ob_get_level();
 			}
 
 			if ( $content === '' ) {

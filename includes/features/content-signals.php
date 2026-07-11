@@ -50,11 +50,17 @@ function filter_robots_txt( string $output, $is_public ): string {
 	 *
 	 * @param string $directive Default `ai-train=no, search=yes, ai-input=no`.
 	 */
-	$directive      = (string) apply_filters( 'ajaco_content_signal', 'ai-train=no, search=yes, ai-input=no' );
-	$content_signal = "Content-Signal: {$directive}\n";
+	$directive = (string) apply_filters( 'ajaco_content_signal', 'ai-train=no, search=yes, ai-input=no' );
+
+	// Emit the directive inside an explicit `User-agent: *` group. Appending a
+	// bare Content-Signal line after other plugins' output would attach it to
+	// whatever User-agent group happens to be last under RFC 9309 group
+	// semantics (e.g. an SEO plugin's AhrefsBot block) — scope would be
+	// nondeterministic.
+	$content_signal = "User-agent: *\nContent-Signal: {$directive}\n";
 
 	if ( trim( $output ) === '' ) {
-		return "User-agent: *\nAllow: /\n\n" . $content_signal;
+		return "User-agent: *\nAllow: /\nContent-Signal: {$directive}\n";
 	}
 
 	return rtrim( $output ) . "\n\n" . $content_signal;

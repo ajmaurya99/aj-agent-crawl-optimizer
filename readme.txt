@@ -2,9 +2,9 @@
 Contributors:      ajmaurya
 Tags:              ai, mcp, openapi, structured-data, llms-txt
 Requires at least: 5.5
-Tested up to:      6.9
+Tested up to:      7.0
 Requires PHP:      7.4
-Stable tag:        1.0.0
+Stable tag:        1.0.1
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -145,6 +145,17 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 
 == Changelog ==
 
+= 1.0.1 =
+* Agent Skills index now validates against the Agent Skills Discovery RFC v0.2.0: entries use `type: skill-md` and a `digest` field with `sha256:` prefix (previously `type: information-retrieval` and a `sha256` key, which external scanners rejected); `$schema` corrected to the published schema URI.
+* MCP Server Card: transport now declares an `endpoint` (SEP-1649 structure) with type `streamable-http`; `protocolVersion` bumped to 2025-06-18.
+* Markdown Negotiation: sends `Vary: Accept` on all frontend responses so page caches and CDNs key correctly on the Accept header; buffer unwind at shutdown is now bounded (no hang on non-removable output buffers); `str_contains()` replaced for WP < 5.9 compatibility.
+* OpenAPI spec now also served at the conventional `/openapi.json` path (query-var form kept as an alias).
+* API Catalog: `service-desc` only advertised when the OpenAPI feature is enabled (no more dead link), and its media type now matches what the endpoint serves.
+* Content-Signal directive is now emitted inside an explicit `User-agent: *` group so its scope is deterministic under RFC 9309 group semantics.
+* llms.txt and SKILL.md bodies are no longer HTML-entity-escaped — agents now receive `Tom's Blog & Café` instead of `Tom&#039;s Blog &amp; Café`.
+* Quick Setup wizard is now armed by a persistent option instead of a 5-minute transient (survives WP-CLI/bulk activations), and can be re-run any time via the "Run the setup wizard again" link on the settings page.
+* Tested up to WordPress 7.0.
+
 = 1.0.0 =
 * Initial release.
 * Ten feature toggles: Markdown Negotiation, Content-Signals, API Catalog (+ Link header), MCP Server Card, Agent Skills Index (+ SKILL.md artifacts), WebMCP Tools, JSON-LD Schema, OpenAPI Spec, IndexNow, llms.txt.
@@ -162,6 +173,9 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * Translation-ready (.pot file shipped) and accessibility-ready (screen-reader h1, dynamic SVG aria-label, aria-live success announcements).
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Spec-compliance fixes: Agent Skills index and MCP Server Card now validate against external agent-readiness scanners; markdown negotiation is cache-safe (Vary: Accept); OpenAPI at /openapi.json.
 
 = 1.0.0 =
 Initial release.

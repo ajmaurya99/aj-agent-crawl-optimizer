@@ -45,17 +45,17 @@ function handle_mcp_server_card_request(): void {
 			'description' => get_bloginfo( 'description' ) ?: '',
 			'websiteUrl'  => home_url( '/' ),
 		),
-		'protocolVersion' => '2024-11-05',
+		'protocolVersion' => '2025-06-18',
 		'transport'       => array(
-			'type' => 'http',
-			'url'  => $api_url,
+			'type'     => 'streamable-http',
+			'endpoint' => $api_url,
 		),
 		'capabilities'    => array(
 			'resources' => (object) array(),
 			'tools'     => (object) array(),
 		),
 		'instructions'    => sprintf(
-			'WordPress site exposing a REST API at %s. Discover endpoints via /.well-known/api-catalog or fetch the OpenAPI spec at /?format=openapi.',
+			'WordPress site exposing a REST API at %s. Discover endpoints via /.well-known/api-catalog or fetch the OpenAPI spec at /openapi.json.',
 			$api_url
 		),
 	);
@@ -63,10 +63,12 @@ function handle_mcp_server_card_request(): void {
 	/**
 	 * Filter the MCP server card before serialization.
 	 *
-	 * Plugins that actually implement an MCP transport (JSON-RPC over HTTP/SSE)
-	 * can override `transport.type` to `streamable-http` and populate proper
-	 * MCP `capabilities` flag objects. The default capabilities are empty
-	 * because vanilla WP doesn't speak the MCP wire protocol.
+	 * The card follows SEP-1649/SEP-2127 structure (`serverInfo`, `transport`
+	 * with an `endpoint`, `capabilities`). Note: vanilla WP does not speak the
+	 * MCP wire protocol — the advertised endpoint is the REST API root and the
+	 * capability objects are empty. Plugins that run a real MCP server (e.g.
+	 * the official WordPress MCP Adapter) should override `transport.endpoint`
+	 * and populate `capabilities` here.
 	 *
 	 * @param array $server_card
 	 */

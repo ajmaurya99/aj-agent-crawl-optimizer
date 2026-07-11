@@ -22,10 +22,13 @@ add_filter( 'plugin_action_links_' . plugin_basename( AJACO_FILE ), __NAMESPACE_
  * @return void
  */
 function on_activation(): void {
-	// Trigger the one-time Quick Setup wizard on the next visit to the
-	// settings page. 5-minute window is enough for the user to navigate over;
-	// after that the wizard quietly drops away and the normal page renders.
-	set_transient( WIZARD_TRANSIENT, 1, 5 * MINUTE_IN_SECONDS );
+	// Arm the Quick Setup wizard persistently (an option, not a timed
+	// transient) so WP-CLI/bulk activations and slow admins don't lose it.
+	// Re-activations after the wizard has already run don't re-arm it — the
+	// user's configuration stands.
+	if ( ! get_option( WIZARD_DONE_OPTION ) ) {
+		update_option( WIZARD_PENDING_OPTION, 1, false );
+	}
 
 	// Flush cached endpoint outputs so the first request after (re)activation
 	// always reflects the current plugin code, not a stale pre-update body.

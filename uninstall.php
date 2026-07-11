@@ -25,12 +25,16 @@ $options = array(
 	'ajaco_indexnow_enabled',
 	'ajaco_llms_txt_enabled',
 	'ajaco_indexnow_key',
+	// Wizard state (persistent options since 1.0.1).
+	'ajaco_show_wizard',
+	'ajaco_wizard_done',
 );
 
 $transients = array(
 	'ajaco_reset_notice',
 	'ajaco_openapi_cache',
 	'ajaco_llms_txt_cache',
+	// Pre-1.0.1 installs stored wizard state in transients.
 	'ajaco_show_wizard',
 	'ajaco_wizard_applied',
 );

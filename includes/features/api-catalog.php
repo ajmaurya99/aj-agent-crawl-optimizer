@@ -39,29 +39,35 @@ function handle_api_catalog_request(): void {
 	$api_url = rest_url( '/' );
 
 	// Build linkset per RFC 9727 (flat form, RFC 9264 §4.2.4.3).
-	$linkset = array(
-		array(
-			'anchor'       => $api_url,
-			'service-desc' => array(
-				array(
-					'href' => home_url( '/?format=openapi' ),
-					'type' => 'application/openapi+json',
-				),
+	$entry = array(
+		'anchor'      => $api_url,
+		'service-doc' => array(
+			array(
+				'href' => 'https://developer.wordpress.org/rest-api/',
+				'type' => 'text/html',
 			),
-			'service-doc'  => array(
-				array(
-					'href' => 'https://developer.wordpress.org/rest-api/',
-					'type' => 'text/html',
-				),
-			),
-			'status'       => array(
-				array(
-					'href' => $api_url,
-					'type' => 'application/json',
-				),
+		),
+		'status'      => array(
+			array(
+				'href' => $api_url,
+				'type' => 'application/json',
 			),
 		),
 	);
+
+	// Only advertise a service-desc when the OpenAPI feature is actually
+	// enabled — otherwise the catalog points agents at a dead link. Media type
+	// matches what the endpoint really serves (application/json).
+	if ( is_feature_enabled( 'openapi' ) ) {
+		$entry['service-desc'] = array(
+			array(
+				'href' => home_url( '/openapi.json' ),
+				'type' => 'application/json',
+			),
+		);
+	}
+
+	$linkset = array( $entry );
 
 	/**
 	 * Filter the RFC 9727 linkset before it's serialized.

@@ -84,7 +84,7 @@ function help_tab_features(): string {
 		array( __( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ), '/.well-known/agent-skills/index.json' ),
 		array( __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'navigator.modelContext.provideContext()' ),
 		array( __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ), '<script type="application/ld+json">' ),
-		array( __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), '/?format=openapi' ),
+		array( __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), '/openapi.json' ),
 		array( __( 'llms.txt', 'aj-agent-crawl-optimizer' ), '/llms.txt' ),
 		array( __( 'IndexNow', 'aj-agent-crawl-optimizer' ), 'POST api.indexnow.org' ),
 	);

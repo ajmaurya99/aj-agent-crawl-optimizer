@@ -51,6 +51,7 @@ require_once AJACO_DIR . 'includes/scan/class-check-info.php';
 require_once AJACO_DIR . 'includes/scan/class-level.php';
 require_once AJACO_DIR . 'includes/scan/class-scanner.php';
 require_once AJACO_DIR . 'includes/scan/class-fix-registry.php';
+require_once AJACO_DIR . 'includes/scan/class-hosting-diagnosis.php';
 $ajaco_check_files = glob( AJACO_DIR . 'includes/scan/checks/class-check-*.php' );
 if ( is_array( $ajaco_check_files ) ) {
 	foreach ( $ajaco_check_files as $ajaco_check_file ) {

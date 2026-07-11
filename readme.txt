@@ -106,6 +106,10 @@ If you want Bing and Yandex to re-crawl your content within minutes of publish:
 
 The scanner runs the same 21 checks (and the same Level 0–5 ladder) as Cloudflare's isitagentready.com: Level 1 needs 2 of robots.txt/sitemap/Link headers; Level 2 adds AI bot rules and Content Signals; Level 3 adds Markdown negotiation; Level 4 adds one of MCP card/Agent Skills/API catalog/A2A card; Level 5 adds two of Web Bot Auth, all four integrations, and auth metadata. Nothing counts unless the scan verifies it — enabling a toggle earns nothing until the endpoint actually responds. Commerce checks are informational and never scored.
 
+= My host blocks /.well-known/ paths or doesn't allow creating files — will the plugin still work? =
+
+The plugin never creates files: every endpoint (/.well-known/*, /llms.txt, /openapi.json, /auth.md) is served virtually by WordPress, so hosts that forbid file creation are fully supported. What can break things is the web server intercepting requests before WordPress runs — typically an nginx dot-path deny rule returning 403 on /.well-known/*, or a static-file rule returning 404 for /llms.txt-style paths. The readiness scan detects exactly this (feature enabled + server blocking) and the Dashboard shows a hosting notice with copy-paste nginx and Apache fixes you can apply yourself or forward to your hosting support.
+
 = Can I run scans from the command line or scripts? =
 
 Yes: `wp agent-ready scan` (add `--format=json` for machines or `--format=agent` for a markdown fix report), `wp agent-ready fix <check>` or `--all-safe`, and `wp agent-ready status`. The same operations are available over REST at `/wp-json/ajaco/v1/scan` and `/wp-json/ajaco/v1/fix` (admin capability required; `/wp-json/ajaco/v1/health` is public).
@@ -181,6 +185,7 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * NEW: AI Bot Rules — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check, with per-bot allow/block policy.
 * NEW: /auth.md — agent authentication documentation for Application Passwords.
 * NEW: /llms-full.txt — full recent content as Markdown alongside /llms.txt; password-protected content excluded from all agent-facing endpoints.
+* NEW: Hosting diagnosis — when a feature is enabled but the server blocks its endpoint (nginx dot-path 403s, static-file 404s), the scan flags it and the Dashboard offers copy-paste nginx/Apache fixes.
 * Settings page moved under Agent Ready → Settings (URLs, help tabs, and reset flow updated accordingly).
 * New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_commerce_signals, ajaco_scan_sslverify.
 

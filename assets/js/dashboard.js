@@ -183,6 +183,7 @@
 			html += renderEmpty();
 		} else {
 			html += '<div class="ajaco-hero-row">' + renderGaugeCard() + renderNextLevel() + '</div>';
+			html += renderHosting();
 			html += renderCategories();
 			html += renderFab();
 			html += state.sheetOpen ? renderSheet() : '';
@@ -277,6 +278,25 @@
 			'<h3>Level ' + next.target + ' — ' + esc( next.name ) + '</h3>' +
 			( next.note ? '<p class="ajaco-meta">' + esc( next.note ) + '</p>' : '' ) +
 			rows + '</div>';
+	}
+
+	function renderHosting() {
+		var hosting = state.scan.hosting;
+		if ( ! hosting || ! hosting.issues || ! hosting.issues.length ) {
+			return '';
+		}
+		var items = '';
+		hosting.issues.forEach( function ( issue ) {
+			items += '<li>' + esc( issue.summary ) + '</li>';
+		} );
+		return '<div class="ajaco-card ajaco-hosting">' +
+			'<h3>' + esc( 'Your host is blocking ' + hosting.issues.length + ' agent endpoint' + ( 1 === hosting.issues.length ? '' : 's' ) ) + '</h3>' +
+			'<p class="ajaco-meta">' + esc( 'These features are enabled and served by the plugin (no files involved), but the web server intercepts the request before WordPress runs. Add the matching rule to your server config — or send it to your hosting support — then re-scan.' ) + '</p>' +
+			'<ul class="ajaco-hosting-list">' + items + '</ul>' +
+			'<div class="ajaco-actions">' +
+			'<button class="button button-small" data-act="copy-snippet" data-snippet="nginx">' + esc( 'Copy nginx fix' ) + '</button>' +
+			'<button class="button button-small" data-act="copy-snippet" data-snippet="apache">' + esc( 'Copy Apache .htaccess fix' ) + '</button>' +
+			'</div></div>';
 	}
 
 	function renderCategories() {
@@ -581,6 +601,10 @@
 						copyText( failingChecks().map( function ( f ) {
 							return buildPrompt( f.id, f.result );
 						} ).join( '\n\n---\n\n' ), el );
+						break;
+					case 'copy-snippet':
+						var snippets = ( state.scan && state.scan.hosting && state.scan.hosting.snippets ) || {};
+						copyText( snippets[ el.getAttribute( 'data-snippet' ) ] || '', el );
 						break;
 				}
 			} );

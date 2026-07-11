@@ -166,6 +166,7 @@ class Scanner {
 			'nextLevel'       => Level::next_level( $level, $statuses ),
 			'isCommerce'      => $is_commerce,
 			'commerceSignals' => $commerce['signals'],
+			'hosting'         => Hosting_Diagnosis::analyze( $categories ),
 			'enabledChecks'   => $enabled,
 			'scannerVersion'  => AJACO_VERSION,
 		);
@@ -225,6 +226,7 @@ class Scanner {
 		$stored['isCommerce']      = $commerce['is_commerce'];
 		$stored['commerceSignals'] = $commerce['signals'];
 		$stored['scores']          = $this->rescore_stored( $stored['checks'] );
+		$stored['hosting']         = Hosting_Diagnosis::analyze( $stored['checks'] );
 
 		update_option( self::LAST_SCAN_OPTION, $stored, false );
 

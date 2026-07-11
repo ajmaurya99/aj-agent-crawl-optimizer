@@ -160,8 +160,8 @@ function help_tab_troubleshooting(): string {
 			__( 'Check three things: (1) the IndexNow API Key field is filled, (2) you\'re publishing a public post type — revisions and autosaves are skipped, (3) you\'re on production. Pings are non-blocking, so failures are silent — check your server log for requests to api.indexnow.org.', 'aj-agent-crawl-optimizer' ),
 		),
 		array(
-			__( 'A /.well-known/ endpoint returns 404.', 'aj-agent-crawl-optimizer' ),
-			__( 'Confirm the matching toggle is on. The endpoints don\'t use WP rewrite rules, so a rewrite flush isn\'t needed — but caching plugins or CDNs might serve a stale 404; purge those if so.', 'aj-agent-crawl-optimizer' ),
+			__( 'A /.well-known/ endpoint returns 403 or 404.', 'aj-agent-crawl-optimizer' ),
+			__( 'Confirm the matching toggle is on, then run a scan from Agent Ready → Dashboard: if the feature is enabled but the server blocks the request (common nginx dot-path deny rules, or static-file blocks without try_files), the dashboard shows a hosting notice with copy-paste nginx/Apache fixes you can apply or send to your host. No files or rewrite flushes are involved — the endpoints are served virtually. Caching plugins or CDNs can also serve a stale 404; purge those too.', 'aj-agent-crawl-optimizer' ),
 		),
 		array(
 			__( 'Multisite subsite paths.', 'aj-agent-crawl-optimizer' ),

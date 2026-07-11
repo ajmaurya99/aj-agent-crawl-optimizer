@@ -58,6 +58,7 @@ function render_settings_page(): void {
 
 		<p>
 			<?php esc_html_e( 'These toggles control what the plugin publishes for AI agents. Whether it actually works on your site is verified by the scanner on the Dashboard.', 'aj-agent-crawl-optimizer' ); ?>
+			<?php esc_html_e( 'Detailed behavior notes for every feature are under the "Help" tab at the top right of this screen.', 'aj-agent-crawl-optimizer' ); ?>
 		</p>
 
 		<form method="post" action="options.php">

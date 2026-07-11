@@ -58,7 +58,7 @@ function render_settings_page(): void {
 
 		<p>
 			<?php esc_html_e( 'These toggles control what the plugin publishes for AI agents. Whether it actually works on your site is verified by the scanner on the Dashboard.', 'aj-agent-crawl-optimizer' ); ?>
-			<?php esc_html_e( 'Detailed behavior notes for every feature are under the "Help" tab at the top right of this screen.', 'aj-agent-crawl-optimizer' ); ?>
+			<a href="#" class="ajaco-open-help" data-tab="ajaco-features"><?php esc_html_e( 'Open the feature guide', 'aj-agent-crawl-optimizer' ); ?></a>
 		</p>
 
 		<form method="post" action="options.php">
@@ -74,6 +74,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_api_catalog_enabled" name="ajaco_api_catalog_enabled" value="1" <?php checked( $api_catalog_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish an API catalog at /.well-known/api-catalog for automated API discovery (RFC 9727). Also emits a Link header advertising the catalog on every response.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="api-catalog"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php if ( $api_catalog_enabled && ! $openapi_enabled ) : ?>
 							<p class="description ajaco-hint">
 								<?php esc_html_e( 'OpenAPI Spec is off, so the catalog is published without a service-desc link. Enable OpenAPI below for a complete catalog.', 'aj-agent-crawl-optimizer' ); ?>
@@ -88,6 +89,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_mcp_server_card_enabled" name="ajaco_mcp_server_card_enabled" value="1" <?php checked( $mcp_server_card_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish MCP Server Card at /.well-known/mcp/server-card.json for AI agent tool discovery.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="mcp-server-card"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -97,6 +99,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_agent_skills_index_enabled" name="ajaco_agent_skills_index_enabled" value="1" <?php checked( $agent_skills_index_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish Agent Skills Index at /.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="agent-skills-index"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -106,6 +109,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_auth_md_enabled" name="ajaco_auth_md_enabled" value="1" <?php checked( $auth_md_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish /auth.md documenting how agents authenticate to the REST API via Application Passwords.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="auth-md"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -115,6 +119,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_llms_txt_enabled" name="ajaco_llms_txt_enabled" value="1" <?php checked( $llms_txt_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish a curated, LLM-readable index at /llms.txt plus full recent content at /llms-full.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="llms-txt"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -124,6 +129,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_indexnow_enabled" name="ajaco_indexnow_enabled" value="1" <?php checked( $indexnow_enabled, true ); ?> />
 							<?php esc_html_e( 'Ping Bing and Yandex instantly when content is published or updated via IndexNow.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="indexnow"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php if ( $indexnow_enabled && '' === trim( $indexnow_key ) ) : ?>
 							<p class="description ajaco-warn">
 								<?php esc_html_e( 'IndexNow is enabled but no API key is set below — no pings are being sent.', 'aj-agent-crawl-optimizer' ); ?>
@@ -173,6 +179,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_markdown_enabled" name="ajaco_markdown_enabled" value="1" <?php checked( $markdown_enabled, true ); ?> />
 							<?php esc_html_e( 'Serve clean Markdown content when AI agents request it via Accept header.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="markdown-negotiation"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -182,6 +189,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_json_ld_enabled" name="ajaco_json_ld_enabled" value="1" <?php checked( $json_ld_enabled, true ); ?> />
 							<?php esc_html_e( 'Add Schema.org structured data (WebSite, Organization, Article, BreadcrumbList, FAQPage) for better content understanding by LLMs.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="json-ld-schema"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php
 						$active_seo = active_seo_plugin();
 						if ( null !== $active_seo ) :
@@ -205,6 +213,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_openapi_enabled" name="ajaco_openapi_enabled" value="1" <?php checked( $openapi_enabled, true ); ?> />
 							<?php esc_html_e( 'Publish OpenAPI 3.0 specification at /openapi.json for API documentation.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="openapi-spec"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 				<tr>
@@ -214,6 +223,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_webmcp_enabled" name="ajaco_webmcp_enabled" value="1" <?php checked( $webmcp_enabled, true ); ?> />
 							<?php esc_html_e( 'Expose site tools to AI agents via WebMCP browser API (Chrome experimental).', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="webmcp-tools"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 					</td>
 				</tr>
 			</table>
@@ -228,6 +238,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_ai_bot_rules_enabled" name="ajaco_ai_bot_rules_enabled" value="1" <?php checked( $ai_bot_rules_enabled, true ); ?> />
 							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for, using the per-bot policy below.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="ai-bot-rules"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php render_ai_bot_policy_table(); ?>
 					</td>
 				</tr>
@@ -238,6 +249,7 @@ function render_settings_page(): void {
 							<input type="checkbox" id="ajaco_content_signals_enabled" name="ajaco_content_signals_enabled" value="1" <?php checked( $content_signals_enabled, true ); ?> />
 							<?php esc_html_e( 'Add a Content-Signal directive to robots.txt declaring AI usage preferences.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="content-signals"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php render_content_signal_fields(); ?>
 					</td>
 				</tr>

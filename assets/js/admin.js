@@ -27,6 +27,55 @@
         });
     });
 
+    // --- "Open the feature guide" --------------------------------------------
+    //
+    // WordPress collapses the contextual Help panel by default, so the feature
+    // documentation is invisible unless you know the Help tab exists. This
+    // link opens the panel, selects the Features tab, and scrolls to it.
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.ajaco-open-help').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                var toggle = document.getElementById('contextual-help-link');
+                var wrap = document.getElementById('contextual-help-wrap');
+                if (!toggle || !wrap) {
+                    return;
+                }
+
+                // Open the panel if it's closed (WP toggles aria-expanded).
+                if ('true' !== toggle.getAttribute('aria-expanded')) {
+                    toggle.click();
+                }
+
+                // Select the requested tab.
+                var tabId = link.getAttribute('data-tab');
+                var tabLink = tabId && document.querySelector('#tab-link-' + tabId + ' a');
+                if (tabLink) {
+                    tabLink.click();
+                }
+
+                wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Deep-link: scroll the panel to this feature's notes and
+                // flash them so the eye lands in the right place.
+                var feature = link.getAttribute('data-feature');
+                var target = feature && document.getElementById('ajaco-help-' + feature);
+                if (!target) {
+                    return;
+                }
+
+                window.setTimeout(function () {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    target.classList.add('ajaco-help-flash');
+                    window.setTimeout(function () {
+                        target.classList.remove('ajaco-help-flash');
+                    }, 1600);
+                }, 250);
+            });
+        });
+    });
+
     // --- AI bot policy presets ----------------------------------------------
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('[data-ajaco-preset]').forEach(function (btn) {

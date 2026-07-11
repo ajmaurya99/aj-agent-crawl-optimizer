@@ -85,74 +85,103 @@ function help_tab_overview(): string {
 }
 
 /**
+ * Feature slug => display name. Slugs are stable across locales and are used
+ * as the Help-panel anchor ids the settings page's "Read more" links target.
+ *
+ * @return array<string, string>
+ */
+function feature_display_names(): array {
+	return array(
+		'api-catalog'          => __( 'API Catalog', 'aj-agent-crawl-optimizer' ),
+		'mcp-server-card'      => __( 'MCP Server Card', 'aj-agent-crawl-optimizer' ),
+		'agent-skills-index'   => __( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ),
+		'auth-md'              => __( 'auth.md', 'aj-agent-crawl-optimizer' ),
+		'llms-txt'             => __( 'llms.txt', 'aj-agent-crawl-optimizer' ),
+		'indexnow'             => __( 'IndexNow', 'aj-agent-crawl-optimizer' ),
+		'markdown-negotiation' => __( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ),
+		'json-ld-schema'       => __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ),
+		'openapi-spec'         => __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ),
+		'webmcp-tools'         => __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ),
+		'ai-bot-rules'         => __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ),
+		'content-signals'      => __( 'Content-Signals', 'aj-agent-crawl-optimizer' ),
+	);
+}
+
+/**
  * @return string
  */
 function help_tab_features(): string {
 	// Per-feature behavior notes (the canonical reference — the settings form
 	// itself only carries one-line descriptions). Bullets may contain <code>.
-	$features = array(
-		__( 'API Catalog', 'aj-agent-crawl-optimizer' )        => array(
+	// Keyed by feature slug — the settings page's "Read more" links point at
+	// `#ajaco-help-{slug}` so each toggle deep-links into its own notes.
+	$bullets_by_feature = array(
+		'api-catalog'          => array(
 			__( 'Serves <code>/.well-known/api-catalog</code> as <code>application/linkset+json</code> per RFC 9727.', 'aj-agent-crawl-optimizer' ),
 			__( 'Each linkset entry advertises service-desc (the OpenAPI spec, when that toggle is on), service-doc (WordPress REST API handbook), and status (the plugin\'s public health endpoint).', 'aj-agent-crawl-optimizer' ),
 			__( 'Also emits <code>Link: &lt;url&gt;; rel="api-catalog"</code> on every frontend response so agents discover the catalog from any URL.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'MCP Server Card', 'aj-agent-crawl-optimizer' )    => array(
+		'mcp-server-card'      => array(
 			__( 'Serves <code>/.well-known/mcp/server-card.json</code> per the SEP-1649 draft so MCP-aware agents can discover the site.', 'aj-agent-crawl-optimizer' ),
 			__( 'serverInfo (name, version, description, websiteUrl) is generated from get_bloginfo() so it stays accurate per subsite.', 'aj-agent-crawl-optimizer' ),
 			__( 'Declares a transport endpoint, capability objects, protocolVersion, and instructions pointing agents at the API catalog and OpenAPI spec.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ) => array(
+		'agent-skills-index'   => array(
 			__( 'Serves <code>/.well-known/agent-skills/index.json</code> listing six skills (content-query, posts-read, pages-read, media-library, categories, tags) per the Agent Skills Discovery RFC v0.2.0.', 'aj-agent-crawl-optimizer' ),
 			__( 'Each skill also ships a deterministic SKILL.md artifact at <code>/.well-known/agent-skills/{name}/SKILL.md</code>.', 'aj-agent-crawl-optimizer' ),
 			__( 'Index entries carry a sha256 digest of the served SKILL.md bytes so agents can verify artifacts.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'auth.md', 'aj-agent-crawl-optimizer' )            => array(
+		'auth-md'              => array(
 			__( 'Serves <code>/auth.md</code> documenting how agents authenticate via Application Passwords: creation by a human account owner, Basic-auth usage, scope, and revocation.', 'aj-agent-crawl-optimizer' ),
 			__( 'Honest by design: it notes when Application Passwords are unavailable and never advertises OAuth endpoints the site doesn\'t have.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'llms.txt', 'aj-agent-crawl-optimizer' )           => array(
+		'llms-txt'             => array(
 			__( 'Serves <code>/llms.txt</code> — a curated Markdown index (site identity, top-level pages, recent posts with cleaned excerpts) per llmstxt.org, with a Discovery section auto-linking every other enabled plugin endpoint.', 'aj-agent-crawl-optimizer' ),
 			__( '<code>/llms-full.txt</code> serves the full content of recent posts and pages converted to Markdown. Password-protected content is always excluded from both.', 'aj-agent-crawl-optimizer' ),
 			__( 'Cached for one hour; invalidates automatically on post changes, site identity changes, and toggle changes.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'IndexNow', 'aj-agent-crawl-optimizer' )           => array(
+		'indexnow'             => array(
 			__( 'On publish, fires a single non-blocking POST to <code>api.indexnow.org</code> with exactly <code>{ host, key, urlList }</code> — Bing and Yandex re-crawl within minutes.', 'aj-agent-crawl-optimizer' ),
 			__( 'Skips revisions, autosaves, and non-public post types; serves the key file at <code>/{key}.txt</code> for ownership verification.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ) => array(
+		'markdown-negotiation' => array(
 			__( 'Watches for <code>Accept: text/markdown</code>; browsers asking for HTML get the normal response, and <code>Vary: Accept</code> keeps caches from mixing the variants.', 'aj-agent-crawl-optimizer' ),
 			__( 'Buffers the rendered HTML, extracts the main content region, and converts it to clean Markdown.', 'aj-agent-crawl-optimizer' ),
 			__( 'Returns <code>Content-Type: text/markdown</code> and <code>X-Markdown-Tokens</code> (≈ chars/4) so agents can budget context size.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' )     => array(
+		'json-ld-schema'       => array(
 			__( 'Outputs a <code>&lt;script type="application/ld+json"&gt;</code> block in the head.', 'aj-agent-crawl-optimizer' ),
 			__( 'Always includes WebSite (with SearchAction) and Organization (logo resolved from your theme\'s custom logo or site icon); singular posts add Article and BreadcrumbList; FAQ-shaped content adds FAQPage.', 'aj-agent-crawl-optimizer' ),
 			__( 'Auto-suppresses when an SEO plugin (Yoast, Rank Math, AIOSEO, etc.) is active to prevent duplicate structured data.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' )       => array(
+		'openapi-spec'         => array(
 			__( 'Serves <code>/openapi.json</code> (and legacy <code>?format=openapi</code>) — a complete OpenAPI 3.0.3 document.', 'aj-agent-crawl-optimizer' ),
 			__( 'Built from every registered REST route (honoring show_in_index), so plugin routes appear automatically; WordPress regex placeholders become templated paths with proper path/query/requestBody parameters.', 'aj-agent-crawl-optimizer' ),
 			__( 'Cached for one day; invalidates on plugin activation/deactivation and theme switch.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'WebMCP Tools', 'aj-agent-crawl-optimizer' )       => array(
+		'webmcp-tools'         => array(
 			__( 'A frontend script registers four read-only tools (search_content, get_posts, get_pages, get_site_info) on <code>navigator.modelContext</code> — the W3C WebMCP draft API.', 'aj-agent-crawl-optimizer' ),
 			__( 'Subsite-aware, and a silent no-op in browsers without the experimental API.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'AI Bot Rules', 'aj-agent-crawl-optimizer' )       => array(
+		'ai-bot-rules'         => array(
 			__( 'Adds one robots.txt group per AI crawler from the policy table: allowed bots get WordPress core\'s wp-admin rules replicated; blocked bots get <code>Disallow: /</code>.', 'aj-agent-crawl-optimizer' ),
 			__( 'Honors "Discourage search engines" — while that Reading setting is on, every managed bot is blocked regardless of policy.', 'aj-agent-crawl-optimizer' ),
 		),
-		__( 'Content-Signals', 'aj-agent-crawl-optimizer' )    => array(
+		'content-signals'      => array(
 			__( 'Appends a <code>Content-Signal</code> directive built from your yes/no preferences, inside an explicit <code>User-agent: *</code> group at the end of robots.txt.', 'aj-agent-crawl-optimizer' ),
 			__( 'Composes with SEO plugins — their robots.txt additions are preserved; our directive lands last.', 'aj-agent-crawl-optimizer' ),
 		),
 	);
 
+	// Display names, kept beside the slugs so the anchors stay stable across locales.
+	$names = feature_display_names();
+
 	$allowed = array( 'code' => array() );
 
 	$html = '<p>' . esc_html__( 'What each feature actually does when its toggle is on:', 'aj-agent-crawl-optimizer' ) . '</p>';
-	foreach ( $features as $name => $bullets ) {
-		$html .= '<p style="margin:10px 0 2px;"><strong>' . esc_html( $name ) . '</strong></p>';
+	foreach ( $bullets_by_feature as $slug => $bullets ) {
+		$name  = isset( $names[ $slug ] ) ? $names[ $slug ] : $slug;
+		$html .= '<p id="ajaco-help-' . esc_attr( $slug ) . '" style="margin:10px 0 2px;"><strong>' . esc_html( $name ) . '</strong></p>';
 		$html .= '<ul style="margin:0 0 0 18px; list-style:disc;">';
 		foreach ( $bullets as $bullet ) {
 			$html .= '<li>' . wp_kses( $bullet, $allowed ) . '</li>';

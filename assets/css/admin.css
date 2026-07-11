@@ -515,3 +515,29 @@
     flex-basis: 100%;
     margin: 4px 0 0;
 }
+
+/* ---------- v2: feature guide links (open the contextual Help panel) ------ */
+
+.ajaco-read-more {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.ajaco-read-more::after {
+    content: " ›";
+}
+
+.ajaco-help-flash {
+    background: #fcf9e8;
+    box-shadow: 0 0 0 6px #fcf9e8;
+    border-radius: 2px;
+    transition: background 0.4s ease-out, box-shadow 0.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ajaco-help-flash {
+        transition: none;
+    }
+}

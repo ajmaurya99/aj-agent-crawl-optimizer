@@ -40,6 +40,8 @@ function render_settings_page(): void {
 	$indexnow_enabled           = (bool) get_option( 'ajaco_indexnow_enabled', false );
 	$indexnow_key               = (string) get_option( 'ajaco_indexnow_key', '' );
 	$llms_txt_enabled           = (bool) get_option( 'ajaco_llms_txt_enabled', false );
+	$ai_bot_rules_enabled       = (bool) get_option( 'ajaco_ai_bot_rules_enabled', false );
+	$auth_md_enabled            = (bool) get_option( 'ajaco_auth_md_enabled', false );
 
 	// Calculate AJ Agent Crawl Optimizer score.
 	$features       = array(
@@ -53,6 +55,8 @@ function render_settings_page(): void {
 		'openapi'         => $openapi_enabled,
 		'llms_txt'        => $llms_txt_enabled,
 		'indexnow'        => $indexnow_enabled,
+		'ai_bot_rules'    => $ai_bot_rules_enabled,
+		'auth_md'         => $auth_md_enabled,
 	);
 	$enabled_count  = count( array_filter( $features ) );
 	$total_features = count( $features );
@@ -126,6 +130,8 @@ function render_settings_page(): void {
 							'openapi'         => __( 'OpenAPI', 'aj-agent-crawl-optimizer' ),
 							'llms_txt'        => __( 'llms.txt', 'aj-agent-crawl-optimizer' ),
 							'indexnow'        => __( 'IndexNow', 'aj-agent-crawl-optimizer' ),
+							'ai_bot_rules'    => __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ),
+							'auth_md'         => __( 'auth.md', 'aj-agent-crawl-optimizer' ),
 						);
 						?>
 						<span class="ajaco-feature-badge">
@@ -175,6 +181,15 @@ function render_settings_page(): void {
 							<?php esc_html_e( 'Publish Agent Skills Index at /.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-read-more" href="#detail-agent-skills-index"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'auth.md', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_auth_md_enabled">
+							<input type="checkbox" id="ajaco_auth_md_enabled" name="ajaco_auth_md_enabled" value="1" <?php checked( $auth_md_enabled, true ); ?> />
+							<?php esc_html_e( 'Publish /auth.md documenting how agents authenticate to the REST API via Application Passwords.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
 					</td>
 				</tr>
 				<tr>
@@ -252,7 +267,7 @@ function render_settings_page(): void {
 						<a class="ajaco-read-more" href="#detail-json-ld"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php
 						$active_seo = active_seo_plugin();
-						if ( $active_seo !== null ) :
+						if ( null !== $active_seo ) :
 							?>
 							<p class="description" style="color: #d63638; margin-top: 5px;">
 								<?php
@@ -292,6 +307,15 @@ function render_settings_page(): void {
 			<p class="description"><?php esc_html_e( 'Declare your preferences for how AI systems may use your content.', 'aj-agent-crawl-optimizer' ); ?></p>
 			<table class="form-table">
 				<tr>
+					<th scope="row"><?php esc_html_e( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_ai_bot_rules_enabled">
+							<input type="checkbox" id="ajaco_ai_bot_rules_enabled" name="ajaco_ai_bot_rules_enabled" value="1" <?php checked( $ai_bot_rules_enabled, true ); ?> />
+							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for (GPTBot, Claude-Web, PerplexityBot, …). Per-bot allow/block policy is filterable via ajaco_ai_bot_policy.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
+					</td>
+				</tr>
+				<tr>
 					<th scope="row"><?php esc_html_e( 'Content-Signals', 'aj-agent-crawl-optimizer' ); ?></th>
 					<td>
 						<label for="ajaco_content_signals_enabled">
@@ -314,7 +338,7 @@ function render_settings_page(): void {
 		</form>
 
 		<p>
-			<a href="<?php echo esc_url( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer&ajaco-wizard=1' ) ); ?>">
+			<a href="<?php echo esc_url( add_query_arg( 'ajaco-wizard', '1', settings_page_url() ) ); ?>">
 				<?php esc_html_e( 'Run the setup wizard again', 'aj-agent-crawl-optimizer' ); ?>
 			</a>
 		</p>

@@ -45,7 +45,12 @@ function handle_reset_request(): void {
 		'ajaco_openapi_enabled',
 		'ajaco_indexnow_enabled',
 		'ajaco_llms_txt_enabled',
+		'ajaco_ai_bot_rules_enabled',
+		'ajaco_auth_md_enabled',
+		'ajaco_ai_bot_policy',
 		'ajaco_indexnow_key',
+		// The stored self-scan — reset must not leave a stale score behind.
+		'ajaco_last_scan',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );
@@ -54,16 +59,13 @@ function handle_reset_request(): void {
 	// Flush cached endpoint outputs so the next request reflects the reset state.
 	delete_transient( 'ajaco_openapi_cache' );
 	delete_transient( 'ajaco_llms_txt_cache' );
+	delete_transient( 'ajaco_llms_full_txt_cache' );
 
 	// One-shot notice flag — consumed on the next settings page render so a
 	// browser refresh doesn't show the notice repeatedly.
 	set_transient( 'ajaco_reset_notice', 1, 60 );
 
-	$redirect = add_query_arg(
-		array( 'page' => 'aj-agent-crawl-optimizer' ),
-		admin_url( 'options-general.php' )
-	);
-	wp_safe_redirect( $redirect );
+	wp_safe_redirect( settings_page_url() );
 	exit;
 }
 
@@ -77,7 +79,9 @@ function handle_reset_request(): void {
  */
 function maybe_show_reset_notice(): void {
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-	if ( ! $screen || $screen->id !== 'settings_page_aj-agent-crawl-optimizer' ) {
+	// Screen id depends on the parent menu — match the page slug instead of
+	// hardcoding the pre-2.0 'settings_page_' prefix.
+	if ( ! $screen || false === strpos( (string) $screen->id, 'aj-agent-crawl-optimizer' ) ) {
 		return;
 	}
 

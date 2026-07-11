@@ -14,7 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'load-settings_page_aj-agent-crawl-optimizer', __NAMESPACE__ . '\\register_help_tabs' );
+// The settings screen's hook suffix depends on its parent menu (it moved
+// under the "Agent Ready" top-level menu in v2), so bind to the real hook
+// captured at registration time instead of a hardcoded 'load-settings_page_*'.
+add_action(
+	'admin_menu',
+	function () {
+		$settings_hook = admin_page_hook( 'settings' );
+		if ( '' !== $settings_hook ) {
+			add_action( 'load-' . $settings_hook, __NAMESPACE__ . '\\register_help_tabs' );
+		}
+	},
+	20
+);
 
 /**
  * Register the contextual Help tabs.

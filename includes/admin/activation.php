@@ -34,6 +34,7 @@ function on_activation(): void {
 	// always reflects the current plugin code, not a stale pre-update body.
 	delete_transient( 'ajaco_openapi_cache' );
 	delete_transient( 'ajaco_llms_txt_cache' );
+	delete_transient( 'ajaco_llms_full_txt_cache' );
 }
 
 /**
@@ -43,11 +44,16 @@ function on_activation(): void {
  * @return array
  */
 function plugin_action_links( array $links ): array {
-	$settings_link = sprintf(
+	$dashboard_link = sprintf(
 		'<a href="%s">%s</a>',
-		esc_url( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer' ) ),
+		esc_url( dashboard_page_url() ),
+		esc_html__( 'Dashboard', 'aj-agent-crawl-optimizer' )
+	);
+	$settings_link  = sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( settings_page_url() ),
 		esc_html__( 'Settings', 'aj-agent-crawl-optimizer' )
 	);
-	array_unshift( $links, $settings_link );
+	array_unshift( $links, $dashboard_link, $settings_link );
 	return $links;
 }

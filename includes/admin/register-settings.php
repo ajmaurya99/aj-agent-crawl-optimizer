@@ -33,6 +33,8 @@ function register_settings(): void {
 		'ajaco_openapi_enabled',
 		'ajaco_indexnow_enabled',
 		'ajaco_llms_txt_enabled',
+		'ajaco_ai_bot_rules_enabled',
+		'ajaco_auth_md_enabled',
 	);
 
 	foreach ( $boolean_options as $option ) {
@@ -56,4 +58,10 @@ function register_settings(): void {
 			'default'           => '',
 		)
 	);
+
+	// NOTE: ajaco_ai_bot_policy (per-bot allow|block map) is deliberately NOT
+	// registered in the `ajaco_settings` group — the settings form renders no
+	// field for it, and options.php force-updates every registered option of a
+	// submitted group, which would wipe the stored policy on every Save.
+	// Writes to it are sanitized at the write sites via sanitize_ai_bot_policy().
 }

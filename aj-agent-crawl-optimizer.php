@@ -40,11 +40,36 @@ require_once AJACO_DIR . 'includes/features/json-ld-schema.php';
 require_once AJACO_DIR . 'includes/features/openapi-spec.php';
 require_once AJACO_DIR . 'includes/features/indexnow.php';
 require_once AJACO_DIR . 'includes/features/llms-txt.php';
+require_once AJACO_DIR . 'includes/features/ai-bot-rules.php';
+require_once AJACO_DIR . 'includes/features/auth-md.php';
 
-// Admin: menu, settings registration, settings page renderer, asset enqueue, help tabs, activation, reset handler, wizard.
+// Scan engine — self-scan with evidence, Level 0-5 ladder, one-click fixes.
+require_once AJACO_DIR . 'includes/scan/class-check-result.php';
+require_once AJACO_DIR . 'includes/scan/class-evidence.php';
+require_once AJACO_DIR . 'includes/scan/class-check.php';
+require_once AJACO_DIR . 'includes/scan/class-check-info.php';
+require_once AJACO_DIR . 'includes/scan/class-level.php';
+require_once AJACO_DIR . 'includes/scan/class-scanner.php';
+require_once AJACO_DIR . 'includes/scan/class-fix-registry.php';
+$ajaco_check_files = glob( AJACO_DIR . 'includes/scan/checks/class-check-*.php' );
+if ( is_array( $ajaco_check_files ) ) {
+	foreach ( $ajaco_check_files as $ajaco_check_file ) {
+		require_once $ajaco_check_file;
+	}
+}
+unset( $ajaco_check_files, $ajaco_check_file );
+
+// REST API (ajaco/v1): scan, fix, health.
+require_once AJACO_DIR . 'includes/rest/class-scan-controller.php';
+
+// WP-CLI: wp agent-ready scan|status|fix (no-ops outside WP-CLI).
+require_once AJACO_DIR . 'includes/cli.php';
+
+// Admin: menu, settings registration, settings + dashboard renderers, asset enqueue, help tabs, activation, reset handler, wizard.
 require_once AJACO_DIR . 'includes/admin/menu.php';
 require_once AJACO_DIR . 'includes/admin/register-settings.php';
 require_once AJACO_DIR . 'includes/admin/settings-page.php';
+require_once AJACO_DIR . 'includes/admin/dashboard-page.php';
 require_once AJACO_DIR . 'includes/admin/enqueue.php';
 require_once AJACO_DIR . 'includes/admin/help-tabs.php';
 require_once AJACO_DIR . 'includes/admin/activation.php';

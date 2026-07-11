@@ -1,0 +1,609 @@
+/**
+ * Agent Ready dashboard styles — native WP admin look.
+ *
+ * @package Ajaco
+ */
+
+.ajaco-dash {
+	--ajaco-track: #e4e4e7;
+	--ajaco-line: #dcdcde;
+	--ajaco-ink2: #50575e;
+	--ajaco-ink3: #8c8f94;
+	max-width: 1080px;
+	position: relative;
+	padding-bottom: 80px;
+}
+
+/* ---------- header ---------- */
+
+.ajaco-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin: 8px 0 16px;
+}
+
+.ajaco-head h2 {
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0;
+	padding: 0;
+}
+
+.ajaco-origin {
+	color: var(--ajaco-ink2);
+	font-size: 13px;
+}
+
+.ajaco-grow {
+	flex: 1;
+}
+
+.ajaco-meta {
+	color: var(--ajaco-ink3);
+	font-size: 12px;
+	margin: 4px 0;
+}
+
+.ajaco-error {
+	margin: 0 0 16px;
+}
+
+.ajaco-spin {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-right: 6px;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: ajaco-rot 0.7s linear infinite;
+	vertical-align: -2px;
+}
+
+.button:not(.button-primary) .ajaco-spin {
+	border-color: rgba(0, 0, 0, 0.15);
+	border-top-color: #50575e;
+}
+
+@keyframes ajaco-rot {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ajaco-spin {
+		animation-duration: 2s;
+	}
+}
+
+/* ---------- cards ---------- */
+
+.ajaco-card {
+	background: #fff;
+	border: 1px solid var(--ajaco-line);
+	border-radius: 8px;
+	padding: 18px 20px;
+	box-sizing: border-box;
+}
+
+.ajaco-empty {
+	max-width: 560px;
+	margin: 60px auto;
+	text-align: center;
+	padding: 40px 32px;
+}
+
+.ajaco-empty h3 {
+	font-size: 18px;
+	margin: 0 0 8px;
+}
+
+.ajaco-empty p {
+	color: var(--ajaco-ink2);
+	margin: 0 0 20px;
+}
+
+.ajaco-hero-row {
+	display: grid;
+	grid-template-columns: minmax(300px, 5fr) minmax(280px, 4fr);
+	gap: 16px;
+	margin-bottom: 8px;
+}
+
+@media (max-width: 960px) {
+	.ajaco-hero-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- gauge ---------- */
+
+.ajaco-gauge-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.ajaco-gauge-wrap {
+	position: relative;
+	width: 240px;
+	height: 140px;
+}
+
+.ajaco-gauge-center {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+}
+
+.ajaco-lvl {
+	display: block;
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.ajaco-lvl-name {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--ajaco-ink2);
+}
+
+.ajaco-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+.ajaco-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	color: var(--ajaco-ink2);
+	border: 1px solid var(--ajaco-line);
+	border-radius: 99px;
+	padding: 3px 10px;
+	font-variant-numeric: tabular-nums;
+}
+
+.ajaco-chip i {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.ajaco-chip-skip {
+	border-style: dashed;
+	color: var(--ajaco-ink3);
+}
+
+/* ---------- next level ---------- */
+
+.ajaco-next-target {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ajaco-ink3);
+	margin: 0 0 2px;
+}
+
+.ajaco-next h3 {
+	margin: 0 0 6px;
+	font-size: 15px;
+}
+
+.ajaco-req {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 0;
+	border-top: 1px solid var(--ajaco-line);
+}
+
+.ajaco-req-name {
+	flex: 1;
+	min-width: 0;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.ajaco-req-name small {
+	display: block;
+	font-weight: 400;
+	color: var(--ajaco-ink3);
+	font-size: 11.5px;
+}
+
+/* ---------- categories & checks ---------- */
+
+.ajaco-cat {
+	margin-top: 24px;
+}
+
+.ajaco-cat-head {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	margin-bottom: 8px;
+}
+
+.ajaco-cat-head h3 {
+	font-size: 14.5px;
+	margin: 0;
+}
+
+.ajaco-cat-score {
+	font-size: 13px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.ajaco-opt {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ajaco-ink3);
+	border: 1px solid var(--ajaco-line);
+	border-radius: 4px;
+	padding: 1px 5px;
+	margin-left: 8px;
+	vertical-align: 2px;
+}
+
+.ajaco-commerce-note {
+	margin: 0 0 8px;
+}
+
+.ajaco-check {
+	background: #fff;
+	border: 1px solid var(--ajaco-line);
+	border-radius: 8px;
+	margin-bottom: 8px;
+	overflow: hidden;
+	transition: box-shadow 0.5s ease;
+}
+
+.ajaco-check-fail {
+	border-color: #e8a9aa;
+}
+
+.ajaco-flash-pass {
+	box-shadow: 0 0 0 2px #00a32a;
+}
+
+.ajaco-flash-fail {
+	box-shadow: 0 0 0 2px #d63638;
+}
+
+.ajaco-check-row {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	width: 100%;
+	padding: 11px 15px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	font: inherit;
+	color: inherit;
+}
+
+.ajaco-check-row:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+}
+
+.ajaco-sicon {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	flex: none;
+	position: relative;
+}
+
+.ajaco-sicon::after {
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.ajaco-sicon-pass {
+	background: #00a32a;
+}
+
+.ajaco-sicon-pass::after {
+	content: "✓";
+}
+
+.ajaco-sicon-fail {
+	background: #d63638;
+}
+
+.ajaco-sicon-fail::after {
+	content: "✕";
+}
+
+.ajaco-sicon-neutral {
+	background: #8c8f94;
+}
+
+.ajaco-sicon-neutral::after {
+	content: "–";
+}
+
+.ajaco-check-name {
+	font-size: 13.5px;
+	font-weight: 600;
+	flex: none;
+}
+
+.ajaco-check-msg {
+	font-size: 12px;
+	color: var(--ajaco-ink3);
+	flex: 1;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ajaco-chevron {
+	margin-left: auto;
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border-right: 2px solid var(--ajaco-ink3);
+	border-bottom: 2px solid var(--ajaco-ink3);
+	transform: rotate(45deg);
+}
+
+.ajaco-check-row[aria-expanded="true"] .ajaco-chevron {
+	transform: rotate(-135deg);
+}
+
+.ajaco-check-body {
+	border-top: 1px solid var(--ajaco-line);
+	padding: 13px 15px 15px 44px;
+}
+
+.ajaco-check-body dl {
+	margin: 0 0 12px;
+}
+
+.ajaco-kv {
+	display: grid;
+	grid-template-columns: 64px 1fr;
+	gap: 4px 12px;
+	font-size: 12.5px;
+	margin-bottom: 6px;
+}
+
+.ajaco-kv dt {
+	color: var(--ajaco-ink3);
+	font-weight: 600;
+	font-size: 11px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	padding-top: 1px;
+}
+
+.ajaco-kv dd {
+	margin: 0;
+	color: var(--ajaco-ink2);
+}
+
+.ajaco-kv-fail {
+	color: #d63638 !important;
+	font-weight: 500;
+}
+
+.ajaco-kv-pass {
+	color: #00a32a !important;
+}
+
+.ajaco-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.ajaco-ev-btn {
+	font-size: 12px;
+	cursor: pointer;
+}
+
+/* ---------- evidence ---------- */
+
+.ajaco-evidence {
+	background: #f6f7f7;
+	border: 1px solid var(--ajaco-line);
+	border-radius: 6px;
+	padding: 10px 12px;
+	margin-top: 12px;
+}
+
+.ajaco-ev-step {
+	display: flex;
+	gap: 10px;
+	padding: 4px 0;
+	font-size: 12px;
+	align-items: baseline;
+}
+
+.ajaco-ev-act {
+	font-size: 9.5px;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	border-radius: 4px;
+	padding: 1px 6px;
+	flex: none;
+	width: 58px;
+	text-align: center;
+}
+
+.ajaco-ev-fetch {
+	background: #eef1fd;
+	color: #2f48c4;
+}
+
+.ajaco-ev-parse {
+	background: #fcf9e8;
+	color: #996800;
+}
+
+.ajaco-ev-conclude {
+	background: #edfaef;
+	color: #007a1f;
+}
+
+.ajaco-ev-label {
+	flex: 1;
+	min-width: 0;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 11.5px;
+}
+
+.ajaco-finding {
+	display: block;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 11.5px;
+	color: var(--ajaco-ink3);
+}
+
+.ajaco-finding-negative {
+	color: #d63638;
+}
+
+.ajaco-finding-positive {
+	color: #007a1f;
+}
+
+.ajaco-http {
+	font-size: 10.5px;
+	font-weight: 700;
+	border-radius: 4px;
+	padding: 1px 6px;
+	flex: none;
+	font-variant-numeric: tabular-nums;
+}
+
+.ajaco-http-ok {
+	background: #edfaef;
+	color: #007a1f;
+}
+
+.ajaco-http-redir {
+	background: #fcf9e8;
+	color: #996800;
+}
+
+.ajaco-http-err {
+	background: #fcf0f1;
+	color: #d63638;
+}
+
+/* ---------- FAB + sheet ---------- */
+
+.ajaco-fab {
+	position: fixed;
+	right: 32px;
+	bottom: 32px;
+	z-index: 900;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: #2271b1;
+	color: #fff;
+	border: none;
+	border-radius: 99px;
+	padding: 12px 20px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.ajaco-fab:focus-visible {
+	outline: 2px solid #1d2327;
+	outline-offset: 2px;
+}
+
+.ajaco-fab-count {
+	background: #fff;
+	color: #2271b1;
+	border-radius: 99px;
+	font-size: 11px;
+	font-weight: 700;
+	padding: 1px 8px;
+	font-variant-numeric: tabular-nums;
+}
+
+.ajaco-sheet-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.35);
+	z-index: 950;
+}
+
+.ajaco-sheet {
+	position: fixed;
+	left: 50%;
+	bottom: 0;
+	transform: translateX(-50%);
+	width: min(640px, 94vw);
+	background: #fff;
+	border-radius: 12px 12px 0 0;
+	padding: 18px 22px 22px;
+	z-index: 960;
+	box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ajaco-sheet-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.ajaco-sheet-head .button-link {
+	cursor: pointer;
+	font-size: 16px;
+	text-decoration: none;
+}
+
+.ajaco-sheet-list {
+	margin: 0 0 14px;
+	padding-left: 18px;
+	font-size: 13px;
+	color: var(--ajaco-ink2);
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.ajaco-sheet-actions {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 6px;
+}

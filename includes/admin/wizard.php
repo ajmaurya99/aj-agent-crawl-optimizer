@@ -34,7 +34,7 @@ add_action( 'admin_notices', __NAMESPACE__ . '\\maybe_show_wizard_applied_notice
  */
 function should_show_wizard(): bool {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( isset( $_GET['ajaco-wizard'] ) && $_GET['ajaco-wizard'] === '1' ) {
+	if ( isset( $_GET['ajaco-wizard'] ) && '1' === $_GET['ajaco-wizard'] ) {
 		return true;
 	}
 	return (bool) get_option( WIZARD_PENDING_OPTION );
@@ -62,8 +62,11 @@ function recommended_settings(): array {
 		'ajaco_json_ld_enabled'            => ! $seo_active,
 		'ajaco_openapi_enabled'            => true,
 		'ajaco_webmcp_enabled'             => true,
+		// Discovery/auth — on: a truthful, static document.
+		'ajaco_auth_md_enabled'            => true,
 		// Declarations — on.
 		'ajaco_content_signals_enabled'    => true,
+		'ajaco_ai_bot_rules_enabled'       => true,
 	);
 }
 
@@ -87,11 +90,11 @@ function handle_wizard_submit(): void {
 		? sanitize_text_field( wp_unslash( $_POST['ajaco_wizard_action'] ) )
 		: '';
 
-	if ( $action === 'apply' ) {
+	if ( 'apply' === $action ) {
 		// Save whatever the user actually checked in the form. Each option
 		// either appears in $_POST as '1' (checked) or is absent (unchecked).
 		foreach ( array_keys( recommended_settings() ) as $option ) {
-			$checked = isset( $_POST[ $option ] ) && $_POST[ $option ] === '1';
+			$checked = isset( $_POST[ $option ] ) && '1' === $_POST[ $option ];
 			update_option( $option, $checked );
 		}
 		set_transient( WIZARD_APPLIED_FLAG, 1, 60 );
@@ -102,7 +105,7 @@ function handle_wizard_submit(): void {
 	delete_option( WIZARD_PENDING_OPTION );
 	update_option( WIZARD_DONE_OPTION, 1, false );
 
-	wp_safe_redirect( admin_url( 'options-general.php?page=aj-agent-crawl-optimizer' ) );
+	wp_safe_redirect( settings_page_url() );
 	exit;
 }
 
@@ -113,7 +116,9 @@ function handle_wizard_submit(): void {
  */
 function maybe_show_wizard_applied_notice(): void {
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-	if ( ! $screen || $screen->id !== 'settings_page_aj-agent-crawl-optimizer' ) {
+	// The settings screen id depends on its parent menu — match the page slug
+	// instead of hardcoding the pre-2.0 'settings_page_' prefix.
+	if ( ! $screen || false === strpos( (string) $screen->id, 'aj-agent-crawl-optimizer' ) ) {
 		return;
 	}
 
@@ -143,7 +148,7 @@ function render_wizard(): void {
 	$skip_url   = wp_nonce_url(
 		add_query_arg(
 			array(
-				'action'                    => 'ajaco_apply_wizard',
+				'action'              => 'ajaco_apply_wizard',
 				'ajaco_wizard_action' => 'skip',
 			),
 			admin_url( 'admin-post.php' )
@@ -158,10 +163,12 @@ function render_wizard(): void {
 		array( 'discovery', __( 'Agent Skills Index', 'aj-agent-crawl-optimizer' ), 'ajaco_agent_skills_index_enabled', __( '/.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'discovery', __( 'llms.txt', 'aj-agent-crawl-optimizer' ), 'ajaco_llms_txt_enabled', __( 'A curated, LLM-readable index at /llms.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ) ),
 		array( 'discovery', __( 'IndexNow', 'aj-agent-crawl-optimizer' ), 'ajaco_indexnow_enabled', __( 'Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'auth.md', 'aj-agent-crawl-optimizer' ), 'ajaco_auth_md_enabled', __( '/auth.md documenting Application Password authentication for agents.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ), 'ajaco_markdown_enabled', __( 'Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ), 'ajaco_json_ld_enabled', __( 'WebSite, Organization, Article, BreadcrumbList, FAQPage structured data.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), 'ajaco_openapi_enabled', __( 'OpenAPI 3.0.3 document at /openapi.json, generated from REST routes.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'ajaco_webmcp_enabled', __( 'Frontend script registering tools via navigator.modelContext (Chrome experimental).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'declarations', __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ), 'ajaco_ai_bot_rules_enabled', __( 'Explicit robots.txt User-agent groups for the 15 AI crawlers scanners check.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'declarations', __( 'Content-Signals', 'aj-agent-crawl-optimizer' ), 'ajaco_content_signals_enabled', __( 'Adds a Content-Signal directive to robots.txt declaring AI-usage preferences.', 'aj-agent-crawl-optimizer' ) ),
 	);
 
@@ -181,7 +188,7 @@ function render_wizard(): void {
 				<?php esc_html_e( 'One-time setup. The toggles below are pre-selected based on your environment — review, adjust, then apply. You can change anything later from the regular settings page.', 'aj-agent-crawl-optimizer' ); ?>
 			</p>
 
-			<?php if ( $seo_plugin !== null ) : ?>
+			<?php if ( null !== $seo_plugin ) : ?>
 				<div class="notice notice-info inline">
 					<p>
 						<?php

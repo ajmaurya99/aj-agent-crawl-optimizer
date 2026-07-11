@@ -4,7 +4,9 @@
  *
  * Serves /llms.txt with site identity, a Discovery section auto-linking every
  * other plugin endpoint that's currently enabled, top-level pages, and
- * recent posts. Format follows https://llmstxt.org/.
+ * recent posts. Also serves /llms-full.txt (same toggle) with the full
+ * Markdown-converted content of those pages/posts. Format follows
+ * https://llmstxt.org/.
  *
  * @package Ajaco
  */
@@ -15,9 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const LLMS_TXT_CACHE_KEY = 'ajaco_llms_txt_cache';
+const LLMS_TXT_CACHE_KEY      = 'ajaco_llms_txt_cache';
+const LLMS_FULL_TXT_CACHE_KEY = 'ajaco_llms_full_txt_cache';
 
 add_action( 'init', __NAMESPACE__ . '\\handle_llms_txt_request' );
+add_action( 'init', __NAMESPACE__ . '\\handle_llms_full_txt_request' );
 
 // Invalidate when posts/pages change — the body contains their titles, URLs,
 // and excerpts.
@@ -34,12 +38,13 @@ add_action( 'update_option_blogdescription', __NAMESPACE__ . '\\flush_llms_txt_c
 add_action( 'updated_option', __NAMESPACE__ . '\\maybe_flush_llms_txt_on_setting_change' );
 
 /**
- * Delete the cached llms.txt body.
+ * Delete the cached llms.txt and llms-full.txt bodies.
  *
  * @return void
  */
 function flush_llms_txt_cache(): void {
 	delete_transient( LLMS_TXT_CACHE_KEY );
+	delete_transient( LLMS_FULL_TXT_CACHE_KEY );
 }
 
 /**
@@ -82,7 +87,7 @@ function handle_llms_txt_request(): void {
 	header( 'Content-Type: text/markdown; charset=utf-8' );
 
 	$cached = get_transient( LLMS_TXT_CACHE_KEY );
-	if ( is_string( $cached ) && $cached !== '' ) {
+	if ( is_string( $cached ) && '' !== $cached ) {
 		// Plain-text Markdown served as text/markdown (never rendered as HTML).
 		// Values are sanitized for the markdown context in build_llms_txt().
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -112,10 +117,11 @@ function build_llms_txt(): string {
 	$description = markdown_safe_text( get_bloginfo( 'description' ) );
 
 	$out = "# {$name}\n\n";
-	if ( $description !== '' ) {
+	if ( '' !== $description ) {
 		$out .= "> {$description}\n\n";
 	}
 	$out .= "An LLM-readable index of {$name}. Follow the links for the full content.\n\n";
+	$out .= 'Full content: ' . esc_url_raw( home_url( '/llms-full.txt' ) ) . "\n\n";
 
 	// Discovery endpoints — only list features that are currently enabled.
 	// esc_url_raw (not esc_url) — display escaping would entity-encode
@@ -146,7 +152,7 @@ function build_llms_txt(): string {
 		$out .= "\n";
 	}
 
-	// Top-level pages.
+	// Top-level pages (password-protected content stays out of agent indexes).
 	$pages = get_posts(
 		array(
 			'post_type'        => 'page',
@@ -156,6 +162,7 @@ function build_llms_txt(): string {
 			'orderby'          => 'menu_order title',
 			'order'            => 'ASC',
 			'suppress_filters' => false,
+			'has_password'     => false,
 		)
 	);
 	if ( ! empty( $pages ) ) {
@@ -166,7 +173,7 @@ function build_llms_txt(): string {
 		$out .= "\n";
 	}
 
-	// Recent posts.
+	// Recent posts (password-protected content stays out of agent indexes).
 	$posts = get_posts(
 		array(
 			'post_type'        => 'post',
@@ -175,6 +182,7 @@ function build_llms_txt(): string {
 			'orderby'          => 'date',
 			'order'            => 'DESC',
 			'suppress_filters' => false,
+			'has_password'     => false,
 		)
 	);
 	if ( ! empty( $posts ) ) {
@@ -218,8 +226,157 @@ function format_llms_txt_entry( \WP_Post $p, bool $with_date = false ): string {
 	if ( $with_date ) {
 		$line .= ' (' . get_the_date( 'Y-m-d', $p ) . ')';
 	}
-	if ( $excerpt !== '' ) {
+	if ( '' !== $excerpt ) {
 		$line .= ': ' . $excerpt;
 	}
 	return $line;
+}
+
+/**
+ * Serve /llms-full.txt at the root or any multisite subsite path.
+ *
+ * Rides the same `llms_txt` toggle as /llms.txt. Cached for one hour in its
+ * own transient; invalidated by the same hooks via flush_llms_txt_cache().
+ *
+ * @return void
+ */
+function handle_llms_full_txt_request(): void {
+	if ( ! is_feature_enabled( 'llms_txt' ) ) {
+		return;
+	}
+
+	if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+		return;
+	}
+
+	$path = wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH );
+	if ( ! is_string( $path ) || ! preg_match( '#(^|/)llms-full\.txt$#', $path ) ) {
+		return;
+	}
+
+	nocache_headers();
+	header( 'Content-Type: text/markdown; charset=utf-8' );
+
+	$cached = get_transient( LLMS_FULL_TXT_CACHE_KEY );
+	if ( is_string( $cached ) && '' !== $cached ) {
+		// Plain-text Markdown served as text/markdown (never rendered as HTML).
+		// Values are sanitized for the markdown context in build_llms_full_txt().
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $cached;
+		exit;
+	}
+
+	$body = build_llms_full_txt();
+	set_transient( LLMS_FULL_TXT_CACHE_KEY, $body, HOUR_IN_SECONDS );
+
+	// Plain-text Markdown served as text/markdown (never rendered as HTML).
+	// Values are sanitized for the markdown context in build_llms_full_txt().
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo $body;
+	exit;
+}
+
+/**
+ * Build the llms-full.txt body: the full content of top-level pages and the
+ * 15 most recent posts, converted to Markdown.
+ *
+ * @return string
+ */
+function build_llms_full_txt(): string {
+	// text/markdown body — markdown_safe_text() (not esc_html) so agents
+	// receive `Tom's Blog & Café`, not `Tom&#039;s Blog &amp; Café`.
+	$name        = markdown_safe_text( get_bloginfo( 'name' ) );
+	$description = markdown_safe_text( get_bloginfo( 'description' ) );
+
+	$out = "# {$name}\n\n";
+	if ( '' !== $description ) {
+		$out .= "> {$description}\n\n";
+	}
+	$out .= "The full content of {$name} in Markdown, for LLM consumption. "
+		. 'A shorter index is available at ' . esc_url_raw( home_url( '/llms.txt' ) ) . ".\n\n";
+
+	// Top-level pages. `has_password => false` — this endpoint serves FULL
+	// content, and applying `the_content` to raw post_content bypasses the
+	// password gate that lives in get_the_content(); protected content must
+	// never reach an unauthenticated machine endpoint.
+	$pages = get_posts(
+		array(
+			'post_type'        => 'page',
+			'post_status'      => 'publish',
+			'numberposts'      => 15,
+			'post_parent'      => 0,
+			'orderby'          => 'menu_order title',
+			'order'            => 'ASC',
+			'suppress_filters' => false,
+			'has_password'     => false,
+		)
+	);
+
+	// Most recent posts (same password exclusion).
+	$posts = get_posts(
+		array(
+			'post_type'        => 'post',
+			'post_status'      => 'publish',
+			'numberposts'      => 15,
+			'orderby'          => 'date',
+			'order'            => 'DESC',
+			'suppress_filters' => false,
+			'has_password'     => false,
+		)
+	);
+
+	foreach ( array_merge( $pages, $posts ) as $p ) {
+		// Defense in depth alongside has_password: never render protected content.
+		if ( post_password_required( $p ) ) {
+			continue;
+		}
+		$out .= format_llms_full_txt_entry( $p );
+	}
+
+	/**
+	 * Filter the final llms-full.txt body.
+	 *
+	 * Themes and plugins can append custom-post-type content or replace the
+	 * body wholesale. Return value is served verbatim with
+	 * `Content-Type: text/markdown`.
+	 *
+	 * @param string $out The Markdown body about to be served.
+	 */
+	return (string) apply_filters( 'ajaco_llms_full_txt_content', $out );
+}
+
+/**
+ * Format a single post/page entry for llms-full.txt: heading, source URL,
+ * publish date, then the full rendered content converted to Markdown
+ * (capped at ~20000 characters).
+ *
+ * @param \WP_Post $p
+ * @return string
+ */
+function format_llms_full_txt_entry( \WP_Post $p ): string {
+	$title = markdown_safe_text( get_the_title( $p ) );
+	$url   = esc_url_raw( get_permalink( $p ) );
+
+	// Render shortcodes/blocks via `the_content`, then convert the HTML to
+	// Markdown with the shared converter from markdown-negotiation.php.
+	// Truncate the rendered HTML BEFORE conversion — html_to_markdown runs
+	// ~25 full-string regex passes, so feeding it a megabyte page-builder
+	// document on a cold cache is a CPU trap.
+	$html = (string) apply_filters( 'the_content', $p->post_content );
+	if ( mb_strlen( $html ) > 100000 ) {
+		$html = mb_substr( $html, 0, 100000 );
+	}
+	$markdown = trim( html_to_markdown( $html ) );
+	if ( ! is_string( $markdown ) || '' === $markdown ) {
+		$markdown = trim( wp_strip_all_tags( $html ) );
+	}
+	if ( mb_strlen( $markdown ) > 20000 ) {
+		$markdown = mb_substr( $markdown, 0, 20000 ) . "\n\n…(truncated)";
+	}
+
+	$entry  = "## {$title}\n\n";
+	$entry .= "Source: {$url}\n";
+	$entry .= 'Published: ' . get_the_date( 'Y-m-d', $p ) . "\n\n";
+	$entry .= $markdown . "\n\n";
+	return $entry;
 }

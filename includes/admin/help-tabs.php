@@ -127,6 +127,12 @@ function help_tab_developers(): string {
 		array( 'ajaco_json_ld_graph', __( 'Add custom Schema.org entries (Product, Recipe, Event, etc.).', 'aj-agent-crawl-optimizer' ) ),
 		array( 'ajaco_openapi_spec', __( 'Add securitySchemes, tags, additional servers.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'ajaco_llms_txt_content', __( 'Append sections or replace the llms.txt body wholesale.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_llms_full_txt_content', __( 'Append content-type sections or replace the llms-full.txt body.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_auth_md_content', __( 'Customize the /auth.md agent-authentication document.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_ai_bot_list', __( 'Add or remove AI crawlers managed by the robots.txt bot rules.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_ai_bot_policy', __( 'Override the per-bot allow/block policy (e.g. block all training bots).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_commerce_signals', __( 'Adjust commerce-site detection for the readiness scan.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'ajaco_scan_sslverify', __( 'Re-enable TLS verification for same-origin scan probes.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'ajaco_active_seo_plugin', __( 'Override SEO-plugin detection for JSON-LD auto-suppress.', 'aj-agent-crawl-optimizer' ) ),
 	);
 

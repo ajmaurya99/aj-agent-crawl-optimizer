@@ -49,7 +49,10 @@ function handle_api_catalog_request(): void {
 		),
 		'status'      => array(
 			array(
-				'href' => $api_url,
+				// Dedicated lightweight health endpoint (public), not the
+				// multi-KB REST index — the RFC 9727 `status` relation is
+				// meant for liveness.
+				'href' => rest_url( 'ajaco/v1/health' ),
 				'type' => 'application/json',
 			),
 		),

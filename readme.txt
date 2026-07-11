@@ -8,32 +8,45 @@ Stable tag:        1.0.1
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-Make your WordPress site legible to AI agents — Markdown negotiation, JSON-LD, OpenAPI, MCP server card, llms.txt, IndexNow, and more.
+The agent-readiness scanner and fixer for WordPress — scan your site against 21 agent standards, fix failures in one click, verify with evidence.
 
 == Description ==
 
-**AJ Agent Crawl Optimizer** is a thin compatibility layer that teaches your site to speak the languages AI agents already use to discover and consume web content. It publishes machine-readable manifests at well-known URLs, serves clean Markdown when an AI requests it, and declares your AI-usage preferences — all without changing anything for human visitors.
+**AJ Agent Crawl Optimizer** makes your site legible to AI agents — and, since 2.0, *proves* it. The built-in **readiness scanner** runs the same 21 checks as Cloudflare's isitagentready.com against your live site, grades you on the **Level 0–5 agent-readiness ladder** (Not Ready → Basic Web Presence → Bot-Aware → Agent-Readable → Agent-Integrated → Agent-Native), and shows the full evidence trail — every request and response — behind every verdict. Failing checks get a **Fix now** button that enables the right feature and re-scans that single check to prove it went green; anything the plugin can't fix in WordPress (DNS records, server config) gets a copy-paste prompt for your coding agent.
 
-Each capability is a separate toggle under **Settings → AJ Agent Crawl Optimizer** and ships **opt-in** (everything starts off). On first activation, a one-time **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data).
+**Release status:** the scanner described below is part of **2.0, currently in development on the `v2-dev` branch** (github.com/ajmaurya99/aj-agent-crawl-optimizer). The current stable release is the 1.0.x publishing toolkit described from "Discovery" onward.
+
+= The scan → fix → verify loop (new in 2.0) =
+
+* **Dashboard** (Agent Ready → Dashboard) — segmented category gauge, Level badge, and a "Next level" panel listing exactly which checks unlock the next level.
+* **21 checks across 5 categories** — Discoverability (robots.txt, sitemap, Link headers, DNS-AID), Content Accessibility (Markdown negotiation), Bot Access Control (AI bot rules, Content Signals, Web Bot Auth), API/Auth/MCP Discovery (API catalog, OAuth discovery, OAuth Protected Resource, auth.md, MCP server card, A2A agent card, Agent Skills, WebMCP), and Commerce (x402, MPP, UCP, ACP, AP2 — informational, never scored).
+* **Evidence timelines** — fetch/parse/conclude steps with request/response snapshots, so you can audit *why* a check passed or failed (and catch page caches or server rules silently breaking your endpoints).
+* **One-click fixes with verification** — 9 checks are fixable in one click; the plugin re-scans just that check afterwards. A bulk "Fix all safe items" sheet handles the rest.
+* **REST API** — `POST /wp-json/ajaco/v1/scan`, `POST /wp-json/ajaco/v1/fix`, public `GET /wp-json/ajaco/v1/health`.
+* **WP-CLI** — `wp agent-ready scan --format=summary|json|agent`, `wp agent-ready fix <check>|--all-safe`, `wp agent-ready status` for agency fleets and AI agents operating over SSH.
+
+Each publishing capability remains a separate toggle under **Agent Ready → Settings** and ships **opt-in** (everything starts off). On first activation, a **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data) — re-runnable any time.
 
 = Discovery — help agents find what your site offers =
 
 * **API Catalog** (RFC 9727) — `/.well-known/api-catalog` linkset advertising your REST API, plus a `Link: rel="api-catalog"` header on every response so agents discover it from any URL.
 * **MCP Server Card** (SEP-1649 draft) — `/.well-known/mcp/server-card.json` describing the site to MCP-aware agents.
-* **Agent Skills Index** (RFC v0.2.0) — `/.well-known/agent-skills/index.json` listing six skills (search, posts, pages, media, categories, tags) plus per-skill `SKILL.md` artifacts with verifiable sha256 digests.
-* **llms.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other plugin endpoint.
+* **Agent Skills Index** (RFC v0.2.0) — `/.well-known/agent-skills/index.json` listing six skills (content-query, posts-read, pages-read, media-library, categories, tags) plus per-skill `SKILL.md` artifacts with verifiable sha256 digests.
+* **llms.txt + llms-full.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other plugin endpoint; `/llms-full.txt` (new in 2.0) serves the full content of recent posts and pages as Markdown. Password-protected content is always excluded.
 * **IndexNow** — non-blocking ping to Bing and Yandex on every post publish so search engines re-crawl within minutes.
 
 = Presentation — format content for agents =
 
 * **Markdown Negotiation** — when a request includes `Accept: text/markdown`, the page is served as clean Markdown with `X-Markdown-Tokens` for context budgeting. Browsers (which send `text/html`) are completely unaffected.
 * **JSON-LD Schema** — Schema.org structured data: WebSite, Organization, Article, BreadcrumbList, and auto-detected FAQPage. Logo resolved from your theme's custom logo or site icon.
-* **OpenAPI 3.0.3** — `/?format=openapi` returns a complete spec generated dynamically from `rest_get_server()`, including plugin-registered REST routes.
+* **OpenAPI 3.0.3** — `/openapi.json` (and legacy `/?format=openapi`) returns a complete spec generated dynamically from `rest_get_server()`, including plugin-registered REST routes.
 * **WebMCP Tools** — registers four tools (search, posts, pages, site info) via `navigator.modelContext.provideContext()` for browsers that support the W3C WebMCP draft.
 
 = Declarations =
 
-* **Content-Signals** — appends a `Content-Signal: ai-train=no, search=yes, ai-input=no` directive to robots.txt declaring your AI-usage preferences (per contentsignals.org). Composes with Yoast/Rank Math/AIOSEO — their additions are preserved, our line lands at the very end.
+* **AI Bot Rules** (new in 2.0) — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for (GPTBot, ChatGPT-User, Claude-Web, PerplexityBot, CCBot, Google-Extended, Bytespider, …), each allowed or blocked per a filterable per-bot policy. Groups are self-contained (they replicate core's wp-admin protections) and honor "Discourage search engines".
+* **Content-Signals** — appends a `Content-Signal: ai-train=no, search=yes, ai-input=no` directive to robots.txt (inside an explicit `User-agent: *` group) declaring your AI-usage preferences per contentsignals.org. Composes with Yoast/Rank Math/AIOSEO — their additions are preserved, our directive lands last.
+* **auth.md** (new in 2.0) — publishes `/auth.md` honestly documenting how agents authenticate to your REST API via Application Passwords: how a human creates one, Basic-auth usage, scope, and revocation. No fictional OAuth endpoints.
 
 = Why use it =
 
@@ -41,12 +54,12 @@ Each capability is a separate toggle under **Settings → AJ Agent Crawl Optimiz
 * **Multisite-aware.** Every endpoint also resolves at `/{subsite}/...` paths automatically.
 * **Cached.** OpenAPI is cached for a day, llms.txt for an hour, with proper invalidation on plugin activation, theme switch, post changes, and setting toggles.
 * **Performance-conscious.** Markdown handler runs at `PHP_INT_MAX` priority so it doesn't break object-cache flushes or Query Monitor. IndexNow pings are non-blocking.
-* **Extensible.** Nine filter hooks let you customize skills, schemas, capabilities, and content. See "For Developers" below.
+* **Extensible.** Fifteen filter hooks let you customize skills, schemas, bot policies, scan behavior, and content. See "For Developers" below.
 * **Accessible.** Score-card SVG has dynamic `aria-label`, copy buttons announce success via `aria-live`, decorative arrows hidden from screen readers via CSS pseudo-elements.
 
 = For developers =
 
-The plugin exposes nine filter hooks for extension. Examples:
+The plugin exposes fifteen filter hooks for extension. Examples:
 
 `add_filter( 'ajaco_required_capability', function () { return 'edit_posts'; } );`
 Delegate plugin access to a non-admin role.
@@ -57,7 +70,7 @@ Register custom skills that ship in the Agent Skills Index and are served as SKI
 `add_filter( 'ajaco_content_signal', function () { return 'ai-train=yes, search=yes, ai-input=yes'; } );`
 Customize the Content-Signal directive (e.g. permit AI training).
 
-Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
+Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_llms_full_txt_content`, `ajaco_auth_md_content`, `ajaco_ai_bot_list`, `ajaco_ai_bot_policy`, `ajaco_commerce_signals`, `ajaco_scan_sslverify`, `ajaco_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
 
 == Installation ==
 
@@ -66,14 +79,14 @@ Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_l
 1. In your WP admin, go to **Plugins → Add New** and search for "AJ Agent Crawl Optimizer".
 2. Click **Install Now**, then **Activate**.
 3. The Quick Setup wizard runs automatically on first activation — review the recommended toggles and click **Apply**.
-4. Adjust any toggle later from **Settings → AJ Agent Crawl Optimizer**.
+4. Open **Agent Ready → Dashboard**, run your first scan, and use **Fix now** on failing checks. Toggles live under **Agent Ready → Settings**.
 
 = Manual install =
 
 1. Download the plugin zip.
 2. Upload the `aj-agent-crawl-optimizer` folder to `/wp-content/plugins/`.
 3. Activate **AJ Agent Crawl Optimizer** from the **Plugins** screen.
-4. Visit **Settings → AJ Agent Crawl Optimizer** and run the wizard or configure manually.
+4. Visit **Agent Ready → Dashboard** to scan, or **Agent Ready → Settings** to run the wizard / configure manually.
 
 = IndexNow setup (optional) =
 
@@ -84,6 +97,18 @@ If you want Bing and Yandex to re-crawl your content within minutes of publish:
 3. Enable the IndexNow toggle. The plugin hosts the key file at `/{key}.txt` for ownership verification automatically.
 
 == Frequently Asked Questions ==
+
+= What's the difference between the Dashboard and Settings screens? =
+
+**Dashboard** is the verifier: it scans your live site over real HTTP, shows your Level 0–5 with evidence for every check, and fixes failures with one click. **Settings** is the switchboard: the per-feature toggles, wizard, and testing tools. A toggle can be ON in Settings while the Dashboard still shows a fail — that gap usually means a page cache or server rule is intercepting the endpoint, and the evidence view shows exactly what happened.
+
+= How is the readiness Level calculated? =
+
+The scanner runs the same 21 checks (and the same Level 0–5 ladder) as Cloudflare's isitagentready.com: Level 1 needs 2 of robots.txt/sitemap/Link headers; Level 2 adds AI bot rules and Content Signals; Level 3 adds Markdown negotiation; Level 4 adds one of MCP card/Agent Skills/API catalog/A2A card; Level 5 adds two of Web Bot Auth, all four integrations, and auth metadata. Nothing counts unless the scan verifies it — enabling a toggle earns nothing until the endpoint actually responds. Commerce checks are informational and never scored.
+
+= Can I run scans from the command line or scripts? =
+
+Yes: `wp agent-ready scan` (add `--format=json` for machines or `--format=agent` for a markdown fix report), `wp agent-ready fix <check>` or `--all-safe`, and `wp agent-ready status`. The same operations are available over REST at `/wp-json/ajaco/v1/scan` and `/wp-json/ajaco/v1/fix` (admin capability required; `/wp-json/ajaco/v1/health` is public).
 
 = Will this conflict with my SEO plugin? =
 
@@ -138,12 +163,26 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 
 == Screenshots ==
 
-1. Settings page — score card, three grouped sections (Discovery / Presentation / Declarations), Read More links to inline details.
-2. Quick Setup wizard on first activation — environment-aware recommendations.
-3. Testing section — one-click curl commands, View output and Open in [validator] links per endpoint.
-4. Help tab → For Developers — built-in API reference for the nine filter hooks.
+1. Dashboard — segmented category gauge, Level 0–5 badge, and the "Next level" panel with one-click fixes.
+2. Check card with evidence timeline — fetch/parse/conclude steps, request/response snapshots, Fix now / Copy agent prompt.
+3. Bulk fix sheet — "Fix all safe items" plus combined agent prompts for out-of-WordPress fixes.
+4. Settings page — per-feature toggles in three grouped sections (Discovery / Presentation / Declarations).
+5. Quick Setup wizard — environment-aware recommendations, re-runnable any time.
+6. WP-CLI — `wp agent-ready scan --format=agent` fix report.
 
 == Changelog ==
+
+= 2.0.0 (in development on the v2-dev branch) =
+* NEW: Built-in agent-readiness scanner — runs the same 21 checks as Cloudflare's isitagentready.com against your live site, with per-check evidence timelines (request/response snapshots) and the Level 0–5 maturity ladder with next-level guidance.
+* NEW: Dashboard under a top-level "Agent Ready" menu — segmented category gauge, Level badge, check cards with Fix now / Copy agent prompt / Audit details, and a bulk fix sheet.
+* NEW: One-click fixes with verification — 9 failing checks fixable in one click; the fixed check is re-scanned immediately to prove it passes.
+* NEW: REST API `ajaco/v1` — POST/GET /scan, POST /scan/check, POST /fix, and a public GET /health (also the API catalog's RFC 9727 status target).
+* NEW: WP-CLI — `wp agent-ready scan|status|fix [--all-safe]` with summary, json, and agent (markdown fix report) formats.
+* NEW: AI Bot Rules — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check, with per-bot allow/block policy.
+* NEW: /auth.md — agent authentication documentation for Application Passwords.
+* NEW: /llms-full.txt — full recent content as Markdown alongside /llms.txt; password-protected content excluded from all agent-facing endpoints.
+* Settings page moved under Agent Ready → Settings (URLs, help tabs, and reset flow updated accordingly).
+* New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_commerce_signals, ajaco_scan_sslverify.
 
 = 1.0.1 =
 * Agent Skills index now validates against the Agent Skills Discovery RFC v0.2.0: entries use `type: skill-md` and a `digest` field with `sha256:` prefix (previously `type: information-retrieval` and a `sha256` key, which external scanners rejected); `$schema` corrected to the published schema URI.
@@ -169,7 +208,7 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * Plugins-row Settings link.
 * Multisite-aware path matching for every endpoint.
 * Transient caching: 1 day for OpenAPI, 1 hour for llms.txt, with smart invalidation.
-* Nine filter hooks for extending or overriding plugin behavior.
+* Filter hooks for extending or overriding plugin behavior.
 * Translation-ready (.pot file shipped) and accessibility-ready (screen-reader h1, dynamic SVG aria-label, aria-live success announcements).
 
 == Upgrade Notice ==
@@ -182,7 +221,18 @@ Initial release.
 
 == External services ==
 
-This plugin connects to one external service, and only when the corresponding feature is explicitly enabled by the site administrator.
+This plugin connects to external services only in two explicitly user-triggered situations: the opt-in IndexNow feature, and DNS lookups made while an administrator runs a readiness scan.
+
+= DNS-over-HTTPS resolvers (cloudflare-dns.com, dns.google) — during scans only =
+
+What they are and what they're used for: the readiness scanner's DNS-AID check queries public DNS-over-HTTPS resolvers (Cloudflare's `https://cloudflare-dns.com/dns-query`, with Google's `https://dns.google/resolve` as fallback) to look up `_agents` SVCB/HTTPS/TXT records for your own domain.
+
+When data is sent: only while a scan that an administrator started (Dashboard, REST, or WP-CLI) is running. The scanner also sends ordinary HTTP requests to your own site's URLs to verify your endpoints.
+
+What data is sent: only DNS query names derived from your own domain (e.g. `_index._agents.example.com`). No visitor information, IP addresses of visitors, or content is sent. Cloudflare's and Google's resolver privacy policies apply:
+
+* Cloudflare 1.1.1.1 privacy: https://developers.cloudflare.com/1.1.1.1/privacy/public-dns-resolver/
+* Google Public DNS privacy: https://developers.google.com/speed/public-dns/privacy
 
 = IndexNow (api.indexnow.org) =
 
@@ -192,7 +242,7 @@ When data is sent: only when the **IndexNow** feature toggle is turned on AND an
 
 What data is sent: the request body is a JSON document containing exactly three fields — your site's host (e.g. `example.com`), your IndexNow API key (which you generated yourself at Bing Webmaster Tools), and the permalink URL of the post that was just published. No visitor information, IP addresses, user-agents, or post content is sent.
 
-If the IndexNow feature toggle is off (the default), the plugin makes no outbound network requests of any kind.
+If the IndexNow feature toggle is off (the default) and no scan is running, the plugin makes no outbound network requests of any kind.
 
 This service is provided by Microsoft (Bing) and the IndexNow project. Their terms and privacy policies apply:
 
@@ -207,17 +257,18 @@ AJ Agent Crawl Optimizer stores data **only on your own server** — there is no
 
 = Local data =
 
-* Plugin **option rows** in the WordPress options table store toggle states and the IndexNow API Key (stored as plain text — keep your database secure).
-* **Transients** cache the OpenAPI document and llms.txt body. These are deleted on plugin uninstall.
+* Plugin **option rows** in the WordPress options table store toggle states, the per-bot AI crawler policy, the most recent scan result (including its evidence snapshots of your own site's responses), and the IndexNow API Key (stored as plain text — keep your database secure).
+* **Transients** cache the OpenAPI document and the llms.txt / llms-full.txt bodies. These are deleted on plugin uninstall.
 * No request data, IP addresses, User-Agents, or visitor information is recorded by the plugin.
 
 = Outbound network calls =
 
-The plugin makes exactly **one** outbound HTTP request, and only when explicitly enabled:
+The plugin makes outbound HTTP requests only in these cases:
 
 * **IndexNow** — when the IndexNow toggle is on and a key is configured, the plugin sends a non-blocking POST to `https://api.indexnow.org/indexnow` on every post publish. The payload contains the site host, the IndexNow key, and the URL of the published post (no visitor data).
+* **Readiness scans** — while an administrator-initiated scan is running, the scanner sends HTTP requests to your own site's URLs (to verify endpoints exactly as an agent would see them) and DNS-over-HTTPS queries for your own domain to Cloudflare/Google resolvers (DNS-AID check). Scans never run automatically.
 
-If the IndexNow toggle is off (the default), the plugin makes zero outbound network requests. All other features (manifests, JSON-LD, robots.txt) only respond to incoming HTTP requests; they never call out.
+Outside those two cases the plugin makes zero outbound network requests. All publishing features (manifests, JSON-LD, robots.txt) only respond to incoming HTTP requests; they never call out.
 
 = Cookies =
 

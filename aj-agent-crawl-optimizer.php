@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       AJ Agent Crawl Optimizer
  * Plugin URI:        https://github.com/ajmaurya99/aj-agent-crawl-optimizer
- * Description:       Make your WordPress site discoverable to AI agents and crawlers — Markdown negotiation, JSON-LD, OpenAPI, MCP server card, agent-skills index, IndexNow, llms.txt, and Content-Signals — each as a separate toggle.
- * Version:           1.0.1
+ * Description:       The agent-readiness scanner and fixer for WordPress — run the 21-check readiness scan (Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more.
+ * Version:           2.0.0-alpha
  * Requires at least: 5.5
  * Tested up to:      7.0
  * Requires PHP:      7.4
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AJACO_VERSION', '1.0.1' );
+define( 'AJACO_VERSION', '2.0.0-alpha' );
 define( 'AJACO_FILE', __FILE__ );
 define( 'AJACO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AJACO_URL', plugin_dir_url( __FILE__ ) );

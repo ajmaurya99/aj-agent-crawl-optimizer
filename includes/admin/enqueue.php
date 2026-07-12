@@ -3,8 +3,10 @@
  * Admin: enqueue assets for the Agent Ready screens.
  *
  * Settings screen keeps the legacy admin.css/js pair; the Dashboard gets the
- * v2 scanner app (dashboard.css/js) plus its localized data payload. Both are
- * gated to their own hook suffix so nothing loads on unrelated admin pages.
+ * v2 scanner app (dashboard.css/js) plus its localized data payload; the
+ * llms.txt curation screen reuses admin.css and adds its own preview script.
+ * Each is gated to its own hook suffix so nothing loads on unrelated admin
+ * pages.
  *
  * @package Ajaco
  */
@@ -35,6 +37,11 @@ function enqueue_admin_assets( string $hook_suffix ): void {
 
 	if ( admin_page_hook( 'dashboard' ) === $hook_suffix ) {
 		enqueue_dashboard_assets();
+		return;
+	}
+
+	if ( admin_page_hook( 'llms' ) === $hook_suffix ) {
+		enqueue_llms_assets();
 	}
 }
 
@@ -150,6 +157,46 @@ function enqueue_dashboard_assets(): void {
 				'fail'        => __( 'Fail', 'aj-agent-crawl-optimizer' ),
 				'neutral'     => __( 'Not applicable', 'aj-agent-crawl-optimizer' ),
 				'unable'      => __( 'Unable to check', 'aj-agent-crawl-optimizer' ),
+			),
+		)
+	);
+}
+
+/**
+ * Curation screen (llms.txt): the shared admin.css plus its preview script.
+ *
+ * @return void
+ */
+function enqueue_llms_assets(): void {
+	$css_path = AJACO_DIR . 'assets/css/admin.css';
+	$js_path  = AJACO_DIR . 'assets/js/llms-admin.js';
+
+	wp_enqueue_style(
+		'ajaco-admin',
+		AJACO_URL . 'assets/css/admin.css',
+		array(),
+		file_exists( $css_path ) ? filemtime( $css_path ) : AJACO_VERSION
+	);
+
+	wp_enqueue_script(
+		'ajaco-llms-admin',
+		AJACO_URL . 'assets/js/llms-admin.js',
+		array(),
+		file_exists( $js_path ) ? filemtime( $js_path ) : AJACO_VERSION,
+		true
+	);
+
+	wp_localize_script(
+		'ajaco-llms-admin',
+		'AjacoLlms',
+		array(
+			'restUrl' => esc_url_raw( rest_url( 'ajaco/v1' ) ),
+			'nonce'   => wp_create_nonce( 'wp_rest' ),
+			'i18n'    => array(
+				'loading'     => __( 'Refreshing preview…', 'aj-agent-crawl-optimizer' ),
+				'failed'      => __( 'Could not build the preview.', 'aj-agent-crawl-optimizer' ),
+				'expired'     => __( 'Your session expired — reload this page and try again.', 'aj-agent-crawl-optimizer' ),
+				'badResponse' => __( 'The server returned an unexpected response. Check for a plugin conflict or a PHP error in your logs.', 'aj-agent-crawl-optimizer' ),
 			),
 		)
 	);

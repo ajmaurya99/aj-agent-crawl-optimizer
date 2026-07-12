@@ -34,6 +34,15 @@ $options = array(
 	'ajaco_wizard_done',
 	// v2: the stored self-scan result.
 	'ajaco_last_scan',
+	// v2: the llms.txt curation config (sections, intro, custom markdown).
+	'ajaco_llms_config',
+);
+
+// v2: per-post llms.txt curation meta. Uninstall (unlike Reset) removes every
+// trace of the plugin, including the meta rows it wrote on posts.
+$post_meta_keys = array(
+	'_ajaco_llms_exclude',
+	'_ajaco_llms_summary',
 );
 
 $transients = array(
@@ -56,6 +65,9 @@ if ( is_multisite() ) {
 		foreach ( $transients as $transient ) {
 			delete_transient( $transient );
 		}
+		foreach ( $post_meta_keys as $post_meta_key ) {
+			delete_post_meta_by_key( $post_meta_key );
+		}
 		restore_current_blog();
 	}
 } else {
@@ -64,5 +76,8 @@ if ( is_multisite() ) {
 	}
 	foreach ( $transients as $transient ) {
 		delete_transient( $transient );
+	}
+	foreach ( $post_meta_keys as $post_meta_key ) {
+		delete_post_meta_by_key( $post_meta_key );
 	}
 }

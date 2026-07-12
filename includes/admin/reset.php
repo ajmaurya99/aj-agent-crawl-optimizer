@@ -52,10 +52,18 @@ function handle_reset_request(): void {
 		'ajaco_indexnow_key',
 		// The stored self-scan — reset must not leave a stale score behind.
 		'ajaco_last_scan',
+		// The llms.txt curation config — sections, intro, custom markdown.
+		'ajaco_llms_config',
 	);
 	foreach ( $options as $option ) {
 		delete_option( $option );
 	}
+
+	// Deliberately NOT deleted here: the per-post `_ajaco_llms_exclude` and
+	// `_ajaco_llms_summary` meta. Those are content an author wrote on their
+	// own posts, not plugin settings — Reset clears settings, and only
+	// uninstall.php removes user content. Wiping summaries from a whole site
+	// because someone clicked "Reset to Defaults" would be unrecoverable.
 
 	// Flush cached endpoint outputs so the next request reflects the reset state.
 	delete_transient( 'ajaco_openapi_cache' );

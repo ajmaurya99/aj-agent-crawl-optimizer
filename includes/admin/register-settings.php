@@ -2,8 +2,10 @@
 /**
  * Admin: register all plugin settings with the WP Settings API.
  *
- * Settings group: `ajaco_settings`. All toggles default to false
- * (opt-in). The IndexNow API key is sanitized via sanitize_indexnow_key().
+ * Settings groups: `ajaco_settings` (feature toggles, saved from the Settings
+ * screen) and `ajaco_llms_settings` (the llms.txt curation config, saved from
+ * its own screen). All toggles default to false (opt-in). The IndexNow API key
+ * is sanitized via sanitize_indexnow_key().
  *
  * @package Ajaco
  */
@@ -79,6 +81,21 @@ function register_settings(): void {
 		array(
 			'type'              => 'array',
 			'sanitize_callback' => 'Ajaco\\sanitize_content_signal_prefs',
+			'default'           => array(),
+		)
+	);
+
+	// The llms.txt curation config lives in its OWN group, saved from its own
+	// screen. It must NOT join `ajaco_settings`: options.php force-updates every
+	// registered option in a submitted group, so a shared group would let the
+	// Settings screen (which renders no curation fields) wipe the whole config
+	// on every save — and vice versa.
+	register_setting(
+		'ajaco_llms_settings',
+		'ajaco_llms_config',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'Ajaco\\sanitize_llms_config',
 			'default'           => array(),
 		)
 	);

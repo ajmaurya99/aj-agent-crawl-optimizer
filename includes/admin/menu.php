@@ -1,6 +1,7 @@
 <?php
 /**
- * Admin: top-level "Agent Ready" menu — Dashboard (scanner) + Settings.
+ * Admin: top-level "Agent Ready" menu — Dashboard (scanner), Settings, and the
+ * llms.txt curation screen.
  *
  * @package Ajaco
  */
@@ -16,7 +17,7 @@ add_action( 'admin_menu', __NAMESPACE__ . '\\add_admin_menu' );
 /**
  * Get/set registered admin page hook suffixes (used to gate asset loading).
  *
- * @param string      $key   'dashboard' or 'settings'.
+ * @param string      $key   'dashboard', 'settings', or 'llms'.
  * @param string|null $value Hook suffix to store, or null to read.
  * @return string
  */
@@ -29,7 +30,7 @@ function admin_page_hook( string $key, ?string $value = null ): string {
 }
 
 /**
- * Register the Agent Ready menu: Dashboard (default) + Settings.
+ * Register the Agent Ready menu: Dashboard (default) + Settings + llms.txt.
  *
  * The settings page keeps its historical slug (aj-agent-crawl-optimizer) so
  * bookmarks and the plugins-row link keep working — it just lives under the
@@ -69,6 +70,16 @@ function add_admin_menu(): void {
 		__NAMESPACE__ . '\\render_settings_page'
 	);
 	admin_page_hook( 'settings', (string) $settings_hook );
+
+	$llms_hook = add_submenu_page(
+		'ajaco-dashboard',
+		__( 'llms.txt Curation', 'aj-agent-crawl-optimizer' ),
+		__( 'llms.txt', 'aj-agent-crawl-optimizer' ),
+		$cap,
+		'ajaco-llms',
+		__NAMESPACE__ . '\\render_llms_page'
+	);
+	admin_page_hook( 'llms', (string) $llms_hook );
 }
 
 /**
@@ -87,4 +98,13 @@ function settings_page_url(): string {
  */
 function dashboard_page_url(): string {
 	return admin_url( 'admin.php?page=ajaco-dashboard' );
+}
+
+/**
+ * Admin URL of the llms.txt curation screen.
+ *
+ * @return string
+ */
+function llms_page_url(): string {
+	return admin_url( 'admin.php?page=ajaco-llms' );
 }

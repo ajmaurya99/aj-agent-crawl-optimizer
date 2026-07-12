@@ -106,11 +106,15 @@ function handle_llms_txt_request(): void {
 }
 
 /**
- * Build the llms.txt body.
+ * Build the llms.txt body from the curation config.
  *
+ * @param array|null $config Config override (used by the admin live preview);
+ *                           null reads the saved config.
  * @return string
  */
-function build_llms_txt(): string {
+function build_llms_txt( ?array $config = null ): string {
+	$config = null === $config ? llms_config() : sanitize_llms_config( $config );
+
 	// text/markdown body — markdown_safe_text() (not esc_html) so agents
 	// receive `Tom's Blog & Café`, not `Tom&#039;s Blog &amp; Café`.
 	$name        = markdown_safe_text( get_bloginfo( 'name' ) );
@@ -120,8 +124,20 @@ function build_llms_txt(): string {
 	if ( '' !== $description ) {
 		$out .= "> {$description}\n\n";
 	}
-	$out .= "An LLM-readable index of {$name}. Follow the links for the full content.\n\n";
+
+	// The owner's intro wins over the boilerplate line — it's the one place
+	// they can tell an agent what this site is actually for.
+	if ( '' !== $config['intro'] ) {
+		$out .= $config['intro'] . "\n\n";
+	} else {
+		$out .= "An LLM-readable index of {$name}. Follow the links for the full content.\n\n";
+	}
+
 	$out .= 'Full content: ' . esc_url_raw( home_url( '/llms-full.txt' ) ) . "\n\n";
+
+	if ( 'top' === $config['custom_position'] && '' !== $config['custom_md'] ) {
+		$out .= $config['custom_md'] . "\n\n";
+	}
 
 	// Discovery endpoints — only list features that are currently enabled.
 	// esc_url_raw (not esc_url) — display escaping would entity-encode
@@ -152,45 +168,27 @@ function build_llms_txt(): string {
 		$out .= "\n";
 	}
 
-	// Top-level pages (password-protected content stays out of agent indexes).
-	$pages = get_posts(
-		array(
-			'post_type'        => 'page',
-			'post_status'      => 'publish',
-			'numberposts'      => 20,
-			'post_parent'      => 0,
-			'orderby'          => 'menu_order title',
-			'order'            => 'ASC',
-			'suppress_filters' => false,
-			'has_password'     => false,
-		)
-	);
-	if ( ! empty( $pages ) ) {
-		$out .= "## Pages\n\n";
-		foreach ( $pages as $page ) {
-			$out .= '- ' . format_llms_txt_entry( $page ) . "\n";
+	// Curated sections: one per configured post type, honoring per-post
+	// exclusions and password protection.
+	foreach ( $config['sections'] as $post_type => $section ) {
+		if ( empty( $section['enabled'] ) || ! post_type_exists( $post_type ) ) {
+			continue;
+		}
+
+		$entries = llms_section_posts( $post_type, $section );
+		if ( empty( $entries ) ) {
+			continue;
+		}
+
+		$out .= '## ' . $section['heading'] . "\n\n";
+		foreach ( $entries as $entry ) {
+			$out .= '- ' . format_llms_txt_entry( $entry, ! empty( $section['show_date'] ) ) . "\n";
 		}
 		$out .= "\n";
 	}
 
-	// Recent posts (password-protected content stays out of agent indexes).
-	$posts = get_posts(
-		array(
-			'post_type'        => 'post',
-			'post_status'      => 'publish',
-			'numberposts'      => 10,
-			'orderby'          => 'date',
-			'order'            => 'DESC',
-			'suppress_filters' => false,
-			'has_password'     => false,
-		)
-	);
-	if ( ! empty( $posts ) ) {
-		$out .= "## Recent Posts\n\n";
-		foreach ( $posts as $post ) {
-			$out .= '- ' . format_llms_txt_entry( $post, true ) . "\n";
-		}
-		$out .= "\n";
+	if ( 'bottom' === $config['custom_position'] && '' !== $config['custom_md'] ) {
+		$out .= $config['custom_md'] . "\n\n";
 	}
 
 	/**
@@ -214,20 +212,23 @@ function build_llms_txt(): string {
  */
 function format_llms_txt_entry( \WP_Post $p, bool $with_date = false ): string {
 	// markdown_safe_text/esc_url_raw — this is a text/markdown body; HTML
-	// entity escaping would corrupt titles and excerpts for agents.
+	// entity escaping would corrupt titles and summaries for agents.
 	$title = markdown_safe_text( get_the_title( $p ) );
 	// Escape closing brackets so a title can't break out of the [label](url) syntax.
-	$title   = str_replace( ']', '\\]', $title );
-	$url     = esc_url_raw( get_permalink( $p ) );
-	$excerpt = markdown_safe_text( get_the_excerpt( $p ) );
-	$excerpt = preg_replace( '/\s*\[(\.\.\.|…)\]\s*$/u', '', $excerpt );
+	$title = str_replace( ']', '\\]', $title );
+	$url   = esc_url_raw( get_permalink( $p ) );
+
+	// The author's LLM summary override wins over the excerpt (see
+	// llms_post_summary()) — excerpts are written for humans skimming, this
+	// line is written for a model deciding whether to fetch the page.
+	$summary = llms_post_summary( $p );
 
 	$line = "[{$title}]({$url})";
 	if ( $with_date ) {
 		$line .= ' (' . get_the_date( 'Y-m-d', $p ) . ')';
 	}
-	if ( '' !== $excerpt ) {
-		$line .= ': ' . $excerpt;
+	if ( '' !== $summary ) {
+		$line .= ': ' . $summary;
 	}
 	return $line;
 }
@@ -295,42 +296,24 @@ function build_llms_full_txt(): string {
 	$out .= "The full content of {$name} in Markdown, for LLM consumption. "
 		. 'A shorter index is available at ' . esc_url_raw( home_url( '/llms.txt' ) ) . ".\n\n";
 
-	// Top-level pages. `has_password => false` — this endpoint serves FULL
-	// content, and applying `the_content` to raw post_content bypasses the
-	// password gate that lives in get_the_content(); protected content must
-	// never reach an unauthenticated machine endpoint.
-	$pages = get_posts(
-		array(
-			'post_type'        => 'page',
-			'post_status'      => 'publish',
-			'numberposts'      => 15,
-			'post_parent'      => 0,
-			'orderby'          => 'menu_order title',
-			'order'            => 'ASC',
-			'suppress_filters' => false,
-			'has_password'     => false,
-		)
-	);
-
-	// Most recent posts (same password exclusion).
-	$posts = get_posts(
-		array(
-			'post_type'        => 'post',
-			'post_status'      => 'publish',
-			'numberposts'      => 15,
-			'orderby'          => 'date',
-			'order'            => 'DESC',
-			'suppress_filters' => false,
-			'has_password'     => false,
-		)
-	);
-
-	foreach ( array_merge( $pages, $posts ) as $p ) {
-		// Defense in depth alongside has_password: never render protected content.
-		if ( post_password_required( $p ) ) {
+	// Same curated sections as llms.txt — the owner's inclusion choices and
+	// per-post exclusions apply to the full-content file too. llms_section_posts()
+	// already drops excluded and password-protected entries (this endpoint
+	// serves FULL content, and applying `the_content` to raw post_content
+	// bypasses the password gate in get_the_content()).
+	//
+	// Full content is heavy, so each section is capped tighter than in the index.
+	$config = llms_config();
+	foreach ( $config['sections'] as $post_type => $section ) {
+		if ( empty( $section['enabled'] ) || ! post_type_exists( $post_type ) ) {
 			continue;
 		}
-		$out .= format_llms_full_txt_entry( $p );
+
+		$section['count'] = min( (int) $section['count'], 15 );
+
+		foreach ( llms_section_posts( $post_type, $section ) as $p ) {
+			$out .= format_llms_full_txt_entry( $p );
+		}
 	}
 
 	/**

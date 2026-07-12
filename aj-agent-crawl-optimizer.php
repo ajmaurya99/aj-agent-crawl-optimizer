@@ -39,7 +39,9 @@ require_once AJACO_DIR . 'includes/features/webmcp-tools.php';
 require_once AJACO_DIR . 'includes/features/json-ld-schema.php';
 require_once AJACO_DIR . 'includes/features/openapi-spec.php';
 require_once AJACO_DIR . 'includes/features/indexnow.php';
+require_once AJACO_DIR . 'includes/features/llms-config.php';
 require_once AJACO_DIR . 'includes/features/llms-txt.php';
+require_once AJACO_DIR . 'includes/features/llms-editor.php';
 require_once AJACO_DIR . 'includes/features/ai-bot-rules.php';
 require_once AJACO_DIR . 'includes/features/auth-md.php';
 
@@ -60,17 +62,19 @@ if ( is_array( $ajaco_check_files ) ) {
 }
 unset( $ajaco_check_files, $ajaco_check_file );
 
-// REST API (ajaco/v1): scan, fix, health.
+// REST API (ajaco/v1): scan, fix, health + the llms.txt curation preview.
 require_once AJACO_DIR . 'includes/rest/class-scan-controller.php';
+require_once AJACO_DIR . 'includes/rest/class-llms-controller.php';
 
 // WP-CLI: wp agent-ready scan|status|fix (no-ops outside WP-CLI).
 require_once AJACO_DIR . 'includes/cli.php';
 
-// Admin: menu, settings registration, settings + dashboard renderers, asset enqueue, help tabs, activation, reset handler, wizard.
+// Admin: menu, settings registration, settings + dashboard + llms.txt renderers, asset enqueue, help tabs, activation, reset handler, wizard.
 require_once AJACO_DIR . 'includes/admin/menu.php';
 require_once AJACO_DIR . 'includes/admin/register-settings.php';
 require_once AJACO_DIR . 'includes/admin/settings-page.php';
 require_once AJACO_DIR . 'includes/admin/dashboard-page.php';
+require_once AJACO_DIR . 'includes/admin/llms-page.php';
 require_once AJACO_DIR . 'includes/admin/enqueue.php';
 require_once AJACO_DIR . 'includes/admin/help-tabs.php';
 require_once AJACO_DIR . 'includes/admin/activation.php';

@@ -63,6 +63,7 @@ function render_settings_page(): void {
 
 		<form method="post" action="options.php">
 			<?php settings_fields( 'ajaco_settings' ); ?>
+			<?php render_rendered_fields_marker( ajaco_settings_form_options() ); ?>
 
 			<h2 class="ajaco-section-heading"><?php esc_html_e( 'Discovery', 'aj-agent-crawl-optimizer' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'Help AI agents find your site and figure out what it offers — manifests, indexes, and push-based notifications.', 'aj-agent-crawl-optimizer' ); ?></p>
@@ -321,6 +322,50 @@ function render_settings_page(): void {
 		</form>
 	</div>
 	<?php
+}
+
+
+/**
+ * The options this settings form renders fields for.
+ *
+ * Declared to the save handler (see render_rendered_fields_marker) so an
+ * option that this form does NOT show can never be silently reset — the
+ * failure mode when an older page is left open across a plugin update.
+ *
+ * @return string[]
+ */
+function ajaco_settings_form_options(): array {
+	return array(
+		'ajaco_api_catalog_enabled',
+		'ajaco_mcp_server_card_enabled',
+		'ajaco_agent_skills_index_enabled',
+		'ajaco_auth_md_enabled',
+		'ajaco_llms_txt_enabled',
+		'ajaco_indexnow_enabled',
+		'ajaco_indexnow_key',
+		'ajaco_markdown_enabled',
+		'ajaco_json_ld_enabled',
+		'ajaco_openapi_enabled',
+		'ajaco_webmcp_enabled',
+		'ajaco_ai_bot_rules_enabled',
+		'ajaco_ai_bot_policy',
+		'ajaco_content_signals_enabled',
+		'ajaco_content_signal_prefs',
+	);
+}
+
+/**
+ * Emit the hidden input that tells the save handler which option fields this
+ * form actually rendered.
+ *
+ * @param string[] $options Option names rendered by the form.
+ * @return void
+ */
+function render_rendered_fields_marker( array $options ): void {
+	printf(
+		'<input type="hidden" name="ajaco_rendered_fields" value="%s" />',
+		esc_attr( implode( ',', $options ) )
+	);
 }
 
 /**

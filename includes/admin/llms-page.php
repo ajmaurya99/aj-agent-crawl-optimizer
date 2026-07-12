@@ -66,6 +66,7 @@ function render_llms_page(): void {
 			<div class="ajaco-llms-col-form">
 				<form method="post" action="options.php" id="ajaco-llms-form">
 					<?php settings_fields( 'ajaco_llms_settings' ); ?>
+			<?php render_rendered_fields_marker( array( 'ajaco_llms_config' ) ); ?>
 
 					<h2 class="ajaco-section-heading"><?php esc_html_e( 'Introduction', 'aj-agent-crawl-optimizer' ); ?></h2>
 					<table class="form-table" role="presentation">

@@ -91,9 +91,19 @@ function handle_wizard_submit(): void {
 		: '';
 
 	if ( 'apply' === $action ) {
-		// Save whatever the user actually checked in the form. Each option
-		// either appears in $_POST as '1' (checked) or is absent (unchecked).
+		// Only write options THIS form rendered. An absent checkbox otherwise
+		// reads as "the user unchecked it" — which silently disables features
+		// when the open page was rendered by an older version of the plugin
+		// (whose form had no field for options added since), or when the POST
+		// was truncated by PHP's max_input_vars.
+		$rendered = isset( $_POST['ajaco_wizard_fields'] )
+			? array_filter( array_map( 'trim', explode( ',', sanitize_text_field( wp_unslash( $_POST['ajaco_wizard_fields'] ) ) ) ) )
+			: array();
+
 		foreach ( array_keys( recommended_settings() ) as $option ) {
+			if ( ! in_array( $option, $rendered, true ) ) {
+				continue; // Not on the submitted form — leave it exactly as it is.
+			}
 			$checked = isset( $_POST[ $option ] ) && '1' === $_POST[ $option ];
 			update_option( $option, $checked );
 		}
@@ -205,6 +215,8 @@ function render_wizard(): void {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="ajaco_apply_wizard" />
 				<?php wp_nonce_field( 'ajaco_apply_wizard' ); ?>
+				<?php // Declare which options this form renders, so the handler never resets one it didn't show. ?>
+				<input type="hidden" name="ajaco_wizard_fields" value="<?php echo esc_attr( implode( ',', wp_list_pluck( $rows, 2 ) ) ); ?>" />
 
 				<?php foreach ( $rows as $row ) : ?>
 					<?php

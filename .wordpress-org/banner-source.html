@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  /* wordpress.org banner — designed at 772x250, rendered at 1x and 2x.
+     Palette taken from the plugin icon: forest green signal arcs. */
+  :root{
+    --ink:      #0c1b13;
+    --ink-2:    #10241a;
+    --green:    #2e7d32;
+    --green-lt: #7bbd80;
+    --green-pale:#bcd9be;
+    --pass:     #46c95f;
+    --white:    #f4faf5;
+    --muted:    rgba(232,245,234,.60);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:772px;height:250px;overflow:hidden}
+  body{
+    background:
+      radial-gradient(120% 150% at 100% 0%, #16321f 0%, rgba(12,27,19,0) 60%),
+      linear-gradient(135deg, #0c1b13 0%, #102a1c 55%, #0b1810 100%);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    color:var(--white);
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+
+  /* Signal arcs — the icon's motif, radiating from the right edge. */
+  .arcs{
+    position:absolute;right:-70px;bottom:-170px;width:520px;height:520px;opacity:.55;
+    -webkit-mask-image:radial-gradient(70% 70% at 50% 80%, #000 40%, transparent 100%);
+            mask-image:radial-gradient(70% 70% at 50% 80%, #000 40%, transparent 100%);
+  }
+  .arcs span{
+    position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    border:2px solid var(--green-lt);
+    border-bottom-color:transparent;border-left-color:transparent;border-right-color:transparent;
+    border-radius:50%;
+  }
+  .a1{width:150px;height:150px;opacity:.8}
+  .a2{width:260px;height:260px;opacity:.48}
+  .a3{width:370px;height:370px;opacity:.28}
+  .a4{width:480px;height:480px;opacity:.15}
+  .dot{
+    position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
+    width:18px;height:18px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 24px rgba(70,201,95,.55);
+  }
+
+  /* ---- left: the pitch ---- */
+  .left{position:relative;z-index:2;padding:0 0 0 44px;width:452px}
+  .lockup{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .mark{width:24px;height:24px;flex:none}
+  .wordmark{
+    font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--white);
+  }
+  .wordmark span{color:var(--green-lt);font-weight:600}
+  .eyebrow{
+    font-size:10.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--green-lt);margin-bottom:8px;
+  }
+  h1{
+    font-size:34px;line-height:1.04;font-weight:800;letter-spacing:-.02em;
+    margin-bottom:10px;
+  }
+  h1 .accent{color:var(--pass)}
+  .tag{font-size:13.5px;line-height:1.45;color:var(--muted);margin-bottom:15px;max-width:400px}
+  .beats{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600}
+  .beat{
+    background:rgba(123,189,128,.13);
+    border:1px solid rgba(123,189,128,.30);
+    border-radius:99px;padding:5px 12px;white-space:nowrap;
+  }
+  .arrow{color:var(--green-lt);font-size:13px;opacity:.75}
+
+  /* ---- right: a miniature of the real dashboard ---- */
+  .card{
+    position:relative;z-index:2;margin-left:auto;margin-right:34px;
+    width:236px;background:rgba(255,255,255,.055);
+    border:1px solid rgba(232,245,234,.14);
+    border-radius:12px;padding:16px 16px 14px;
+    backdrop-filter:blur(2px);
+  }
+  .gauge{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+  .ring{
+    width:56px;height:56px;border-radius:50%;flex:none;
+    background:
+      conic-gradient(from -90deg, var(--pass) 0turn .66turn, rgba(255,255,255,.10) .66turn 1turn);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ring i{
+    width:42px;height:42px;border-radius:50%;background:#0f2418;
+    display:flex;align-items:center;justify-content:center;
+    font-style:normal;font-size:16px;font-weight:800;color:var(--white);
+  }
+  .lvl-name{font-size:13px;font-weight:700;line-height:1.2}
+  .lvl-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:4px 0;color:rgba(232,245,234,.86)}
+  .tick{
+    width:14px;height:14px;border-radius:50%;flex:none;background:var(--pass);
+    color:#06210d;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  }
+  .tick.warn{background:#e0b341;color:#2b2000}
+  .row code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+    color:rgba(232,245,234,.95);
+  }
+  .fixnow{
+    margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.02em;
+    background:var(--pass);color:#06210d;border-radius:4px;padding:2px 7px;
+  }
+</style>
+</head>
+<body>
+  <div class="arcs">
+    <span class="a4"></span><span class="a3"></span><span class="a2"></span><span class="a1"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="left">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <path d="M6 40a26 26 0 0 1 52 0" stroke="#bcd9be" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M15 42a17 17 0 0 1 34 0" stroke="#7bbd80" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M24 44a8 8 0 0 1 16 0" stroke="#46c95f" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="32" cy="54" r="4.5" fill="#46c95f"/>
+      </svg>
+      <div class="wordmark">AJ Agent Crawl Optimizer</div>
+    </div>
+    <div class="eyebrow">Is your site ready for AI agents?</div>
+    <h1>Scan. Fix. <span class="accent">Verify.</span></h1>
+    <p class="tag">Audit your site against 21 agent-readiness standards, then fix what fails — in one click, with the proof to show for it.</p>
+    <div class="beats">
+      <span class="beat">21 checks</span>
+      <span class="arrow">→</span>
+      <span class="beat">Level 0–5</span>
+      <span class="arrow">→</span>
+      <span class="beat">One-click fixes</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="gauge">
+      <div class="ring"><i>L4</i></div>
+      <div>
+        <div class="lvl-name">Agent-Integrated</div>
+        <div class="lvl-sub">12 of 14 checks verified</div>
+      </div>
+    </div>
+    <div class="row"><span class="tick">✓</span><code>robots.txt</code></div>
+    <div class="row"><span class="tick">✓</span><code>llms.txt</code></div>
+    <div class="row"><span class="tick">✓</span><code>MCP server card</code></div>
+    <div class="row"><span class="tick warn">!</span><code>markdown</code><span class="fixnow">Fix now</span></div>
+  </div>
+</body>
+</html>

@@ -1,6 +1,8 @@
 # AJ Agent Crawl Optimizer
 
-**The agent-readiness scanner and fixer for WordPress.** Scan your site against the 21 agent-readiness checks (the same ones Cloudflare's [isitagentready.com](https://isitagentready.com/) runs), see your Level 0–5 with full request/response evidence, fix failures in one click, and re-verify instantly — then publish everything agents need: Markdown negotiation, llms.txt, MCP server card, Agent Skills, API catalog, AI bot rules, Content Signals, and more.
+**The agent-readiness scanner and fixer for WordPress.** Scan your site against the 21 agent-readiness checks (the same ones Cloudflare's [isitagentready.com](https://isitagentready.com/) runs), see your Level 0–5 with full request/response evidence, fix failures in one click, and re-verify instantly.
+
+Then publish everything agents need — Markdown negotiation, MCP server card, Agent Skills, API catalog, AI bot rules, Content Signals — and **hand-curate the `llms.txt` they actually read**: your intro, your sections, your per-post summaries. [Jump to curation →](#curating-llmstxt)
 
 [![WordPress plugin](https://img.shields.io/wordpress/plugin/v/aj-agent-crawl-optimizer)](https://wordpress.org/plugins/aj-agent-crawl-optimizer/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)

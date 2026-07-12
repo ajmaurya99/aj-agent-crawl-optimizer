@@ -8,7 +8,7 @@ Stable tag:        1.0.1
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-The agent-readiness scanner and fixer for WordPress — scan your site against 21 agent standards, fix failures in one click, verify with evidence.
+Agent-readiness scanner and fixer: audit 21 AI-agent standards, fix failures in one click, and hand-curate the llms.txt agents actually read.
 
 == Description ==
 
@@ -27,6 +27,17 @@ The agent-readiness scanner and fixer for WordPress — scan your site against 2
 * **WP-CLI** — `wp agent-ready scan --format=summary|json|agent`, `wp agent-ready fix <check>|--all-safe`, `wp agent-ready status` for agency fleets and AI agents operating over SSH.
 
 Each publishing capability remains a separate toggle under **Agent Ready → Settings** and ships **opt-in** (everything starts off). On first activation, a **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data) — re-runnable any time.
+
+= Curated llms.txt — you decide what agents read =
+
+Most plugins generate `llms.txt` from fixed rules and hand you the result. This one hands you the controls.
+
+* **A dedicated editor** (Agent Ready → llms.txt) — write the intro that tells an agent what your site is *for*, choose which content types appear (custom post types and WooCommerce products are detected automatically), and set each section's heading, item count and order. Add your own Markdown block above or below.
+* **Live preview** — see exactly what `/llms.txt` will serve, with entry, byte and token counts, *before* you save.
+* **Per-post control** — every post and page gets an "Agent Ready (llms.txt)" panel in the editor: keep an entry out of the agent indexes entirely, or write a **Summary for AI agents** that overrides the excerpt. An excerpt is written for a human skimming; that line is written for a model deciding whether to fetch the page — and it is the single highest-leverage field in the whole plugin.
+* **`/llms-full.txt`** serves the full content of the same curated entries. Password-protected content is always excluded from both.
+
+Defaults reproduce the previous automatic output exactly, so upgrading changes nothing until you decide to edit something.
 
 = Discovery — help agents find what your site offers =
 
@@ -177,14 +188,14 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 
 == Screenshots ==
 
-1. Dashboard — segmented category gauge, Level 0–5 badge, and the "Next level" panel with one-click fixes.
-2. Check card with evidence timeline — fetch/parse/conclude steps, request/response snapshots, Fix now / Copy agent prompt.
-3. Bulk fix sheet — "Fix all safe items" plus combined agent prompts for out-of-WordPress fixes.
-4. llms.txt curation — intro, per-post-type sections, custom Markdown block, and a live preview of the file.
-5. Editor panel — "Include in llms.txt" toggle and the "Summary for AI agents" override on a single post.
-6. Settings page — per-feature toggles, per-bot AI crawler policy, Content-Signal preferences, and live endpoint links.
-7. Quick Setup wizard — environment-aware recommendations, re-runnable any time.
-8. WP-CLI — `wp agent-ready scan --format=agent` fix report.
+1. Dashboard — the Level 0–5 badge, category gauge, "Next level" panel, and check cards with one-click fixes.
+2. Evidence timeline — the fetch/parse/conclude audit trail behind a failing check, with the real request and response.
+3. Bulk fix sheet — "Fix all safe items", plus copy-paste agent prompts for the fixes that need DNS or server access.
+4. llms.txt curation — intro, per-content-type sections, custom Markdown block, and a live preview with entry/byte/token counts.
+5. Settings — per-feature toggles, each with a live link to the endpoint it publishes.
+6. AI bot rules — per-crawler allow/block policy for the 15 AI crawlers scanners check, plus Content-Signal preferences.
+7. Built-in feature guide — what every feature actually does, in the contextual Help tab.
+8. Quick Setup wizard — environment-aware recommendations on first activation.
 
 == Changelog ==
 

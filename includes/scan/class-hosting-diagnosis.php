@@ -13,8 +13,13 @@
  *    blocks (`location ~* \.(txt|json)$ { ... }`) without try_files, so the
  *    server 404s missing static files instead of routing to index.php.
  *
- * This class recognizes those signatures in a finished scan and produces
- * actionable server-config remedies the dashboard can surface.
+ * Two sources feed the diagnosis: the finished scan (for endpoints the 21
+ * readiness checks cover) and a direct probe of the ones they don't — the
+ * check list mirrors the external scanner, which has no llms.txt or OpenAPI
+ * check, so a rule that 404s /llms.txt would otherwise be invisible.
+ *
+ * Output is the list of blocked endpoints plus copy-paste nginx/Apache
+ * remedies the dashboard surfaces.
  *
  * @package Ajaco
  */
@@ -116,6 +121,12 @@ class Hosting_Diagnosis {
 			);
 		}
 
+		// Endpoints the plugin serves that NO readiness check covers (the 21
+		// checks come from the external scanner's list, which has no llms.txt
+		// or /openapi.json check). Without this, a static-file rule that 404s
+		// /llms.txt would be completely invisible — probe them directly.
+		$issues = array_merge( $issues, self::probe_unchecked_endpoints() );
+
 		return array(
 			'issues'   => $issues,
 			'snippets' => empty( $issues ) ? array() : array(
@@ -123,6 +134,83 @@ class Hosting_Diagnosis {
 				'apache' => self::apache_snippet(),
 			),
 		);
+	}
+
+	/**
+	 * Endpoints the plugin serves that the 21 readiness checks never probe
+	 * (the check list mirrors the external scanner, which has no llms.txt or
+	 * OpenAPI check of its own).
+	 *
+	 * @return array<string, array{option: string, kind: string}>
+	 */
+	public static function unchecked_endpoint_map(): array {
+		return array(
+			'/llms.txt'      => array(
+				'option' => 'ajaco_llms_txt_enabled',
+				'kind'   => 'static-ext',
+			),
+			'/llms-full.txt' => array(
+				'option' => 'ajaco_llms_txt_enabled',
+				'kind'   => 'static-ext',
+			),
+			'/openapi.json'  => array(
+				'option' => 'ajaco_openapi_enabled',
+				'kind'   => 'static-ext',
+			),
+		);
+	}
+
+	/**
+	 * Probe the enabled-but-unchecked endpoints directly and report any the
+	 * server intercepts (403) or fails to route to WordPress (404).
+	 *
+	 * @return array<int, array>
+	 */
+	private static function probe_unchecked_endpoints(): array {
+		$issues = array();
+		$origin = untrailingslashit( home_url( '/' ) );
+
+		foreach ( self::unchecked_endpoint_map() as $path => $endpoint ) {
+			if ( ! get_option( $endpoint['option'], false ) ) {
+				continue;
+			}
+
+			$response = wp_remote_get(
+				$origin . $path,
+				array(
+					'timeout'     => 10,
+					'redirection' => 3,
+					'user-agent'  => 'AJACO-Scanner/' . AJACO_VERSION . ' (+' . home_url( '/' ) . ')',
+					'sslverify'   => apply_filters( 'ajaco_scan_sslverify', false ),
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+				continue;
+			}
+
+			$code = (int) wp_remote_retrieve_response_code( $response );
+
+			if ( 403 === $code ) {
+				$cause = 'denied';
+			} elseif ( 404 === $code ) {
+				$cause = 'not-routed';
+			} else {
+				// 2xx (or anything else) — the plugin is reaching the client.
+				continue;
+			}
+
+			$issues[] = array(
+				'check'      => '',
+				'path'       => $path,
+				'kind'       => $endpoint['kind'],
+				'httpStatus' => $code,
+				'cause'      => $cause,
+				'summary'    => self::summary_for( $path, $cause, $code ),
+			);
+		}
+
+		return $issues;
 	}
 
 	/**

@@ -22,7 +22,8 @@ The agent-readiness scanner and fixer for WordPress — scan your site against 2
 * **21 checks across 5 categories** — Discoverability (robots.txt, sitemap, Link headers, DNS-AID), Content Accessibility (Markdown negotiation), Bot Access Control (AI bot rules, Content Signals, Web Bot Auth), API/Auth/MCP Discovery (API catalog, OAuth discovery, OAuth Protected Resource, auth.md, MCP server card, A2A agent card, Agent Skills, WebMCP), and Commerce (x402, MPP, UCP, ACP, AP2 — informational, never scored).
 * **Evidence timelines** — fetch/parse/conclude steps with request/response snapshots, so you can audit *why* a check passed or failed (and catch page caches or server rules silently breaking your endpoints).
 * **One-click fixes with verification** — 9 checks are fixable in one click; the plugin re-scans just that check afterwards. A bulk "Fix all safe items" sheet handles the rest.
-* **REST API** — `POST /wp-json/ajaco/v1/scan`, `POST /wp-json/ajaco/v1/fix`, public `GET /wp-json/ajaco/v1/health`.
+* **Hosting diagnosis** — the plugin writes no files (every endpoint is served by WordPress), but some hosts block the requests before WordPress runs: nginx dot-path rules 403 `/.well-known/*`, and static-file rules 404 `/llms.txt`. When a feature is enabled and the server blocks it, the Dashboard says so and hands you copy-paste nginx and Apache fixes.
+* **REST API** — `POST /wp-json/ajaco/v1/scan`, `POST /wp-json/ajaco/v1/scan/check`, `POST /wp-json/ajaco/v1/fix`, `POST /wp-json/ajaco/v1/llms/preview`, and a public `GET /wp-json/ajaco/v1/health`.
 * **WP-CLI** — `wp agent-ready scan --format=summary|json|agent`, `wp agent-ready fix <check>|--all-safe`, `wp agent-ready status` for agency fleets and AI agents operating over SSH.
 
 Each publishing capability remains a separate toggle under **Agent Ready → Settings** and ships **opt-in** (everything starts off). On first activation, a **Quick Setup wizard** suggests sensible defaults based on your environment (for example, it skips JSON-LD when an SEO plugin is detected so you don't get duplicate structured data) — re-runnable any time.
@@ -32,7 +33,8 @@ Each publishing capability remains a separate toggle under **Agent Ready → Set
 * **API Catalog** (RFC 9727) — `/.well-known/api-catalog` linkset advertising your REST API, plus a `Link: rel="api-catalog"` header on every response so agents discover it from any URL.
 * **MCP Server Card** (SEP-1649 draft) — `/.well-known/mcp/server-card.json` describing the site to MCP-aware agents.
 * **Agent Skills Index** (RFC v0.2.0) — `/.well-known/agent-skills/index.json` listing six skills (content-query, posts-read, pages-read, media-library, categories, tags) plus per-skill `SKILL.md` artifacts with verifiable sha256 digests.
-* **llms.txt + llms-full.txt** (per llmstxt.org) — `/llms.txt` curated, LLM-readable index of your top pages and recent posts, with a Discovery section auto-linking every other plugin endpoint; `/llms-full.txt` (new in 2.0) serves the full content of recent posts and pages as Markdown. Password-protected content is always excluded.
+* **llms.txt + llms-full.txt** (per llmstxt.org) — `/llms.txt` is a **curated** LLM-readable index: you write the intro, choose which post types appear (custom post types and WooCommerce products included), set each section's heading, count and order, and add your own Markdown block. `/llms-full.txt` serves the full content of those same entries as Markdown. Password-protected content is always excluded.
+* **Per-post curation** — an "Agent Ready (llms.txt)" panel in the editor (block editor and classic) lets an author keep a page out of the agent indexes entirely, or write a **Summary for AI agents** that overrides the excerpt — a line aimed at a model deciding whether to fetch the page, not a human skimming.
 * **IndexNow** — non-blocking ping to Bing and Yandex on every post publish so search engines re-crawl within minutes.
 
 = Presentation — format content for agents =
@@ -54,12 +56,12 @@ Each publishing capability remains a separate toggle under **Agent Ready → Set
 * **Multisite-aware.** Every endpoint also resolves at `/{subsite}/...` paths automatically.
 * **Cached.** OpenAPI is cached for a day, llms.txt for an hour, with proper invalidation on plugin activation, theme switch, post changes, and setting toggles.
 * **Performance-conscious.** Markdown handler runs at `PHP_INT_MAX` priority so it doesn't break object-cache flushes or Query Monitor. IndexNow pings are non-blocking.
-* **Extensible.** Fifteen filter hooks let you customize skills, schemas, bot policies, scan behavior, and content. See "For Developers" below.
-* **Accessible.** Score-card SVG has dynamic `aria-label`, copy buttons announce success via `aria-live`, decorative arrows hidden from screen readers via CSS pseudo-elements.
+* **Extensible.** Seventeen filter hooks let you customize skills, schemas, bot policies, llms.txt curation, scan behavior, and content. See "For Developers" below.
+* **Accessible.** The Dashboard gauge carries a dynamic `aria-label`, copy buttons announce success via `aria-live`, and decorative icons are hidden from screen readers.
 
 = For developers =
 
-The plugin exposes fifteen filter hooks for extension. Examples:
+The plugin exposes seventeen filter hooks for extension. Examples:
 
 `add_filter( 'ajaco_required_capability', function () { return 'edit_posts'; } );`
 Delegate plugin access to a non-admin role.
@@ -70,7 +72,9 @@ Register custom skills that ship in the Agent Skills Index and are served as SKI
 `add_filter( 'ajaco_content_signal', function () { return 'ai-train=yes, search=yes, ai-input=yes'; } );`
 Customize the Content-Signal directive (e.g. permit AI training).
 
-Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_llms_full_txt_content`, `ajaco_auth_md_content`, `ajaco_ai_bot_list`, `ajaco_ai_bot_policy`, `ajaco_commerce_signals`, `ajaco_scan_sslverify`, `ajaco_active_seo_plugin`. The settings page's Help tab → For Developers lists all of them with descriptions.
+Other hooks: `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_llms_full_txt_content`, `ajaco_llms_post_types`, `ajaco_llms_exclude_post`, `ajaco_auth_md_content`, `ajaco_ai_bot_list`, `ajaco_ai_bot_policy`, `ajaco_commerce_signals`, `ajaco_scan_sslverify`, `ajaco_active_seo_plugin`. The Help tab (top right of the settings screen) lists all of them with descriptions.
+
+Per-post curation is stored in two post meta fields you can read or set programmatically: `_ajaco_llms_exclude` (boolean) and `_ajaco_llms_summary` (string, 300 chars). Both are registered with `show_in_rest`, so they round-trip through the REST API and WP-CLI (`wp post meta update 42 _ajaco_llms_summary "..."`).
 
 == Installation ==
 
@@ -110,6 +114,12 @@ The scanner runs the same 21 checks (and the same Level 0–5 ladder) as Cloudfl
 
 The plugin never creates files: every endpoint (/.well-known/*, /llms.txt, /openapi.json, /auth.md) is served virtually by WordPress, so hosts that forbid file creation are fully supported. What can break things is the web server intercepting requests before WordPress runs — typically an nginx dot-path deny rule returning 403 on /.well-known/*, or a static-file rule returning 404 for /llms.txt-style paths. The readiness scan detects exactly this (feature enabled + server blocking) and the Dashboard shows a hosting notice with copy-paste nginx and Apache fixes you can apply yourself or forward to your hosting support.
 
+= Can I control what goes into llms.txt? =
+
+Yes — it is curated, not auto-generated from fixed rules. Under **Agent Ready → llms.txt** you write the intro, pick which post types appear (custom post types and WooCommerce products show up automatically), and set each section's heading, item count and order, plus your own Markdown block. A live preview shows the file as you edit, before you save.
+
+Individual entries are steered from the editor: the "Agent Ready (llms.txt)" panel has an **Include in llms.txt** toggle (excluded pages stay out of both `/llms.txt` and `/llms-full.txt`) and a **Summary for AI agents** field that overrides the excerpt for that entry — write it for a model deciding whether to fetch the page. Defaults reproduce the previous automatic output, so upgrading changes nothing until you edit something.
+
 = Can I run scans from the command line or scripts? =
 
 Yes: `wp agent-ready scan` (add `--format=json` for machines or `--format=agent` for a markdown fix report), `wp agent-ready fix <check>` or `--all-safe`, and `wp agent-ready status`. The same operations are available over REST at `/wp-json/ajaco/v1/scan` and `/wp-json/ajaco/v1/fix` (admin capability required; `/wp-json/ajaco/v1/health` is public).
@@ -147,7 +157,7 @@ Yes. Use the relevant filter:
 * `ajaco_api_catalog_linkset` — add anchors or rels (e.g. for a GraphQL endpoint).
 * `ajaco_mcp_server_card` — override transport / capabilities for a real MCP implementation.
 
-The Help tab's "For Developers" section on the settings page lists every hook.
+The Help tab's "For Developers" section on the settings page lists every hook with a description.
 
 = How do I undo everything and start over? =
 
@@ -170,13 +180,15 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 1. Dashboard — segmented category gauge, Level 0–5 badge, and the "Next level" panel with one-click fixes.
 2. Check card with evidence timeline — fetch/parse/conclude steps, request/response snapshots, Fix now / Copy agent prompt.
 3. Bulk fix sheet — "Fix all safe items" plus combined agent prompts for out-of-WordPress fixes.
-4. Settings page — per-feature toggles in three grouped sections (Discovery / Presentation / Declarations).
-5. Quick Setup wizard — environment-aware recommendations, re-runnable any time.
-6. WP-CLI — `wp agent-ready scan --format=agent` fix report.
+4. llms.txt curation — intro, per-post-type sections, custom Markdown block, and a live preview of the file.
+5. Editor panel — "Include in llms.txt" toggle and the "Summary for AI agents" override on a single post.
+6. Settings page — per-feature toggles, per-bot AI crawler policy, Content-Signal preferences, and live endpoint links.
+7. Quick Setup wizard — environment-aware recommendations, re-runnable any time.
+8. WP-CLI — `wp agent-ready scan --format=agent` fix report.
 
 == Changelog ==
 
-= 2.0.0 (in development on the v2-dev branch) =
+= 2.0.0-alpha (in development on the v2-dev branch; not yet released) =
 * NEW: Built-in agent-readiness scanner — runs the same 21 checks as Cloudflare's isitagentready.com against your live site, with per-check evidence timelines (request/response snapshots) and the Level 0–5 maturity ladder with next-level guidance.
 * NEW: Dashboard under a top-level "Agent Ready" menu — segmented category gauge, Level badge, check cards with Fix now / Copy agent prompt / Audit details, and a bulk fix sheet.
 * NEW: One-click fixes with verification — 9 failing checks fixable in one click; the fixed check is re-scanned immediately to prove it passes.
@@ -185,9 +197,12 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * NEW: AI Bot Rules — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check, with per-bot allow/block policy.
 * NEW: /auth.md — agent authentication documentation for Application Passwords.
 * NEW: /llms-full.txt — full recent content as Markdown alongside /llms.txt; password-protected content excluded from all agent-facing endpoints.
+* NEW: Curated llms.txt — a dedicated **Agent Ready → llms.txt** screen with a custom intro, per-post-type sections (custom post types and WooCommerce products included) with heading/count/order controls, a custom Markdown block, and a live preview of the file before you save. Defaults reproduce the previous automatic output exactly.
+* NEW: Per-post curation — an "Agent Ready (llms.txt)" panel in the block editor (with a classic-editor fallback): "Include in llms.txt" excludes an entry from both agent files, and "Summary for AI agents" overrides its excerpt. Stored as the `_ajaco_llms_exclude` / `_ajaco_llms_summary` post meta (REST-exposed, so WP-CLI and the REST API can set them).
 * NEW: Hosting diagnosis — when a feature is enabled but the server blocks its endpoint (nginx dot-path 403s, static-file 404s), the scan flags it and the Dashboard offers copy-paste nginx/Apache fixes.
-* Settings page moved under Agent Ready → Settings and streamlined: the toggle-count score card is replaced by the scan-verified Level banner (one source of truth with the Dashboard), a per-bot AI crawler policy table with presets ("Allow search & user requests, block training"), Content-Signal yes/no selectors, inline dependency warnings (keyless IndexNow, catalog without OpenAPI), and the curl Testing/Details sections replaced by a pointer to the scanner plus external validators.
-* New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_commerce_signals, ajaco_scan_sslverify.
+* Settings page moved under Agent Ready → Settings and streamlined: the toggle-count score card is replaced by the scan-verified Level banner (one source of truth with the Dashboard), a per-bot AI crawler policy table with presets ("Allow search & user requests, block training"), Content-Signal yes/no selectors, inline dependency warnings (keyless IndexNow, catalog without OpenAPI), and live "View" links to every endpoint the plugin is serving.
+* Feature documentation moved into the contextual Help tab, reachable from a "Read more" link on every toggle (which opens the guide at that feature's notes).
+* New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_llms_post_types, ajaco_llms_exclude_post, ajaco_commerce_signals, ajaco_scan_sslverify.
 
 = 1.0.1 =
 * Agent Skills index now validates against the Agent Skills Discovery RFC v0.2.0: entries use `type: skill-md` and a `digest` field with `sha256:` prefix (previously `type: information-retrieval` and a `sha256` key, which external scanners rejected); `$schema` corrected to the published schema URI.

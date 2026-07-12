@@ -15,14 +15,16 @@ Where external scanners stop at "here's a prompt, go fix it," this plugin closes
 2. **Level** — results map to the Level 0–5 agent-readiness ladder (Not Ready → Basic Web Presence → Bot-Aware → Agent-Readable → Agent-Integrated → Agent-Native), with a "Next level" panel listing exactly which checks unlock the next rung. Nothing scores unless the scan verifies it.
 3. **Fix** — 9 checks have a **Fix now** button that enables the right feature; the plugin re-scans that single check immediately and shows it going green. Fixes needing DNS or server access get copy-paste prompts for your coding agent (Cursor, Claude Code, Windsurf, Copilot).
 
-**Dashboard** (Agent Ready → Dashboard) is the verifier; **Settings** (Agent Ready → Settings) is the per-feature switchboard.
+**Hosting diagnosis.** The plugin writes no files — every endpoint is served by WordPress — but some hosts block the request before WordPress runs (nginx dot-path rules `403` on `/.well-known/*`; static-file rules `404` on `/llms.txt`). When a feature is on and the server blocks it, the Dashboard says so and hands you a copy-paste nginx or Apache fix.
+
+**Dashboard** (Agent Ready → Dashboard) is the verifier; **Settings** (Agent Ready → Settings) is the per-feature switchboard; **llms.txt** (Agent Ready → llms.txt) is where you curate the index.
 
 ## What it publishes
 
 | Feature | Endpoint / behavior | Standard |
 |---|---|---|
 | Markdown Negotiation | `Accept: text/markdown` → clean Markdown + `X-Markdown-Tokens`, with `Vary: Accept` | [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) |
-| llms.txt + llms-full.txt | `/llms.txt` curated index · `/llms-full.txt` full recent content as Markdown (password-protected content always excluded) | [llmstxt.org](https://llmstxt.org/) |
+| llms.txt + llms-full.txt | `/llms.txt` curated index (your intro, your sections, your per-post choices) · `/llms-full.txt` full content of those entries (password-protected content always excluded) | [llmstxt.org](https://llmstxt.org/) |
 | AI Bot Rules | robots.txt User-agent groups for the 15 scanner-checked AI crawlers, per-bot allow/block policy | [RFC 9309](https://www.rfc-editor.org/rfc/rfc9309) |
 | Content Signals | `Content-Signal: ai-train=no, search=yes, ai-input=no` inside a `User-agent: *` group | [contentsignals.org](https://contentsignals.org/) |
 | API Catalog | `/.well-known/api-catalog` linkset + `Link: rel="api-catalog"` header | [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) |
@@ -33,6 +35,29 @@ Where external scanners stop at "here's a prompt, go fix it," this plugin closes
 | OpenAPI | `/openapi.json` (and `/?format=openapi`) generated from live REST routes | OpenAPI 3.0.3 |
 | JSON-LD Schema | WebSite, Organization, Article, BreadcrumbList, FAQPage — auto-suppressed next to Yoast/Rank Math/AIOSEO/etc. | schema.org |
 | IndexNow | Non-blocking ping to Bing/Yandex on publish | [indexnow.org](https://www.indexnow.org/) |
+
+## Curating llms.txt
+
+The index is **curated, not auto-generated from fixed rules** — though the defaults reproduce the old automatic output exactly, so upgrading changes nothing until you edit something.
+
+**Site-wide** (Agent Ready → llms.txt):
+
+- **Intro** — replaces the boilerplate line. This is where you tell an agent what the site is actually for.
+- **Sections** — one per post type; custom post types and WooCommerce products appear automatically. Each has include on/off, heading, item count, order (recent / menu order / title), top-level-only (hierarchical types), and show-dates.
+- **Custom Markdown block** — pinned above or below the generated sections.
+- **Live preview** — renders the file (with byte, token and entry counts) from your *unsaved* edits, via `POST /wp-json/ajaco/v1/llms/preview`.
+
+**Per entry** — the "Agent Ready (llms.txt)" panel in the editor (block editor, with a classic-editor metabox fallback):
+
+- **Include in llms.txt** — off keeps the entry out of both `/llms.txt` and `/llms-full.txt`.
+- **Summary for AI agents** — overrides the excerpt for that entry. An excerpt is written for a human skimming; this line is written for a model deciding whether to fetch the page.
+
+Both are plain post meta (REST-exposed), so they script cleanly:
+
+```bash
+wp post meta update 42 _ajaco_llms_exclude 1                       # keep a thin page out of the agent indexes
+wp post meta update 17 _ajaco_llms_summary "Step-by-step V60 recipe: grind, ratio, timing."
+```
 
 ## Interfaces
 
@@ -56,6 +81,7 @@ POST /wp-json/ajaco/v1/scan          {"checks": ["robotsTxt", ...]}   # omit for
 GET  /wp-json/ajaco/v1/scan                                           # last stored scan
 POST /wp-json/ajaco/v1/scan/check    {"check": "markdownNegotiation"} # re-run one check
 POST /wp-json/ajaco/v1/fix           {"check": "agentSkills"}         # fix + re-verify
+POST /wp-json/ajaco/v1/llms/preview  {"config": { ... }}              # preview llms.txt for an unsaved config
 GET  /wp-json/ajaco/v1/health                                         # public liveness (RFC 9727 status target)
 ```
 
@@ -90,7 +116,7 @@ Cross-check with Cloudflare's [Agent Readiness scanner](https://isitagentready.c
 
 ## For developers
 
-Fifteen filter hooks: `ajaco_required_capability`, `ajaco_skill_definitions`, `ajaco_content_signal`, `ajaco_ai_bot_list`, `ajaco_ai_bot_policy`, `ajaco_auth_md_content`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_llms_full_txt_content`, `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_commerce_signals`, `ajaco_scan_sslverify`, `ajaco_active_seo_plugin`, plus the standard WordPress surface. Examples in the Help tab → For Developers, or see [readme.txt](readme.txt).
+Seventeen filter hooks: `ajaco_required_capability`, `ajaco_skill_definitions`, `ajaco_content_signal`, `ajaco_ai_bot_list`, `ajaco_ai_bot_policy`, `ajaco_auth_md_content`, `ajaco_json_ld_graph`, `ajaco_openapi_spec`, `ajaco_llms_txt_content`, `ajaco_llms_full_txt_content`, `ajaco_llms_post_types`, `ajaco_llms_exclude_post`, `ajaco_api_catalog_linkset`, `ajaco_mcp_server_card`, `ajaco_commerce_signals`, `ajaco_scan_sslverify`, `ajaco_active_seo_plugin`, plus the standard WordPress surface. Examples in the Help tab → For Developers, or see [readme.txt](readme.txt).
 
 ```php
 // Register a WooCommerce products skill in the Agent Skills index.

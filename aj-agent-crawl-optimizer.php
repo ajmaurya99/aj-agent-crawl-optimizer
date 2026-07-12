@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       AJ Agent Crawl Optimizer
+ * Plugin Name:       AJ Agent Crawl Optimizer – AI Readiness Scanner & llms.txt for WordPress
  * Plugin URI:        https://github.com/ajmaurya99/aj-agent-crawl-optimizer
  * Description:       The agent-readiness scanner and fixer for WordPress — run the 21-check readiness scan (Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more.
  * Version:           2.0.0

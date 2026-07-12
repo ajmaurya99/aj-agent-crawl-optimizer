@@ -1,6 +1,6 @@
-=== AJ Agent Crawl Optimizer ===
+=== AJ Agent Crawl Optimizer – AI Readiness Scanner & llms.txt for WordPress ===
 Contributors:      ajmaurya
-Tags:              ai, mcp, openapi, structured-data, llms-txt
+Tags:              llms-txt, ai, chatgpt, mcp, ai crawlers
 Requires at least: 5.6
 Tested up to:      7.0
 Requires PHP:      7.4
@@ -8,11 +8,15 @@ Stable tag:        2.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-Agent-readiness scanner and fixer: audit 21 AI-agent standards, fix failures in one click, and hand-curate the llms.txt agents actually read.
+llms.txt + AI-readiness scanner for WordPress: get found by ChatGPT & Claude, manage AI crawlers in robots.txt, fix failures in one click.
 
 == Description ==
 
-**AJ Agent Crawl Optimizer** makes your site legible to AI agents — and, since 2.0, *proves* it. The built-in **readiness scanner** runs the same 21 checks as Cloudflare's isitagentready.com against your live site, grades you on the **Level 0–5 agent-readiness ladder** (Not Ready → Basic Web Presence → Bot-Aware → Agent-Readable → Agent-Integrated → Agent-Native), and shows the full evidence trail — every request and response — behind every verdict. Failing checks get a **Fix now** button that enables the right feature and re-scans that single check to prove it went green; anything the plugin can't fix in WordPress (DNS records, server config) gets a copy-paste prompt for your coding agent.
+**AJ Agent Crawl Optimizer is a free WordPress plugin that scans your site against 21 AI-agent-readiness checks — the same set used by Cloudflare's isitagentready.com — grades it on a Level 0–5 readiness ladder, fixes failing checks in one click, and lets you hand-curate the `llms.txt` that AI agents like ChatGPT, Claude, and Perplexity read.**
+
+It makes your site legible to AI agents — and, since 2.0, *proves* it. The built-in **readiness scanner** runs 21 checks against your live site, grades you on the **Level 0–5 agent-readiness ladder** (Not Ready → Basic Web Presence → Bot-Aware → Agent-Readable → Agent-Integrated → Agent-Native), and shows the full evidence trail — every request and response — behind every verdict. Failing checks get a **Fix now** button that enables the right feature and re-scans that single check to prove it went green; anything the plugin can't fix in WordPress (DNS records, server config) gets a copy-paste prompt for your coding agent.
+
+This is the technical, agent-readiness layer of **answer engine optimization (AEO)** and **generative engine optimization (GEO)**: it improves your **AI visibility** by making your content legible to AI agents through llms.txt, JSON-LD, Markdown negotiation, and AI crawler rules. It is *not* a content SEO plugin — it doesn't write titles or meta descriptions, and it doesn't track brand mentions or AI citations. It prepares your WordPress site so AI search engines and agents can read, trust, and route on it, then verifies that over real HTTP.
 
 = The scan → fix → verify loop (new in 2.0) =
 
@@ -55,9 +59,13 @@ The defaults keep the same sections and ordering as the previous automatic outpu
 
 = Declarations =
 
-* **AI Bot Rules** (new in 2.0) — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for (GPTBot, ChatGPT-User, Claude-Web, PerplexityBot, CCBot, Google-Extended, Bytespider, …), each allowed or blocked per a filterable per-bot policy. Groups are self-contained (they replicate core's wp-admin protections) and honor "Discourage search engines".
+* **AI Bot Rules** (new in 2.0) — **to be cited by an AI engine, you must first allow its crawler.** The plugin writes explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for (GPTBot and ChatGPT-User from OpenAI, Claude-Web, PerplexityBot, CCBot, Google-Extended, Bytespider, …), each allowed or blocked per a filterable per-bot policy. Groups are self-contained (they replicate core's wp-admin protections) and honor "Discourage search engines".
 * **Content-Signals** — appends a `Content-Signal: ai-train=no, search=yes, ai-input=no` directive to robots.txt (inside an explicit `User-agent: *` group) declaring your AI-usage preferences per contentsignals.org. Composes with Yoast/Rank Math/AIOSEO — their additions are preserved, our directive lands last.
 * **auth.md** (new in 2.0) — publishes `/auth.md` honestly documenting how agents authenticate to your REST API via Application Passwords: how a human creates one, Basic-auth usage, scope, and revocation. No fictional OAuth endpoints.
+
+= How it compares to other AI / llms.txt plugins =
+
+Most AI and `llms.txt` plugins only *generate* a file from fixed rules. AJ Agent Crawl Optimizer also **scans** your live site over real HTTP, **scores** it on the Level 0–5 ladder, shows the request/response **evidence** behind every verdict, and **fixes** failures in one click — then re-scans to prove the check turned green. It writes per-bot robots.txt rules for 15 AI crawlers and lets you hand-curate what AI agents read instead of auto-dumping every post. Scan → score → fix → verify, not generate-and-hope.
 
 = Why use it =
 
@@ -110,6 +118,34 @@ If you want Bing and Yandex to re-crawl your content within minutes of publish:
 3. Enable the IndexNow toggle. The plugin hosts the key file at `/{key}.txt` for ownership verification automatically.
 
 == Frequently Asked Questions ==
+
+= Is my WordPress site ready for AI agents? =
+
+Run the built-in readiness scanner. AJ Agent Crawl Optimizer checks your live site against 21 AI-agent-readiness checks — the same set as Cloudflare's isitagentready.com — and grades you on a Level 0–5 ladder from Not Ready to Agent-Native. Every verdict shows the real request and response behind it, and failing checks get a one-click **Fix now** button that re-scans to prove it passed.
+
+= What is llms.txt and does my WordPress site need one? =
+
+`llms.txt` is a plain-Markdown file at `/llms.txt` that gives AI agents a curated index of your most important content, proposed at llmstxt.org. AJ Agent Crawl Optimizer lets you hand-curate it: write the intro, pick which post types (and WooCommerce products) appear, and set a per-post "Summary for AI agents" that overrides the excerpt. It is a surface AI agents can route on — not a guaranteed path to AI citations, but a machine-readable map of what your site is for.
+
+= How do I allow or block GPTBot and other AI crawlers in WordPress? =
+
+The plugin writes explicit robots.txt rules for the 15 AI crawlers readiness scanners check — GPTBot and ChatGPT-User (OpenAI), Claude-Web (Anthropic), PerplexityBot, Google-Extended, CCBot and Bytespider among them — each allowed or blocked per a per-bot policy. Presets like "Allow search & user requests, block training" make it a single choice. Remember: to be cited by an AI engine you must *allow* its crawler.
+
+= How do I get my WordPress content found by ChatGPT and Perplexity? =
+
+There is no guaranteed path, but three things help and this plugin does all three: allow the AI search crawlers (OAI-SearchBot, PerplexityBot, Google-Extended), publish the machine-readable surfaces agents look for (llms.txt, JSON-LD, Markdown negotiation), and write a clear "Summary for AI agents" on key pages. The readiness scanner then verifies each of these is actually live over real HTTP — so you fix what's broken instead of guessing.
+
+= What is the difference between llms.txt and llms-full.txt? =
+
+`/llms.txt` is a curated *index* — a Markdown list of your key pages with links and short summaries, so an agent can decide what to fetch. `/llms-full.txt` serves the full Markdown *content* of those same curated entries in one file, for agents that want everything inline. The plugin serves both, and password-protected content is always excluded from each.
+
+= How is this different from an llms.txt generator or an AI SEO plugin? =
+
+Most plugins only *generate* an llms.txt file from fixed rules. AJ Agent Crawl Optimizer is an agent-readiness scanner and fixer: it audits your live site over real HTTP against 21 checks, scores a Level 0–5 ladder, shows the request/response evidence behind every verdict, fixes failures in one click, and re-verifies. It covers the answer engine optimization (AEO) and generative engine optimization (GEO) groundwork — structured data, AI crawler rules, and MCP discovery — that plain generators and content-writing SEO plugins skip.
+
+= Does it work with WooCommerce? =
+
+Yes. WooCommerce products are detected automatically and can appear as their own section in your curated llms.txt, so AI agents can see your catalogue. You control whether products appear, how many, and in what order, and you can exclude individual products or give any product a per-product "Summary for AI agents."
 
 = What's the difference between the Dashboard and Settings screens? =
 

@@ -1,6 +1,8 @@
-# AJ Agent Crawl Optimizer
+# AJ Agent Crawl Optimizer — AI Readiness Scanner & llms.txt for WordPress
 
-**The agent-readiness scanner and fixer for WordPress.** Scan your site against the 21 agent-readiness checks (the same ones Cloudflare's [isitagentready.com](https://isitagentready.com/) runs), see your Level 0–5 with full request/response evidence, fix failures in one click, and re-verify instantly.
+**AJ Agent Crawl Optimizer is a free WordPress plugin that scans your site against 21 AI-agent-readiness checks — the same set used by Cloudflare's [isitagentready.com](https://isitagentready.com/) — grades it on a Level 0–5 ladder, fixes failing checks in one click, and lets you hand-curate the `llms.txt` that AI agents like ChatGPT, Claude, and Perplexity read.**
+
+It's the technical, agent-readiness layer of **answer engine optimization (AEO)** and **generative engine optimization (GEO)**: make your WordPress content legible and visible to AI agents through llms.txt, JSON-LD, Markdown negotiation, and AI crawler rules — then *prove* it over real HTTP. See your Level 0–5 with full request/response evidence, fix failures in one click, and re-verify instantly.
 
 Then publish everything agents need — Markdown negotiation, MCP server card, Agent Skills, API catalog, AI bot rules, Content Signals — and **hand-curate the `llms.txt` they actually read**: your intro, your sections, your per-post summaries. [Jump to curation →](#curating-llmstxt)
 
@@ -20,6 +22,22 @@ Where external scanners stop at "here's a prompt, go fix it," this plugin closes
 **Hosting diagnosis.** The plugin writes no files — every endpoint is served by WordPress — but some hosts block the request before WordPress runs (nginx dot-path rules `403` on `/.well-known/*`; static-file rules `404` on `/llms.txt`). When a feature is on and the server blocks it, the Dashboard says so and hands you a copy-paste nginx or Apache fix.
 
 **Dashboard** (Agent Ready → Dashboard) is the verifier; **Settings** (Agent Ready → Settings) is the per-feature switchboard; **llms.txt** (Agent Ready → llms.txt) is where you curate the index.
+
+## How it compares to other AI / llms.txt plugins
+
+Most AI and llms.txt plugins stop at *generating* a file. This one closes the loop:
+
+| Capability | Typical llms.txt generator / AI SEO plugin | AJ Agent Crawl Optimizer |
+|---|---|---|
+| Generate `llms.txt` | ✅ fixed rules | ✅ **hand-curated** — your intro, sections, per-post summaries |
+| Scan the live site over real HTTP | ❌ | ✅ 21 checks across 5 categories |
+| Score agent-readiness | ❌ | ✅ Level 0–5 ladder |
+| Evidence behind each verdict | ❌ | ✅ request/response timeline |
+| One-click fix + re-verify | ❌ | ✅ 9 fixes, re-scanned to prove green |
+| Per-bot AI crawler rules (GPTBot, Claude-Web, PerplexityBot…) | rare | ✅ 15 crawlers, allow/block each |
+| MCP server card + WebMCP + Agent Skills | ❌ | ✅ |
+
+**Scan → score → fix → verify, not generate-and-hope.**
 
 ## What it publishes
 
@@ -63,9 +81,11 @@ wp post meta update 17 _ajaco_llms_summary "Step-by-step V60 recipe: grind, rati
 
 ## Interfaces
 
-**Dashboard** — Agent Ready → Dashboard in wp-admin.
+### Dashboard
 
-**WP-CLI**
+Agent Ready → Dashboard in wp-admin.
+
+### WP-CLI
 
 ```bash
 wp agent-ready scan                      # summary table + next-level guidance
@@ -76,9 +96,11 @@ wp agent-ready fix --all-safe            # fix every failing check that has a on
 wp agent-ready status                    # last stored scan without re-running
 ```
 
-**REST API** (`manage_options` capability + REST nonce, except `/health`)
+### REST API
 
-```
+Requires the `manage_options` capability + a REST nonce, except `/health` (public).
+
+```text
 POST /wp-json/ajaco/v1/scan          {"checks": ["robotsTxt", ...]}   # omit for the 19-check default
 GET  /wp-json/ajaco/v1/scan                                           # last stored scan
 POST /wp-json/ajaco/v1/scan/check    {"check": "markdownNegotiation"} # re-run one check
@@ -115,6 +137,20 @@ curl https://example.com/robots.txt                           # AI bot groups + 
 ```
 
 Cross-check with Cloudflare's [Agent Readiness scanner](https://isitagentready.com/) — the plugin implements the same check ids, pass criteria, and level ladder, so the numbers should agree.
+
+## FAQ
+
+**Is my WordPress site ready for AI agents?** Run the built-in scanner — it checks your live site against 21 AI-agent-readiness checks (the same set as Cloudflare's isitagentready.com) and grades you Level 0–5, with the request/response evidence behind every verdict and a one-click fix for failures.
+
+**What is llms.txt and does my site need one?** `llms.txt` is a Markdown file at `/llms.txt` that gives AI agents a curated index of your key content ([llmstxt.org](https://llmstxt.org/)). This plugin lets you hand-curate it — intro, sections, per-post "Summary for AI agents" — rather than auto-dumping every post.
+
+**How do I allow or block GPTBot and other AI crawlers in WordPress?** The plugin writes explicit robots.txt rules for the 15 AI crawlers readiness scanners check (GPTBot, ChatGPT-User, Claude-Web, PerplexityBot, Google-Extended, CCBot, Bytespider…), each allowed or blocked per a per-bot policy. To be cited by an AI engine, you must first allow its crawler.
+
+**How do I get my content found by ChatGPT and Perplexity?** No guarantees, but three things help and this plugin does all three: allow the AI search crawlers, publish the machine-readable surfaces agents look for (llms.txt, JSON-LD, Markdown negotiation), and write a clear per-page "Summary for AI agents" — then the scanner verifies each is live over real HTTP.
+
+**What's the difference between llms.txt and llms-full.txt?** `/llms.txt` is a curated index (links + short summaries so an agent can choose what to fetch); `/llms-full.txt` is the full Markdown content of those same entries inline. The plugin serves both; password-protected content is always excluded from each.
+
+**How is this different from an llms.txt generator or an AI SEO plugin?** Generators only produce a file. This is an agent-readiness scanner and fixer: it audits your live site over real HTTP, scores a Level 0–5 ladder, shows the evidence, fixes failures in one click, and re-verifies — covering the answer engine optimization (AEO) and generative engine optimization (GEO) groundwork (structured data, AI crawler rules, MCP discovery) that generators skip.
 
 ## For developers
 

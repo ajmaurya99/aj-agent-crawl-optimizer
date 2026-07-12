@@ -196,6 +196,7 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 6. AI bot rules — per-crawler allow/block policy for the 15 AI crawlers scanners check, plus Content-Signal preferences.
 7. Built-in feature guide — what every feature actually does, in the contextual Help tab.
 8. Quick Setup wizard — environment-aware recommendations on first activation.
+9. Per-post curation — the "Agent Ready (llms.txt)" panel in the editor: keep an entry out of the agent indexes, or write the one-line summary an AI agent sees instead of the excerpt.
 
 == Changelog ==
 

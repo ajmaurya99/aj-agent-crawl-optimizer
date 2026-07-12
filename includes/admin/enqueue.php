@@ -99,10 +99,17 @@ function enqueue_dashboard_assets(): void {
 	wp_enqueue_script(
 		'ajaco-dashboard',
 		AJACO_URL . 'assets/js/dashboard.js',
-		array(),
+		array( 'wp-i18n' ),
 		file_exists( $js_path ) ? filemtime( $js_path ) : AJACO_VERSION,
 		true
 	);
+
+	// The localized i18n payload is already translated server-side via __();
+	// this makes the handle translation-aware for completeness and parity with
+	// the block-editor script.
+	if ( function_exists( 'wp_set_script_translations' ) ) {
+		wp_set_script_translations( 'ajaco-dashboard', 'aj-agent-crawl-optimizer' );
+	}
 
 	// Per-check static metadata for card rendering + copy prompts.
 	$meta   = array();
@@ -157,6 +164,57 @@ function enqueue_dashboard_assets(): void {
 				'fail'        => __( 'Fail', 'aj-agent-crawl-optimizer' ),
 				'neutral'     => __( 'Not applicable', 'aj-agent-crawl-optimizer' ),
 				'unable'      => __( 'Unable to check', 'aj-agent-crawl-optimizer' ),
+
+				// Empty state.
+				'emptyTitle'  => __( 'Is this site agent-ready?', 'aj-agent-crawl-optimizer' ),
+				'emptyBody'   => __( 'Run the readiness scan — the same checks Cloudflare’s isitagentready.com runs — against this site, with full request/response evidence and one-click fixes.', 'aj-agent-crawl-optimizer' ),
+				'runFirst'    => __( 'Run your first scan', 'aj-agent-crawl-optimizer' ),
+
+				// Gauge + next level.
+				/* translators: 1: level number 0-5, 2: level name. */
+				'levelOfName' => __( 'Level %1$s of 5 — %2$s', 'aj-agent-crawl-optimizer' ),
+				'nextLevel'   => __( 'Next level', 'aj-agent-crawl-optimizer' ),
+				'topLevel'    => __( 'Top level', 'aj-agent-crawl-optimizer' ),
+				/* translators: 1: level number, 2: level name. */
+				'levelDashName' => __( 'Level %1$s — %2$s', 'aj-agent-crawl-optimizer' ),
+				'topLevelBody' => __( 'This site passes every ladder requirement. Keep an eye on spec churn — standards in this space move fast.', 'aj-agent-crawl-optimizer' ),
+
+				// Hosting diagnosis.
+				/* translators: %s: number of blocked endpoints. Singular|plural. */
+				'hostingTitle' => __( 'Your host is blocking %s agent endpoint|Your host is blocking %s agent endpoints', 'aj-agent-crawl-optimizer' ),
+				'hostingBody'  => __( 'These features are enabled and served by the plugin (no files involved), but the web server intercepts the request before WordPress runs. Add the matching rule to your server config — or send it to your hosting support — then re-scan.', 'aj-agent-crawl-optimizer' ),
+				'copyNginx'    => __( 'Copy nginx fix', 'aj-agent-crawl-optimizer' ),
+				'copyApache'   => __( 'Copy Apache .htaccess fix', 'aj-agent-crawl-optimizer' ),
+
+				// Category section.
+				'optional'         => __( 'Optional', 'aj-agent-crawl-optimizer' ),
+				'notChecked'       => __( 'not checked', 'aj-agent-crawl-optimizer' ),
+				'commerceNote'     => __( 'Commerce protocols are emerging standards — informational, never counted in the score.', 'aj-agent-crawl-optimizer' ),
+				'commerceNoteNone' => __( 'No e-commerce signals detected on this site. Shown for information only; does not affect the score.', 'aj-agent-crawl-optimizer' ),
+
+				// Check card detail labels.
+				'goalLabel'   => __( 'Goal', 'aj-agent-crawl-optimizer' ),
+				'resultLabel' => __( 'Result', 'aj-agent-crawl-optimizer' ),
+				'issueLabel'  => __( 'Issue', 'aj-agent-crawl-optimizer' ),
+				'noteLabel'   => __( 'Note', 'aj-agent-crawl-optimizer' ),
+				'fixLabel'    => __( 'Fix', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: duration in milliseconds. */
+				'completedIn' => __( 'Completed in %s ms', 'aj-agent-crawl-optimizer' ),
+
+				// Fix sheet.
+				'improveReadiness' => __( 'Improve readiness', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: number of failing checks. Singular|plural. */
+				'issuesFound'      => __( '%s issue found|%s issues found', 'aj-agent-crawl-optimizer' ),
+				'oneClickFix'      => __( '(one-click fix)', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: number of one-click-fixable checks. */
+				'fixAllSafe'       => __( 'Fix all safe items (%s)', 'aj-agent-crawl-optimizer' ),
+				'copyAllPrompts'   => __( 'Copy all agent prompts', 'aj-agent-crawl-optimizer' ),
+				'sheetIntro'       => __( 'Copied prompts paste into any coding agent (Cursor, Claude Code, Windsurf, Copilot). Fixes needing DNS or server access always go the prompt route.', 'aj-agent-crawl-optimizer' ),
+
+				// Errors.
+				'sessionExpired' => __( 'Your session expired — reload this page and try again.', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: HTTP status code. */
+				'requestFailed'  => __( 'Request failed (HTTP %s)', 'aj-agent-crawl-optimizer' ),
 			),
 		)
 	);

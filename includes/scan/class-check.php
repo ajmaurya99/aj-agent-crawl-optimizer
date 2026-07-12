@@ -102,6 +102,10 @@ abstract class Check {
 			'timeout'     => 10,
 			'redirection' => 3,
 			'user-agent'  => 'AJACO-Scanner/' . AJACO_VERSION . ' (+' . home_url( '/' ) . ')',
+			// TLS verification stays ON for external requests (e.g. DNS-over-
+			// HTTPS resolvers). It is relaxed ONLY for probes of the site's own
+			// origin, so a scan still works on a local/staging site behind a
+			// self-signed certificate; the filter re-enables it if desired.
 			'sslverify'   => $same_origin ? apply_filters( 'ajaco_scan_sslverify', false ) : true,
 		);
 		$response = wp_remote_get( $url, array_merge( $defaults, $args ) );

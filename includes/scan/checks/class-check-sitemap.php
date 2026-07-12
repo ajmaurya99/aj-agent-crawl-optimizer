@@ -187,6 +187,8 @@ class Check_Sitemap extends Check {
 	private function extract_sitemap_directives( string $body ): array {
 		$urls = array();
 
+		$origin_host = wp_parse_url( $this->origin(), PHP_URL_HOST );
+
 		if ( preg_match_all( '/^\s*sitemap\s*:\s*(\S+)/im', $body, $matches ) ) {
 			foreach ( $matches[1] as $url ) {
 				$url = trim( $url );
@@ -198,6 +200,19 @@ class Check_Sitemap extends Check {
 				if ( ! preg_match( '#^https?://#i', $url ) ) {
 					$url = $this->origin() . '/' . ltrim( $url, '/' );
 				}
+
+				// Only probe directives on our OWN host. A robots.txt (which
+				// another plugin or a physical file may control) could point
+				// Sitemap: at an internal address (169.254.169.254, localhost,
+				// an intranet host); the scanner must not turn into an SSRF
+				// relay by fetching it. Off-origin directives are skipped —
+				// the scanner's job is this site's sitemap, not a third party's.
+				$url_host = wp_parse_url( $url, PHP_URL_HOST );
+				if ( ! is_string( $url_host ) || ! is_string( $origin_host )
+					|| 0 !== strcasecmp( $url_host, $origin_host ) ) {
+					continue;
+				}
+
 				$urls[] = $url;
 			}
 		}

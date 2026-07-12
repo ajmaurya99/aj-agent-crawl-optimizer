@@ -44,6 +44,28 @@
 			.replace( />/g, '&gt;' ).replace( /"/g, '&quot;' );
 	}
 
+	// Localized UI strings come from the AjacoDash.i18n payload (built with
+	// __()/_n() in includes/admin/enqueue.php, so they land in the .pot).
+	var t = D.i18n || {};
+
+	// Minimal printf supporting both sequential (%s, %d) and numbered
+	// (%1$s, %2$d) placeholders — WordPress uses numbered args for strings
+	// with more than one substitution so translators can reorder them.
+	function fmt( template ) {
+		var args = Array.prototype.slice.call( arguments, 1 );
+		var i = 0;
+		return String( template == null ? '' : template ).replace( /%(\d+\$)?[sd]/g, function ( match, num ) {
+			var idx = num ? parseInt( num, 10 ) - 1 : i++;
+			return idx < args.length && null != args[ idx ] ? args[ idx ] : '';
+		} );
+	}
+
+	// Pick singular/plural from an "singular|plural" i18n string by count.
+	function plural( template, n ) {
+		var parts = String( template == null ? '' : template ).split( '|' );
+		return ( 1 === n || parts.length < 2 ) ? parts[ 0 ] : parts[ 1 ];
+	}
+
 	function api( method, path, body ) {
 		return window.fetch( D.restUrl + path, {
 			method: method,
@@ -61,9 +83,9 @@
 			} ).then( function ( json ) {
 				if ( ! res.ok ) {
 					if ( 403 === res.status ) {
-						throw new Error( 'Your session expired — reload this page and try again.' );
+						throw new Error( t.sessionExpired );
 					}
-					throw new Error( json && json.message ? json.message : 'Request failed (HTTP ' + res.status + ')' );
+					throw new Error( json && json.message ? json.message : fmt( t.requestFailed, res.status ) );
 				}
 				return json;
 			} );
@@ -125,7 +147,7 @@
 		} );
 
 		return '<svg width="240" height="140" viewBox="0 0 240 140" role="img" aria-label="' +
-			esc( 'Level ' + scan.level + ' of 5 — ' + scan.levelName ) + '">' + parts + '</svg>';
+			esc( fmt( t.levelOfName, scan.level, scan.levelName ) ) + '">' + parts + '</svg>';
 	}
 
 	/* ------------------------------------------------------------------ *
@@ -215,11 +237,11 @@
 
 	function renderEmpty() {
 		return '<div class="ajaco-card ajaco-empty">' +
-			'<h3>' + esc( 'Is this site agent-ready?' ) + '</h3>' +
-			'<p>' + esc( 'Run the 19-check readiness scan — the same checks Cloudflare’s isitagentready.com runs — against this site, with full request/response evidence and one-click fixes.' ) + '</p>' +
+			'<h3>' + esc( t.emptyTitle ) + '</h3>' +
+			'<p>' + esc( D.i18n.emptyBody ) + '</p>' +
 			( state.busyScan
 				? '<button class="button button-primary button-hero" disabled><span class="ajaco-spin"></span>' + esc( D.i18n.scanning ) + '</button>'
-				: '<button class="button button-primary button-hero" data-act="scan">' + esc( 'Run your first scan' ) + '</button>' ) +
+				: '<button class="button button-primary button-hero" data-act="scan">' + esc( t.runFirst ) + '</button>' ) +
 			'</div>';
 	}
 
@@ -233,7 +255,7 @@
 			}
 			var label = D.categoryLabels[ c ] || c;
 			if ( 'commerce' === c ) {
-				var commerceTxt = cat.total > 0 ? cat.passed + '/' + cat.total : esc( 'not checked' );
+				var commerceTxt = cat.total > 0 ? cat.passed + '/' + cat.total : esc( t.notChecked );
 				chips += '<span class="ajaco-chip ajaco-chip-skip">' + esc( label ) + ' — ' + commerceTxt + '</span>';
 				return;
 			}
@@ -255,9 +277,9 @@
 	function renderNextLevel() {
 		var next = state.scan.nextLevel;
 		if ( ! next ) {
-			return '<div class="ajaco-card ajaco-next"><p class="ajaco-next-target">' + esc( 'Top level' ) + '</p>' +
-				'<h3>' + esc( 'Level 5 — ' + ( D.levelNames[ 5 ] || '' ) ) + '</h3>' +
-				'<p class="ajaco-meta">' + esc( 'This site passes every ladder requirement. Keep an eye on spec churn — standards in this space move fast.' ) + '</p></div>';
+			return '<div class="ajaco-card ajaco-next"><p class="ajaco-next-target">' + esc( t.topLevel ) + '</p>' +
+				'<h3>' + esc( fmt( t.levelDashName, 5, ( D.levelNames[ 5 ] || '' ) ) ) + '</h3>' +
+				'<p class="ajaco-meta">' + esc( t.topLevelBody ) + '</p></div>';
 		}
 		var rows = '';
 		next.requirements.forEach( function ( req ) {
@@ -274,7 +296,7 @@
 				'<small>' + esc( req.description || '' ) + '</small></span>' + btn + '</div>';
 		} );
 		return '<div class="ajaco-card ajaco-next">' +
-			'<p class="ajaco-next-target">' + esc( 'Next level' ) + '</p>' +
+			'<p class="ajaco-next-target">' + esc( t.nextLevel ) + '</p>' +
 			'<h3>Level ' + next.target + ' — ' + esc( next.name ) + '</h3>' +
 			( next.note ? '<p class="ajaco-meta">' + esc( next.note ) + '</p>' : '' ) +
 			rows + '</div>';
@@ -290,12 +312,12 @@
 			items += '<li>' + esc( issue.summary ) + '</li>';
 		} );
 		return '<div class="ajaco-card ajaco-hosting">' +
-			'<h3>' + esc( 'Your host is blocking ' + hosting.issues.length + ' agent endpoint' + ( 1 === hosting.issues.length ? '' : 's' ) ) + '</h3>' +
-			'<p class="ajaco-meta">' + esc( 'These features are enabled and served by the plugin (no files involved), but the web server intercepts the request before WordPress runs. Add the matching rule to your server config — or send it to your hosting support — then re-scan.' ) + '</p>' +
+			'<h3>' + esc( fmt( plural( t.hostingTitle, hosting.issues.length ), hosting.issues.length ) ) + '</h3>' +
+			'<p class="ajaco-meta">' + esc( t.hostingBody ) + '</p>' +
 			'<ul class="ajaco-hosting-list">' + items + '</ul>' +
 			'<div class="ajaco-actions">' +
-			'<button class="button button-small" data-act="copy-snippet" data-snippet="nginx">' + esc( 'Copy nginx fix' ) + '</button>' +
-			'<button class="button button-small" data-act="copy-snippet" data-snippet="apache">' + esc( 'Copy Apache .htaccess fix' ) + '</button>' +
+			'<button class="button button-small" data-act="copy-snippet" data-snippet="nginx">' + esc( t.copyNginx ) + '</button>' +
+			'<button class="button button-small" data-act="copy-snippet" data-snippet="apache">' + esc( t.copyApache ) + '</button>' +
 			'</div></div>';
 	}
 
@@ -317,7 +339,7 @@
 
 			var scoreInfo = state.scan.scores.categories[ cat ];
 			var scoreTxt = scoreInfo ? scoreInfo.passed + '/' + scoreInfo.total : '';
-			var optional = 'commerce' === cat ? '<span class="ajaco-opt">' + esc( 'Optional' ) + '</span>' : '';
+			var optional = 'commerce' === cat ? '<span class="ajaco-opt">' + esc( t.optional ) + '</span>' : '';
 
 			html += '<section class="ajaco-cat"><div class="ajaco-cat-head"><h3>' +
 				esc( D.categoryLabels[ cat ] || cat ) + optional + '</h3>' +
@@ -326,8 +348,8 @@
 
 			if ( 'commerce' === cat ) {
 				html += '<p class="ajaco-meta ajaco-commerce-note">' + esc( state.scan.isCommerce
-					? 'Commerce protocols are emerging standards — informational, never counted in the score.'
-					: 'No e-commerce signals detected on this site. Shown for information only; does not affect the score.' ) + '</p>';
+					? t.commerceNote
+					: t.commerceNoteNone ) + '</p>';
 			}
 
 			ids.forEach( function ( id ) {
@@ -363,12 +385,13 @@
 
 			var rows = '';
 			if ( meta.description ) {
-				rows += '<div class="ajaco-kv"><dt>' + esc( 'Goal' ) + '</dt><dd>' + esc( meta.description ) + '</dd></div>';
+				rows += '<div class="ajaco-kv"><dt>' + esc( t.goalLabel ) + '</dt><dd>' + esc( meta.description ) + '</dd></div>';
 			}
-			rows += '<div class="ajaco-kv"><dt>' + esc( 'pass' === result.status ? 'Result' : ( 'fail' === result.status ? 'Issue' : 'Note' ) ) + '</dt>' +
+			var resultLabel = 'pass' === result.status ? t.resultLabel : ( 'fail' === result.status ? t.issueLabel : t.noteLabel );
+			rows += '<div class="ajaco-kv"><dt>' + esc( resultLabel ) + '</dt>' +
 				'<dd class="ajaco-kv-' + status.cls + '">' + esc( result.message ) + '</dd></div>';
 			if ( meta.fixable && 'pass' !== result.status && meta.fixNote ) {
-				rows += '<div class="ajaco-kv"><dt>' + esc( 'Fix' ) + '</dt><dd>' + esc( meta.fixNote ) + '</dd></div>';
+				rows += '<div class="ajaco-kv"><dt>' + esc( t.fixLabel ) + '</dt><dd>' + esc( meta.fixNote ) + '</dd></div>';
 			}
 
 			body = '<div class="ajaco-check-body"><dl>' + rows + '</dl>' +
@@ -404,7 +427,7 @@
 				'<span class="ajaco-ev-label">' + esc( step.label ) + finding + '</span>' +
 				badge + '</div>';
 		} );
-		var dur = 'number' === typeof result.durationMs ? '<p class="ajaco-meta">' + esc( 'Completed in ' + result.durationMs + ' ms' ) + '</p>' : '';
+		var dur = 'number' === typeof result.durationMs ? '<p class="ajaco-meta">' + esc( fmt( t.completedIn, result.durationMs ) ) + '</p>' : '';
 		return '<div class="ajaco-evidence">' + steps + dur + '</div>';
 	}
 
@@ -413,7 +436,7 @@
 		if ( ! failing.length ) {
 			return '';
 		}
-		return '<button class="ajaco-fab" data-act="sheet">' + esc( 'Improve readiness' ) +
+		return '<button class="ajaco-fab" data-act="sheet">' + esc( t.improveReadiness ) +
 			'<span class="ajaco-fab-count">' + failing.length + '</span></button>';
 	}
 
@@ -425,18 +448,18 @@
 		var items = '';
 		failing.forEach( function ( f ) {
 			var meta = D.checkMeta[ f.id ] || {};
-			items += '<li>' + esc( meta.name || f.id ) + ( meta.fixable ? ' <em>' + esc( '(one-click fix)' ) + '</em>' : '' ) + '</li>';
+			items += '<li>' + esc( meta.name || f.id ) + ( meta.fixable ? ' <em>' + esc( t.oneClickFix ) + '</em>' : '' ) + '</li>';
 		} );
 		return '<div class="ajaco-sheet-backdrop" data-act="sheet-close"></div>' +
-			'<div class="ajaco-sheet" role="dialog" aria-label="' + esc( 'Improve readiness' ) + '">' +
-			'<div class="ajaco-sheet-head"><strong>' + failing.length + esc( ' issue' + ( 1 === failing.length ? '' : 's' ) + ' found' ) + '</strong>' +
+			'<div class="ajaco-sheet" role="dialog" aria-label="' + esc( t.improveReadiness ) + '">' +
+			'<div class="ajaco-sheet-head"><strong>' + esc( fmt( plural( t.issuesFound, failing.length ), failing.length ) ) + '</strong>' +
 			'<button class="button-link" data-act="sheet-close">✕</button></div>' +
 			'<ul class="ajaco-sheet-list">' + items + '</ul>' +
 			'<div class="ajaco-sheet-actions">' +
-			( fixable.length ? '<button class="button button-primary" data-act="fix-all">' + esc( 'Fix all safe items (' + fixable.length + ')' ) + '</button>' : '' ) +
-			'<button class="button" data-act="copy-all">' + esc( 'Copy all agent prompts' ) + '</button>' +
+			( fixable.length ? '<button class="button button-primary" data-act="fix-all">' + esc( fmt( t.fixAllSafe, fixable.length ) ) + '</button>' : '' ) +
+			'<button class="button" data-act="copy-all">' + esc( t.copyAllPrompts ) + '</button>' +
 			'</div>' +
-			'<p class="ajaco-meta">' + esc( 'Copied prompts paste into any coding agent (Cursor, Claude Code, Windsurf, Copilot). Fixes needing DNS or server access always go the prompt route.' ) + '</p>' +
+			'<p class="ajaco-meta">' + esc( t.sheetIntro ) + '</p>' +
 			'</div>';
 	}
 

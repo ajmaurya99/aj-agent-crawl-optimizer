@@ -40,7 +40,7 @@ Where external scanners stop at "here's a prompt, go fix it," this plugin closes
 
 ## Curating llms.txt
 
-The index is **curated, not auto-generated from fixed rules** — though the defaults reproduce the old automatic output exactly, so upgrading changes nothing until you edit something.
+The index is **curated, not auto-generated from fixed rules** — but the defaults keep the same sections and ordering as the old automatic output (2.0 adds a one-line pointer to `/llms-full.txt`), so upgrading needs no attention until you choose to curate.
 
 **Site-wide** (Agent Ready → llms.txt):
 

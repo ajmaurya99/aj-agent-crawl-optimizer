@@ -2,22 +2,20 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: AJ Agent Crawl Optimizer 1.0.0\n"
+"Project-Id-Version: AJ Agent Crawl Optimizer 2.0.0-alpha\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/aj-agent-crawl-optimizer\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-27T20:52:04+00:00\n"
+"POT-Creation-Date: 2026-07-12T09:24:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: aj-agent-crawl-optimizer\n"
 
 #. Plugin Name of the plugin
 #: aj-agent-crawl-optimizer.php
-#: includes/admin/menu.php:23
-#: includes/admin/menu.php:24
 msgid "AJ Agent Crawl Optimizer"
 msgstr ""
 
@@ -28,7 +26,7 @@ msgstr ""
 
 #. Description of the plugin
 #: aj-agent-crawl-optimizer.php
-msgid "Make your WordPress site discoverable to AI agents and crawlers — Markdown negotiation, JSON-LD, OpenAPI, MCP server card, agent-skills index, IndexNow, llms.txt, and Content-Signals — each as a separate toggle."
+msgid "The agent-readiness scanner and fixer for WordPress — run the 21-check readiness scan (Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more."
 msgstr ""
 
 #. Author of the plugin
@@ -41,803 +39,1489 @@ msgstr ""
 msgid "https://x.com/aalootechie"
 msgstr ""
 
-#: includes/admin/activation.php:68
-msgid "AJ Agent Crawl Optimizer is active."
+#: includes/admin/activation.php:50
+#: includes/admin/menu.php:58
+msgid "Dashboard"
 msgstr ""
 
-#: includes/admin/activation.php:69
-msgid "All features start disabled — pick which capabilities to expose to AI agents."
-msgstr ""
-
-#: includes/admin/activation.php:71
-msgid "Configure AJ Agent Crawl Optimizer"
-msgstr ""
-
-#: includes/admin/activation.php:88
+#: includes/admin/activation.php:55
+#: includes/admin/menu.php:67
 msgid "Settings"
 msgstr ""
 
-#: includes/admin/enqueue.php:55
+#: includes/admin/dashboard-page.php:29
+#: includes/admin/menu.php:57
+msgid "Agent Ready Dashboard"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:33
+msgid "The Agent Ready dashboard requires JavaScript. You can still manage individual features under Agent Ready → Settings, or run scans with: wp agent-ready scan"
+msgstr ""
+
+#: includes/admin/enqueue.php:77
+#: includes/admin/enqueue.php:160
 msgid "Copied!"
 msgstr ""
 
-#: includes/admin/help-tabs.php:33
+#: includes/admin/enqueue.php:146
+msgid "Discoverability"
+msgstr ""
+
+#: includes/admin/enqueue.php:147
+msgid "Content Accessibility"
+msgstr ""
+
+#: includes/admin/enqueue.php:148
+msgid "Bot Access Control"
+msgstr ""
+
+#: includes/admin/enqueue.php:149
+msgid "API, Auth, MCP & Skill Discovery"
+msgstr ""
+
+#: includes/admin/enqueue.php:150
+msgid "Commerce"
+msgstr ""
+
+#: includes/admin/enqueue.php:153
+msgid "Run scan"
+msgstr ""
+
+#: includes/admin/enqueue.php:154
+msgid "Scanning…"
+msgstr ""
+
+#: includes/admin/enqueue.php:155
+msgid "Re-scan"
+msgstr ""
+
+#: includes/admin/enqueue.php:156
+msgid "Fix now"
+msgstr ""
+
+#: includes/admin/enqueue.php:157
+msgid "Fixing…"
+msgstr ""
+
+#: includes/admin/enqueue.php:158
+msgid "Verifying…"
+msgstr ""
+
+#: includes/admin/enqueue.php:159
+msgid "Copy agent prompt"
+msgstr ""
+
+#: includes/admin/enqueue.php:161
+msgid "Audit details"
+msgstr ""
+
+#: includes/admin/enqueue.php:162
+msgid "Hide details"
+msgstr ""
+
+#: includes/admin/enqueue.php:163
+msgid "Pass"
+msgstr ""
+
+#: includes/admin/enqueue.php:164
+msgid "Fail"
+msgstr ""
+
+#: includes/admin/enqueue.php:165
+msgid "Not applicable"
+msgstr ""
+
+#: includes/admin/enqueue.php:166
+msgid "Unable to check"
+msgstr ""
+
+#: includes/admin/enqueue.php:169
+msgid "Is this site agent-ready?"
+msgstr ""
+
+#: includes/admin/enqueue.php:170
+msgid "Run the readiness scan — the same checks Cloudflare’s isitagentready.com runs — against this site, with full request/response evidence and one-click fixes."
+msgstr ""
+
+#: includes/admin/enqueue.php:171
+#: includes/admin/settings-page.php:450
+msgid "Run your first scan"
+msgstr ""
+
+#. translators: 1: level number 0-5, 2: level name.
+#: includes/admin/enqueue.php:175
+#, php-format
+msgid "Level %1$s of 5 — %2$s"
+msgstr ""
+
+#: includes/admin/enqueue.php:176
+msgid "Next level"
+msgstr ""
+
+#: includes/admin/enqueue.php:177
+msgid "Top level"
+msgstr ""
+
+#. translators: 1: level number, 2: level name.
+#: includes/admin/enqueue.php:179
+#, php-format
+msgid "Level %1$s — %2$s"
+msgstr ""
+
+#: includes/admin/enqueue.php:180
+msgid "This site passes every ladder requirement. Keep an eye on spec churn — standards in this space move fast."
+msgstr ""
+
+#. translators: %s: number of blocked endpoints. Singular|plural.
+#: includes/admin/enqueue.php:184
+#, php-format
+msgid "Your host is blocking %s agent endpoint|Your host is blocking %s agent endpoints"
+msgstr ""
+
+#: includes/admin/enqueue.php:185
+msgid "These features are enabled and served by the plugin (no files involved), but the web server intercepts the request before WordPress runs. Add the matching rule to your server config — or send it to your hosting support — then re-scan."
+msgstr ""
+
+#: includes/admin/enqueue.php:186
+msgid "Copy nginx fix"
+msgstr ""
+
+#: includes/admin/enqueue.php:187
+msgid "Copy Apache .htaccess fix"
+msgstr ""
+
+#: includes/admin/enqueue.php:190
+msgid "Optional"
+msgstr ""
+
+#: includes/admin/enqueue.php:191
+msgid "not checked"
+msgstr ""
+
+#: includes/admin/enqueue.php:192
+msgid "Commerce protocols are emerging standards — informational, never counted in the score."
+msgstr ""
+
+#: includes/admin/enqueue.php:193
+msgid "No e-commerce signals detected on this site. Shown for information only; does not affect the score."
+msgstr ""
+
+#: includes/admin/enqueue.php:196
+msgid "Goal"
+msgstr ""
+
+#: includes/admin/enqueue.php:197
+msgid "Result"
+msgstr ""
+
+#: includes/admin/enqueue.php:198
+msgid "Issue"
+msgstr ""
+
+#: includes/admin/enqueue.php:199
+msgid "Note"
+msgstr ""
+
+#: includes/admin/enqueue.php:200
+msgid "Fix"
+msgstr ""
+
+#. translators: %s: duration in milliseconds.
+#: includes/admin/enqueue.php:202
+#, php-format
+msgid "Completed in %s ms"
+msgstr ""
+
+#: includes/admin/enqueue.php:205
+msgid "Improve readiness"
+msgstr ""
+
+#. translators: %s: number of failing checks. Singular|plural.
+#: includes/admin/enqueue.php:207
+#, php-format
+msgid "%s issue found|%s issues found"
+msgstr ""
+
+#: includes/admin/enqueue.php:208
+msgid "(one-click fix)"
+msgstr ""
+
+#. translators: %s: number of one-click-fixable checks.
+#: includes/admin/enqueue.php:210
+#, php-format
+msgid "Fix all safe items (%s)"
+msgstr ""
+
+#: includes/admin/enqueue.php:211
+msgid "Copy all agent prompts"
+msgstr ""
+
+#: includes/admin/enqueue.php:212
+msgid "Copied prompts paste into any coding agent (Cursor, Claude Code, Windsurf, Copilot). Fixes needing DNS or server access always go the prompt route."
+msgstr ""
+
+#: includes/admin/enqueue.php:215
+#: includes/admin/enqueue.php:256
+msgid "Your session expired — reload this page and try again."
+msgstr ""
+
+#. translators: %s: HTTP status code.
+#: includes/admin/enqueue.php:217
+#, php-format
+msgid "Request failed (HTTP %s)"
+msgstr ""
+
+#: includes/admin/enqueue.php:254
+msgid "Refreshing preview…"
+msgstr ""
+
+#: includes/admin/enqueue.php:255
+msgid "Could not build the preview."
+msgstr ""
+
+#: includes/admin/enqueue.php:257
+msgid "The server returned an unexpected response. Check for a plugin conflict or a PHP error in your logs."
+msgstr ""
+
+#: includes/admin/help-tabs.php:45
 msgid "Overview"
 msgstr ""
 
-#: includes/admin/help-tabs.php:41
+#: includes/admin/help-tabs.php:53
 msgid "Features"
 msgstr ""
 
-#: includes/admin/help-tabs.php:49
+#: includes/admin/help-tabs.php:61
 msgid "For Developers"
 msgstr ""
 
-#: includes/admin/help-tabs.php:57
+#: includes/admin/help-tabs.php:69
 msgid "Troubleshooting"
 msgstr ""
 
-#: includes/admin/help-tabs.php:69
+#: includes/admin/help-tabs.php:81
 msgid "AJ Agent Crawl Optimizer makes your site legible to AI agents."
 msgstr ""
 
-#: includes/admin/help-tabs.php:70
+#: includes/admin/help-tabs.php:82
 msgid "It exposes machine-readable manifests at well-known URLs (API catalog, MCP server card, agent skills index, OpenAPI spec, llms.txt), serves clean Markdown when an AI requests it via the Accept header, and declares your AI usage preferences in robots.txt. Nothing changes for human visitors."
 msgstr ""
 
-#: includes/admin/help-tabs.php:71
+#: includes/admin/help-tabs.php:83
 msgid "Each capability is a separate toggle below — enable only what you need. All toggles default to off."
 msgstr ""
 
-#: includes/admin/help-tabs.php:80
-#: includes/admin/settings-page.php:236
-#: includes/admin/settings-page.php:394
-#: includes/admin/settings-page.php:573
-#: includes/admin/wizard.php:149
-msgid "Markdown Negotiation"
-msgstr ""
-
-#: includes/admin/help-tabs.php:81
-#: includes/admin/help-tabs.php:172
-#: includes/admin/settings-page.php:120
-#: includes/admin/settings-page.php:295
-#: includes/admin/settings-page.php:441
-#: includes/admin/settings-page.php:650
-#: includes/admin/wizard.php:153
-msgid "Content-Signals"
-msgstr ""
-
-#: includes/admin/help-tabs.php:82
-#: includes/admin/settings-page.php:121
-#: includes/admin/settings-page.php:151
-#: includes/admin/settings-page.php:326
-#: includes/admin/settings-page.php:462
-#: includes/admin/wizard.php:144
+#: includes/admin/help-tabs.php:95
+#: includes/admin/settings-page.php:72
+#: includes/admin/wizard.php:171
 msgid "API Catalog"
 msgstr ""
 
-#: includes/admin/help-tabs.php:83
-#: includes/admin/settings-page.php:161
-#: includes/admin/settings-page.php:348
-#: includes/admin/settings-page.php:486
-#: includes/admin/wizard.php:145
+#: includes/admin/help-tabs.php:96
+#: includes/admin/settings-page.php:88
+#: includes/admin/wizard.php:172
 msgid "MCP Server Card"
 msgstr ""
 
-#: includes/admin/help-tabs.php:84
-#: includes/admin/settings-page.php:171
-#: includes/admin/settings-page.php:360
-#: includes/admin/settings-page.php:501
-#: includes/admin/wizard.php:146
+#: includes/admin/help-tabs.php:97
+#: includes/admin/settings-page.php:99
+#: includes/admin/wizard.php:173
 msgid "Agent Skills Index"
 msgstr ""
 
-#: includes/admin/help-tabs.php:85
-#: includes/admin/settings-page.php:280
-#: includes/admin/settings-page.php:429
-#: includes/admin/settings-page.php:640
-#: includes/admin/wizard.php:152
-msgid "WebMCP Tools"
+#: includes/admin/help-tabs.php:98
+#: includes/admin/settings-page.php:110
+#: includes/admin/wizard.php:176
+msgid "auth.md"
 msgstr ""
 
-#: includes/admin/help-tabs.php:86
-#: includes/admin/settings-page.php:246
-#: includes/admin/settings-page.php:403
-#: includes/admin/settings-page.php:589
-#: includes/admin/wizard.php:150
-msgid "JSON-LD Schema"
-msgstr ""
-
-#: includes/admin/help-tabs.php:87
-#: includes/admin/settings-page.php:270
-#: includes/admin/settings-page.php:415
-#: includes/admin/settings-page.php:607
-#: includes/admin/wizard.php:151
-msgid "OpenAPI Spec"
-msgstr ""
-
-#: includes/admin/help-tabs.php:88
-#: includes/admin/settings-page.php:127
-#: includes/admin/settings-page.php:181
-#: includes/admin/settings-page.php:372
-#: includes/admin/settings-page.php:524
-#: includes/admin/wizard.php:147
+#: includes/admin/help-tabs.php:99
+#: includes/admin/llms-page.php:40
+#: includes/admin/menu.php:77
+#: includes/admin/settings-page.php:121
+#: includes/admin/wizard.php:174
 msgid "llms.txt"
 msgstr ""
 
-#: includes/admin/help-tabs.php:89
-#: includes/admin/settings-page.php:128
-#: includes/admin/settings-page.php:191
-#: includes/admin/settings-page.php:384
-#: includes/admin/settings-page.php:539
-#: includes/admin/wizard.php:148
+#: includes/admin/help-tabs.php:100
+#: includes/admin/settings-page.php:132
+#: includes/admin/wizard.php:175
 msgid "IndexNow"
 msgstr ""
 
-#: includes/admin/help-tabs.php:92
-msgid "Where each feature surfaces when its toggle is on:"
-msgstr ""
-
 #: includes/admin/help-tabs.php:101
-msgid "See the Testing section below the form for one-click curl commands to verify each endpoint."
+#: includes/admin/settings-page.php:185
+#: includes/admin/wizard.php:177
+msgid "Markdown Negotiation"
 msgstr ""
 
-#: includes/admin/help-tabs.php:110
-msgid "Capability required to manage settings (default manage_options)."
+#: includes/admin/help-tabs.php:102
+#: includes/admin/settings-page.php:203
+#: includes/admin/wizard.php:178
+msgid "JSON-LD Schema"
 msgstr ""
 
-#: includes/admin/help-tabs.php:111
-msgid "Register custom skills in the Agent Skills Index."
+#: includes/admin/help-tabs.php:103
+#: includes/admin/settings-page.php:237
+#: includes/admin/wizard.php:179
+msgid "OpenAPI Spec"
 msgstr ""
 
-#: includes/admin/help-tabs.php:112
-msgid "Customize the Content-Signal directive (e.g. ai-train=yes)."
+#: includes/admin/help-tabs.php:104
+#: includes/admin/settings-page.php:248
+#: includes/admin/wizard.php:180
+msgid "WebMCP Tools"
 msgstr ""
 
-#: includes/admin/help-tabs.php:113
-msgid "Add anchors or rels to the linkset (e.g. a GraphQL endpoint)."
+#: includes/admin/help-tabs.php:105
+#: includes/admin/settings-page.php:263
+#: includes/admin/wizard.php:181
+msgid "AI Bot Rules"
 msgstr ""
 
-#: includes/admin/help-tabs.php:114
-msgid "Override transport / capabilities for a real MCP implementation."
+#: includes/admin/help-tabs.php:106
+#: includes/admin/help-tabs.php:270
+#: includes/admin/settings-page.php:275
+#: includes/admin/wizard.php:182
+msgid "Content-Signals"
 msgstr ""
 
-#: includes/admin/help-tabs.php:115
-msgid "Add custom Schema.org entries (Product, Recipe, Event, etc.)."
-msgstr ""
-
-#: includes/admin/help-tabs.php:116
-msgid "Add securitySchemes, tags, additional servers."
-msgstr ""
-
-#: includes/admin/help-tabs.php:117
-msgid "Append sections or replace the llms.txt body wholesale."
-msgstr ""
-
-#: includes/admin/help-tabs.php:118
-msgid "Override SEO-plugin detection for JSON-LD auto-suppress."
+#: includes/admin/help-tabs.php:120
+msgid "Serves <code>/.well-known/api-catalog</code> as <code>application/linkset+json</code> per RFC 9727."
 msgstr ""
 
 #: includes/admin/help-tabs.php:121
-msgid "Filter hooks for extending or customizing the plugin:"
+msgid "Each linkset entry advertises service-desc (the OpenAPI spec, when that toggle is on), service-doc (WordPress REST API handbook), and status (the plugin's public health endpoint)."
 msgstr ""
 
-#: includes/admin/help-tabs.php:137
-msgid "My SEO plugin and JSON-LD both seem to be running."
+#: includes/admin/help-tabs.php:122
+msgid "Also emits <code>Link: &lt;url&gt;; rel=\"api-catalog\"</code> on every frontend response so agents discover the catalog from any URL."
 msgstr ""
 
-#: includes/admin/help-tabs.php:138
-msgid "They're not — AJ Agent Crawl Optimizer auto-suppresses its JSON-LD when Yoast, Rank Math, AIOSEO, SEOPress, The SEO Framework, Slim SEO, Squirrly, Schema Pro, or SASWP is active. Look for the red note under the JSON-LD Schema toggle."
+#: includes/admin/help-tabs.php:125
+msgid "Serves <code>/.well-known/mcp/server-card.json</code> per the SEP-1649 draft so MCP-aware agents can discover the site."
+msgstr ""
+
+#: includes/admin/help-tabs.php:126
+msgid "serverInfo (name, version, description, websiteUrl) is generated from get_bloginfo() so it stays accurate per subsite."
+msgstr ""
+
+#: includes/admin/help-tabs.php:127
+msgid "Declares a transport endpoint, capability objects, protocolVersion, and instructions pointing agents at the API catalog and OpenAPI spec."
+msgstr ""
+
+#: includes/admin/help-tabs.php:130
+msgid "Serves <code>/.well-known/agent-skills/index.json</code> listing six skills (content-query, posts-read, pages-read, media-library, categories, tags) per the Agent Skills Discovery RFC v0.2.0."
+msgstr ""
+
+#: includes/admin/help-tabs.php:131
+msgid "Each skill also ships a deterministic SKILL.md artifact at <code>/.well-known/agent-skills/{name}/SKILL.md</code>."
+msgstr ""
+
+#: includes/admin/help-tabs.php:132
+msgid "Index entries carry a sha256 digest of the served SKILL.md bytes so agents can verify artifacts."
+msgstr ""
+
+#: includes/admin/help-tabs.php:135
+msgid "Serves <code>/auth.md</code> documenting how agents authenticate via Application Passwords: creation by a human account owner, Basic-auth usage, scope, and revocation."
+msgstr ""
+
+#: includes/admin/help-tabs.php:136
+msgid "Honest by design: it notes when Application Passwords are unavailable and never advertises OAuth endpoints the site doesn't have."
+msgstr ""
+
+#: includes/admin/help-tabs.php:139
+msgid "Serves <code>/llms.txt</code> — a curated Markdown index (site identity, top-level pages, recent posts with cleaned excerpts) per llmstxt.org, with a Discovery section auto-linking every other enabled plugin endpoint."
+msgstr ""
+
+#: includes/admin/help-tabs.php:140
+msgid "<code>/llms-full.txt</code> serves the full content of recent posts and pages converted to Markdown. Password-protected content is always excluded from both."
 msgstr ""
 
 #: includes/admin/help-tabs.php:141
-msgid "IndexNow is enabled but I'm not seeing pings."
+msgid "Cached for one hour; invalidates automatically on post changes, site identity changes, and toggle changes."
 msgstr ""
 
-#: includes/admin/help-tabs.php:142
-msgid "Check three things: (1) the IndexNow API Key field is filled, (2) you're publishing a public post type — revisions and autosaves are skipped, (3) you're on production. Pings are non-blocking, so failures are silent — check your server log for requests to api.indexnow.org."
+#: includes/admin/help-tabs.php:144
+msgid "On publish, fires a single non-blocking POST to <code>api.indexnow.org</code> with exactly <code>{ host, key, urlList }</code> — Bing and Yandex re-crawl within minutes."
 msgstr ""
 
 #: includes/admin/help-tabs.php:145
-msgid "A /.well-known/ endpoint returns 404."
+msgid "Skips revisions, autosaves, and non-public post types; serves the key file at <code>/{key}.txt</code> for ownership verification."
 msgstr ""
 
-#: includes/admin/help-tabs.php:146
-msgid "Confirm the matching toggle is on. The endpoints don't use WP rewrite rules, so a rewrite flush isn't needed — but caching plugins or CDNs might serve a stale 404; purge those if so."
+#: includes/admin/help-tabs.php:148
+msgid "Watches for <code>Accept: text/markdown</code>; browsers asking for HTML get the normal response, and <code>Vary: Accept</code> keeps caches from mixing the variants."
 msgstr ""
 
 #: includes/admin/help-tabs.php:149
-msgid "Multisite subsite paths."
+msgid "Buffers the rendered HTML, extracts the main content region, and converts it to clean Markdown."
 msgstr ""
 
 #: includes/admin/help-tabs.php:150
-msgid "Every endpoint also resolves at /{subsite}/ paths automatically (e.g. /blog/llms.txt). Each subsite has its own settings."
+msgid "Returns <code>Content-Type: text/markdown</code> and <code>X-Markdown-Tokens</code> (≈ chars/4) so agents can budget context size."
 msgstr ""
 
 #: includes/admin/help-tabs.php:153
-msgid "Markdown Negotiation breaks on agent requests."
+msgid "Outputs a <code>&lt;script type=\"application/ld+json\"&gt;</code> block in the head."
 msgstr ""
 
 #: includes/admin/help-tabs.php:154
-msgid "Browsers always get HTML — the feature only fires when Accept: text/markdown is in the request header. If you see broken admin or cache behavior, check whether an agent or curl is hitting your site with that header."
+msgid "Always includes WebSite (with SearchAction) and Organization (logo resolved from your theme's custom logo or site icon); singular posts add Article and BreadcrumbList; FAQ-shaped content adds FAQPage."
+msgstr ""
+
+#: includes/admin/help-tabs.php:155
+msgid "Auto-suppresses when an SEO plugin (Yoast, Rank Math, AIOSEO, etc.) is active to prevent duplicate structured data."
+msgstr ""
+
+#: includes/admin/help-tabs.php:158
+msgid "Serves <code>/openapi.json</code> (and legacy <code>?format=openapi</code>) — a complete OpenAPI 3.0.3 document."
+msgstr ""
+
+#: includes/admin/help-tabs.php:159
+msgid "Built from every registered REST route (honoring show_in_index), so plugin routes appear automatically; WordPress regex placeholders become templated paths with proper path/query/requestBody parameters."
+msgstr ""
+
+#: includes/admin/help-tabs.php:160
+msgid "Cached for one day; invalidates on plugin activation/deactivation and theme switch."
+msgstr ""
+
+#: includes/admin/help-tabs.php:163
+msgid "A frontend script registers four read-only tools (search_content, get_posts, get_pages, get_site_info) on <code>navigator.modelContext</code> — the W3C WebMCP draft API."
+msgstr ""
+
+#: includes/admin/help-tabs.php:164
+msgid "Subsite-aware, and a silent no-op in browsers without the experimental API."
+msgstr ""
+
+#: includes/admin/help-tabs.php:167
+msgid "Adds one robots.txt group per AI crawler from the policy table: allowed bots get WordPress core's wp-admin rules replicated; blocked bots get <code>Disallow: /</code>."
+msgstr ""
+
+#: includes/admin/help-tabs.php:168
+msgid "Honors \"Discourage search engines\" — while that Reading setting is on, every managed bot is blocked regardless of policy."
 msgstr ""
 
 #: includes/admin/help-tabs.php:171
+msgid "Appends a <code>Content-Signal</code> directive built from your yes/no preferences, inside an explicit <code>User-agent: *</code> group at the end of robots.txt."
+msgstr ""
+
+#: includes/admin/help-tabs.php:172
+msgid "Composes with SEO plugins — their robots.txt additions are preserved; our directive lands last."
+msgstr ""
+
+#: includes/admin/help-tabs.php:181
+msgid "What each feature actually does when its toggle is on:"
+msgstr ""
+
+#: includes/admin/help-tabs.php:191
+msgid "To verify any of this against your live site, run a scan from Agent Ready → Dashboard — every check shows the actual request and response."
+msgstr ""
+
+#: includes/admin/help-tabs.php:200
+msgid "Capability required to manage settings (default manage_options)."
+msgstr ""
+
+#: includes/admin/help-tabs.php:201
+msgid "Register custom skills in the Agent Skills Index."
+msgstr ""
+
+#: includes/admin/help-tabs.php:202
+msgid "Customize the Content-Signal directive (e.g. ai-train=yes)."
+msgstr ""
+
+#: includes/admin/help-tabs.php:203
+msgid "Add anchors or rels to the linkset (e.g. a GraphQL endpoint)."
+msgstr ""
+
+#: includes/admin/help-tabs.php:204
+msgid "Override transport / capabilities for a real MCP implementation."
+msgstr ""
+
+#: includes/admin/help-tabs.php:205
+msgid "Add custom Schema.org entries (Product, Recipe, Event, etc.)."
+msgstr ""
+
+#: includes/admin/help-tabs.php:206
+msgid "Add securitySchemes, tags, additional servers."
+msgstr ""
+
+#: includes/admin/help-tabs.php:207
+msgid "Append sections or replace the llms.txt body wholesale."
+msgstr ""
+
+#: includes/admin/help-tabs.php:208
+msgid "Append content-type sections or replace the llms-full.txt body."
+msgstr ""
+
+#: includes/admin/help-tabs.php:209
+msgid "Add or remove post types offered on the llms.txt curation screen."
+msgstr ""
+
+#: includes/admin/help-tabs.php:210
+msgid "Programmatically exclude a post from llms.txt / llms-full.txt."
+msgstr ""
+
+#: includes/admin/help-tabs.php:211
+msgid "Customize the /auth.md agent-authentication document."
+msgstr ""
+
+#: includes/admin/help-tabs.php:212
+msgid "Add or remove AI crawlers managed by the robots.txt bot rules."
+msgstr ""
+
+#: includes/admin/help-tabs.php:213
+msgid "Override the per-bot allow/block policy (e.g. block all training bots)."
+msgstr ""
+
+#: includes/admin/help-tabs.php:214
+msgid "Adjust commerce-site detection for the readiness scan."
+msgstr ""
+
+#: includes/admin/help-tabs.php:215
+msgid "Re-enable TLS verification for same-origin scan probes."
+msgstr ""
+
+#: includes/admin/help-tabs.php:216
+msgid "Override SEO-plugin detection for JSON-LD auto-suppress."
+msgstr ""
+
+#: includes/admin/help-tabs.php:219
+msgid "Filter hooks for extending or customizing the plugin:"
+msgstr ""
+
+#: includes/admin/help-tabs.php:235
+msgid "My SEO plugin and JSON-LD both seem to be running."
+msgstr ""
+
+#: includes/admin/help-tabs.php:236
+msgid "They're not — AJ Agent Crawl Optimizer auto-suppresses its JSON-LD when Yoast, Rank Math, AIOSEO, SEOPress, The SEO Framework, Slim SEO, Squirrly, Schema Pro, or SASWP is active. Look for the red note under the JSON-LD Schema toggle."
+msgstr ""
+
+#: includes/admin/help-tabs.php:239
+msgid "IndexNow is enabled but I'm not seeing pings."
+msgstr ""
+
+#: includes/admin/help-tabs.php:240
+msgid "Check three things: (1) the IndexNow API Key field is filled, (2) you're publishing a public post type — revisions and autosaves are skipped, (3) you're on production. Pings are non-blocking, so failures are silent — check your server log for requests to api.indexnow.org."
+msgstr ""
+
+#: includes/admin/help-tabs.php:243
+msgid "A /.well-known/ endpoint returns 403 or 404."
+msgstr ""
+
+#: includes/admin/help-tabs.php:244
+msgid "Confirm the matching toggle is on, then run a scan from Agent Ready → Dashboard: if the feature is enabled but the server blocks the request (common nginx dot-path deny rules, or static-file blocks without try_files), the dashboard shows a hosting notice with copy-paste nginx/Apache fixes you can apply or send to your host. No files or rewrite flushes are involved — the endpoints are served virtually. Caching plugins or CDNs can also serve a stale 404; purge those too."
+msgstr ""
+
+#: includes/admin/help-tabs.php:247
+msgid "Multisite subsite paths."
+msgstr ""
+
+#: includes/admin/help-tabs.php:248
+msgid "Every endpoint also resolves at /{subsite}/ paths automatically (e.g. /blog/llms.txt). Each subsite has its own settings."
+msgstr ""
+
+#: includes/admin/help-tabs.php:251
+msgid "Markdown Negotiation breaks on agent requests."
+msgstr ""
+
+#: includes/admin/help-tabs.php:252
+msgid "Browsers always get HTML — the feature only fires when Accept: text/markdown is in the request header. If you see broken admin or cache behavior, check whether an agent or curl is hitting your site with that header."
+msgstr ""
+
+#: includes/admin/help-tabs.php:269
 msgid "llms.txt spec"
 msgstr ""
 
-#: includes/admin/help-tabs.php:173
+#: includes/admin/help-tabs.php:271
 msgid "RFC 9727 — API catalog"
 msgstr ""
 
-#: includes/admin/help-tabs.php:174
+#: includes/admin/help-tabs.php:272
 msgid "Agent Skills Discovery"
 msgstr ""
 
-#: includes/admin/help-tabs.php:175
+#: includes/admin/help-tabs.php:273
 msgid "WebMCP draft"
 msgstr ""
 
-#: includes/admin/help-tabs.php:176
+#: includes/admin/help-tabs.php:274
 msgid "IndexNow (Bing)"
 msgstr ""
 
-#: includes/admin/help-tabs.php:177
+#: includes/admin/help-tabs.php:275
 msgid "WP REST API handbook"
 msgstr ""
 
-#: includes/admin/help-tabs.php:180
+#: includes/admin/help-tabs.php:278
 msgid "Reference"
+msgstr ""
+
+#: includes/admin/llms-page.php:42
+msgid "Curate what an AI agent reads first. This file is a short, hand-picked index of your site — not a sitemap dump. Choose what belongs in it, tell agents what the site is for, and check the preview before you save."
+msgstr ""
+
+#. translators: %s: link to the Agent Ready settings screen.
+#: includes/admin/llms-page.php:52
+#, php-format
+msgid "The llms.txt feature is turned off, so nothing is being served at <code>/llms.txt</code> yet. You can still curate the file here — turn the feature on in %s to publish it."
+msgstr ""
+
+#: includes/admin/llms-page.php:58
+msgid "Agent Ready → Settings"
+msgstr ""
+
+#: includes/admin/llms-page.php:71
+msgid "Introduction"
+msgstr ""
+
+#: includes/admin/llms-page.php:75
+msgid "Intro text"
+msgstr ""
+
+#: includes/admin/llms-page.php:78
+msgid "e.g. Acme sells hand-built espresso machines. Product pages carry live pricing and stock; the guides explain maintenance and repair."
+msgstr ""
+
+#: includes/admin/llms-page.php:80
+msgid "Replaces the generic boilerplate line under your site title. This is the one place you get to tell an agent, in plain language, what this site is for and what it should trust the site to answer. Leave it empty to keep the default line."
+msgstr ""
+
+#: includes/admin/llms-page.php:86
+msgid "Sections"
+msgstr ""
+
+#: includes/admin/llms-page.php:88
+msgid "One section per content type. Every public post type on this site is listed — including custom post types and products. Exclude an individual entry, or rewrite the one-line summary an agent sees for it, from that post’s editor sidebar."
+msgstr ""
+
+#: includes/admin/llms-page.php:94
+msgid "Include"
+msgstr ""
+
+#: includes/admin/llms-page.php:95
+msgid "Content type"
+msgstr ""
+
+#: includes/admin/llms-page.php:96
+msgid "Heading"
+msgstr ""
+
+#: includes/admin/llms-page.php:97
+msgid "Max items"
+msgstr ""
+
+#: includes/admin/llms-page.php:98
+#: includes/admin/llms-page.php:138
+msgid "Order"
+msgstr ""
+
+#: includes/admin/llms-page.php:99
+msgid "Top level only"
+msgstr ""
+
+#: includes/admin/llms-page.php:100
+msgid "Show date"
+msgstr ""
+
+#. translators: %s: post type label, e.g. "Posts".
+#: includes/admin/llms-page.php:119
+#, php-format
+msgid "Include %s in llms.txt"
+msgstr ""
+
+#: includes/admin/llms-page.php:130
+msgid "Section heading"
+msgstr ""
+
+#: includes/admin/llms-page.php:134
+msgid "Maximum items"
+msgstr ""
+
+#: includes/admin/llms-page.php:150
+msgid "Only list top-level items (skip children)"
+msgstr ""
+
+#: includes/admin/llms-page.php:153
+msgid "Not applicable — this content type is not hierarchical."
+msgstr ""
+
+#: includes/admin/llms-page.php:159
+msgid "Show the publish date next to each entry"
+msgstr ""
+
+#: includes/admin/llms-page.php:166
+msgid "Custom Markdown block"
+msgstr ""
+
+#: includes/admin/llms-page.php:170
+msgid "Markdown"
+msgstr ""
+
+#: includes/admin/llms-page.php:173
+msgid "e.g. ## Contact — [Support](https://example.com/support): replies within one business day."
+msgstr ""
+
+#: includes/admin/llms-page.php:175
+msgid "Raw Markdown appended to the file — anything the generated sections can’t express: contact routes, licensing terms, an FAQ, a pointer to your API. HTML is stripped; write plain Markdown."
+msgstr ""
+
+#: includes/admin/llms-page.php:181
+msgid "Position"
+msgstr ""
+
+#: includes/admin/llms-page.php:185
+msgid "Top — before the generated sections"
+msgstr ""
+
+#: includes/admin/llms-page.php:186
+msgid "Bottom — after the generated sections"
+msgstr ""
+
+#: includes/admin/llms-page.php:189
+msgid "Agents read top-down and may stop early. Put anything they must not miss at the top."
+msgstr ""
+
+#: includes/admin/llms-page.php:202
+msgid "Preview"
+msgstr ""
+
+#: includes/admin/llms-page.php:204
+msgid "Refresh preview"
+msgstr ""
+
+#: includes/admin/llms-page.php:209
+msgid "Exactly what /llms.txt would serve, including your unsaved changes on this page. Nothing here is published until you press Save Changes."
+msgstr ""
+
+#: includes/admin/llms-page.php:217
+msgid "entries"
+msgstr ""
+
+#: includes/admin/llms-page.php:221
+msgid "bytes"
+msgstr ""
+
+#: includes/admin/llms-page.php:225
+msgid "tokens (approx.)"
+msgstr ""
+
+#: includes/admin/llms-page.php:246
+msgid "Newest first"
+msgstr ""
+
+#: includes/admin/llms-page.php:247
+msgid "Menu order"
+msgstr ""
+
+#: includes/admin/llms-page.php:248
+msgid "Title (A–Z)"
+msgstr ""
+
+#: includes/admin/menu.php:45
+#: includes/admin/menu.php:46
+msgid "Agent Ready"
+msgstr ""
+
+#: includes/admin/menu.php:66
+#: includes/admin/settings-page.php:55
+msgid "Agent Ready Settings"
+msgstr ""
+
+#: includes/admin/menu.php:76
+msgid "llms.txt Curation"
 msgstr ""
 
 #: includes/admin/reset.php:29
 msgid "You do not have permission to reset AJ Agent Crawl Optimizer settings."
 msgstr ""
 
-#: includes/admin/reset.php:92
+#: includes/admin/reset.php:105
 msgid "AJ Agent Crawl Optimizer settings reset to defaults."
 msgstr ""
 
-#: includes/admin/reset.php:93
+#: includes/admin/reset.php:106
 msgid "All toggles are off and the IndexNow API key is cleared."
 msgstr ""
 
-#: includes/admin/settings-page.php:62
-msgid "Excellent"
+#: includes/admin/settings-page.php:60
+msgid "These toggles control what the plugin publishes for AI agents. Whether it actually works on your site is verified by the scanner on the Dashboard."
 msgstr ""
 
-#: includes/admin/settings-page.php:65
-msgid "Good"
+#: includes/admin/settings-page.php:61
+msgid "Open the feature guide"
 msgstr ""
 
 #: includes/admin/settings-page.php:68
-msgid "Needs Work"
-msgstr ""
-
-#: includes/admin/settings-page.php:71
-msgid "Poor"
-msgstr ""
-
-#. translators: 1: numeric score 0-100. 2: qualitative label e.g. "Excellent".
-#: includes/admin/settings-page.php:76
-#, php-format
-msgid "AJ Agent Crawl Optimizer score: %1$d out of 100, %2$s."
-msgstr ""
-
-#: includes/admin/settings-page.php:82
-msgid "AJ Agent Crawl Optimizer Settings"
-msgstr ""
-
-#: includes/admin/settings-page.php:98
-msgid "Score"
-msgstr ""
-
-#. translators: 1: enabled count. 2: total features.
-#: includes/admin/settings-page.php:108
-#, php-format
-msgid "%1$d of %2$d AJ Agent Crawl Optimizer features enabled"
-msgstr ""
-
-#: includes/admin/settings-page.php:119
-msgid "Markdown"
-msgstr ""
-
-#: includes/admin/settings-page.php:122
-msgid "MCP Card"
-msgstr ""
-
-#: includes/admin/settings-page.php:123
-msgid "Skills Index"
-msgstr ""
-
-#: includes/admin/settings-page.php:124
-msgid "WebMCP"
-msgstr ""
-
-#: includes/admin/settings-page.php:125
-msgid "JSON-LD"
-msgstr ""
-
-#: includes/admin/settings-page.php:126
-msgid "OpenAPI"
-msgstr ""
-
-#: includes/admin/settings-page.php:141
-msgid "AJ Agent Crawl Optimizer improves your site's compatibility with AI agents and crawlers."
-msgstr ""
-
-#: includes/admin/settings-page.php:147
-#: includes/admin/settings-page.php:323
-#: includes/admin/settings-page.php:460
-#: includes/admin/wizard.php:157
+#: includes/admin/wizard.php:186
 msgid "Discovery"
 msgstr ""
 
-#: includes/admin/settings-page.php:148
+#: includes/admin/settings-page.php:69
 msgid "Help AI agents find your site and figure out what it offers — manifests, indexes, and push-based notifications."
 msgstr ""
 
-#: includes/admin/settings-page.php:155
+#: includes/admin/settings-page.php:76
 msgid "Publish an API catalog at /.well-known/api-catalog for automated API discovery (RFC 9727). Also emits a Link header advertising the catalog on every response."
 msgstr ""
 
-#: includes/admin/settings-page.php:157
-#: includes/admin/settings-page.php:167
-#: includes/admin/settings-page.php:177
-#: includes/admin/settings-page.php:187
-#: includes/admin/settings-page.php:197
-#: includes/admin/settings-page.php:242
-#: includes/admin/settings-page.php:252
-#: includes/admin/settings-page.php:276
-#: includes/admin/settings-page.php:286
-#: includes/admin/settings-page.php:301
+#: includes/admin/settings-page.php:78
+#: includes/admin/settings-page.php:94
+#: includes/admin/settings-page.php:105
+#: includes/admin/settings-page.php:116
+#: includes/admin/settings-page.php:127
+#: includes/admin/settings-page.php:138
+#: includes/admin/settings-page.php:191
+#: includes/admin/settings-page.php:209
+#: includes/admin/settings-page.php:243
+#: includes/admin/settings-page.php:254
+#: includes/admin/settings-page.php:269
+#: includes/admin/settings-page.php:281
 msgid "Read more"
 msgstr ""
 
-#: includes/admin/settings-page.php:165
+#: includes/admin/settings-page.php:82
+msgid "OpenAPI Spec is off, so the catalog is published without a service-desc link. Enable OpenAPI below for a complete catalog."
+msgstr ""
+
+#: includes/admin/settings-page.php:92
 msgid "Publish MCP Server Card at /.well-known/mcp/server-card.json for AI agent tool discovery."
 msgstr ""
 
-#: includes/admin/settings-page.php:175
+#: includes/admin/settings-page.php:103
 msgid "Publish Agent Skills Index at /.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts."
 msgstr ""
 
-#: includes/admin/settings-page.php:185
-msgid "Publish a curated, LLM-readable index of the site at /llms.txt (per llmstxt.org)."
+#: includes/admin/settings-page.php:114
+msgid "Publish /auth.md documenting how agents authenticate to the REST API via Application Passwords."
 msgstr ""
 
-#: includes/admin/settings-page.php:195
+#: includes/admin/settings-page.php:125
+msgid "Publish a curated, LLM-readable index at /llms.txt plus full recent content at /llms-full.txt (per llmstxt.org)."
+msgstr ""
+
+#: includes/admin/settings-page.php:136
 msgid "Ping Bing and Yandex instantly when content is published or updated via IndexNow."
 msgstr ""
 
-#: includes/admin/settings-page.php:199
+#: includes/admin/settings-page.php:144
+msgid "IndexNow is enabled but no API key is set below — no pings are being sent."
+msgstr ""
+
+#: includes/admin/settings-page.php:148
 msgid "Recommended for production only — do not enable on local or staging environments."
 msgstr ""
 
-#: includes/admin/settings-page.php:205
+#: includes/admin/settings-page.php:154
 msgid "IndexNow API Key"
 msgstr ""
 
-#: includes/admin/settings-page.php:208
+#: includes/admin/settings-page.php:157
 msgid "e.g. 1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p"
 msgstr ""
 
 #. translators: %s: link to the Bing IndexNow portal.
-#: includes/admin/settings-page.php:214
+#: includes/admin/settings-page.php:163
 #, php-format
 msgid "Generate a key at %s and paste it here. Your site will host it at <code>/{key}.txt</code> for ownership verification."
 msgstr ""
 
-#: includes/admin/settings-page.php:232
-#: includes/admin/settings-page.php:391
-#: includes/admin/settings-page.php:571
-#: includes/admin/wizard.php:158
+#: includes/admin/settings-page.php:181
+#: includes/admin/wizard.php:187
 msgid "Presentation"
 msgstr ""
 
-#: includes/admin/settings-page.php:233
+#: includes/admin/settings-page.php:182
 msgid "Format the site’s content and APIs in shapes agents can consume — Markdown, structured data, machine-readable specs."
 msgstr ""
 
-#: includes/admin/settings-page.php:240
+#: includes/admin/settings-page.php:189
 msgid "Serve clean Markdown content when AI agents request it via Accept header."
 msgstr ""
 
-#: includes/admin/settings-page.php:250
+#: includes/admin/settings-page.php:194
+msgid "Test:"
+msgstr ""
+
+#: includes/admin/settings-page.php:196
+msgid "Copy"
+msgstr ""
+
+#: includes/admin/settings-page.php:197
+msgid "Browsers can’t send this header — the Dashboard scan verifies it for you."
+msgstr ""
+
+#: includes/admin/settings-page.php:207
 msgid "Add Schema.org structured data (WebSite, Organization, Article, BreadcrumbList, FAQPage) for better content understanding by LLMs."
 msgstr ""
 
+#: includes/admin/settings-page.php:212
+#: includes/admin/settings-page.php:390
+msgid "View:"
+msgstr ""
+
+#: includes/admin/settings-page.php:214
+#: includes/admin/settings-page.php:302
+msgid "Google Rich Results Test"
+msgstr ""
+
+#: includes/admin/settings-page.php:217
+msgid "The markup lives in your page source, not at a URL."
+msgstr ""
+
 #. translators: %s: SEO plugin display name.
-#: includes/admin/settings-page.php:261
+#: includes/admin/settings-page.php:228
 #, php-format
 msgid "%s is active and emits its own JSON-LD. To prevent duplicate structured data, our output is automatically suppressed regardless of this toggle."
 msgstr ""
 
-#: includes/admin/settings-page.php:274
-msgid "Publish OpenAPI 3.0 specification at /?format=openapi for API documentation."
+#: includes/admin/settings-page.php:241
+msgid "Publish OpenAPI 3.0 specification at /openapi.json for API documentation."
 msgstr ""
 
-#: includes/admin/settings-page.php:284
+#: includes/admin/settings-page.php:252
 msgid "Expose site tools to AI agents via WebMCP browser API (Chrome experimental)."
 msgstr ""
 
-#: includes/admin/settings-page.php:291
-#: includes/admin/settings-page.php:438
-#: includes/admin/settings-page.php:648
-#: includes/admin/wizard.php:159
+#: includes/admin/settings-page.php:259
+#: includes/admin/wizard.php:188
 msgid "Declarations"
 msgstr ""
 
-#: includes/admin/settings-page.php:292
+#: includes/admin/settings-page.php:260
 msgid "Declare your preferences for how AI systems may use your content."
 msgstr ""
 
-#: includes/admin/settings-page.php:299
-msgid "Add Content-Signals directives to robots.txt declaring AI usage preferences."
+#: includes/admin/settings-page.php:267
+msgid "Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for, using the per-bot policy below."
 msgstr ""
 
-#: includes/admin/settings-page.php:309
-msgid "Reset all AJ Agent Crawl Optimizer settings to defaults? This will turn every feature off and clear the IndexNow API key."
+#: includes/admin/settings-page.php:279
+msgid "Add a Content-Signal directive to robots.txt declaring AI usage preferences."
 msgstr ""
 
-#: includes/admin/settings-page.php:312
-msgid "Restores every toggle to off and clears the IndexNow API key. Cached endpoint outputs are also cleared."
+#: includes/admin/settings-page.php:293
+msgid "Verification"
 msgstr ""
 
-#: includes/admin/settings-page.php:313
-msgid "Reset to Defaults"
+#: includes/admin/settings-page.php:295
+msgid "Don’t trust the toggles — verify. The Dashboard scans your live site over real HTTP (catching caches, CDNs, and server rules) and shows evidence for every check."
 msgstr ""
 
-#: includes/admin/settings-page.php:318
-msgid "Testing"
+#: includes/admin/settings-page.php:298
+msgid "Run a scan on the Dashboard"
+msgstr ""
+
+#: includes/admin/settings-page.php:301
+msgid "External validators:"
+msgstr ""
+
+#: includes/admin/settings-page.php:304
+msgid "Swagger Editor (OpenAPI)"
+msgstr ""
+
+#: includes/admin/settings-page.php:306
+msgid "isitagentready.com"
+msgstr ""
+
+#: includes/admin/settings-page.php:311
+msgid "Setup & reset"
+msgstr ""
+
+#: includes/admin/settings-page.php:314
+msgid "Run the setup wizard again"
+msgstr ""
+
+#: includes/admin/settings-page.php:317
+msgid "Reset all Agent Ready settings to defaults? This turns every feature off, clears the IndexNow API key and bot policy, and deletes the stored scan."
 msgstr ""
 
 #: includes/admin/settings-page.php:320
-msgid "One-click curl commands grouped by section."
+msgid "Restores every toggle to off, clears the IndexNow API key and per-bot policy, deletes the stored scan result, and flushes cached endpoint outputs."
 msgstr ""
 
-#: includes/admin/settings-page.php:327
-msgid "Check API catalog for automated discovery:"
+#: includes/admin/settings-page.php:321
+msgid "Reset to Defaults"
 msgstr ""
 
-#: includes/admin/settings-page.php:330
-#: includes/admin/settings-page.php:342
-#: includes/admin/settings-page.php:352
-#: includes/admin/settings-page.php:364
-#: includes/admin/settings-page.php:376
-#: includes/admin/settings-page.php:398
-#: includes/admin/settings-page.php:407
-#: includes/admin/settings-page.php:419
-#: includes/admin/settings-page.php:433
-#: includes/admin/settings-page.php:445
-msgid "Copy"
+#: includes/admin/settings-page.php:396
+msgid "(opens in a new tab)"
 msgstr ""
 
-#: includes/admin/settings-page.php:333
-#: includes/admin/settings-page.php:355
-#: includes/admin/settings-page.php:367
-#: includes/admin/settings-page.php:379
-#: includes/admin/settings-page.php:422
-#: includes/admin/settings-page.php:448
-msgid "View output"
+#. translators: %s: comma-separated list of endpoint paths.
+#: includes/admin/settings-page.php:406
+#, php-format
+msgid "Publishes: %s"
 msgstr ""
 
-#: includes/admin/settings-page.php:338
-msgid "API Catalog Link Header"
+#. translators: %d: readiness level 0-5.
+#: includes/admin/settings-page.php:434
+#, php-format
+msgid "Level %d"
 msgstr ""
 
-#: includes/admin/settings-page.php:339
-msgid "Confirm every page advertises the catalog via a Link header (RFC 9727 §3):"
-msgstr ""
-
-#: includes/admin/settings-page.php:344
-msgid "Requires the API Catalog toggle above to be enabled."
-msgstr ""
-
-#: includes/admin/settings-page.php:349
-msgid "Check MCP Server Card for AI agent tool discovery:"
-msgstr ""
-
-#: includes/admin/settings-page.php:361
-msgid "Check Agent Skills Index for skill discovery:"
-msgstr ""
-
-#: includes/admin/settings-page.php:373
-msgid "Fetch the LLM-readable site index:"
-msgstr ""
-
-#: includes/admin/settings-page.php:385
-msgid "IndexNow pings Bing and Yandex when content changes. Test by publishing or updating a post — check your server logs for requests to api.indexnow.org."
-msgstr ""
-
-#: includes/admin/settings-page.php:387
-msgid "Open Bing Webmaster Tools"
-msgstr ""
-
-#: includes/admin/settings-page.php:395
-msgid "Test the Markdown negotiation feature:"
-msgstr ""
-
-#: includes/admin/settings-page.php:404
-msgid "Check for JSON-LD structured data in page source:"
-msgstr ""
-
-#: includes/admin/settings-page.php:410
-msgid "Open in Google Rich Results Test"
-msgstr ""
-
-#: includes/admin/settings-page.php:416
-msgid "Check OpenAPI specification:"
-msgstr ""
-
-#: includes/admin/settings-page.php:424
-msgid "Open in Swagger Editor"
-msgstr ""
-
-#: includes/admin/settings-page.php:430
-msgid "WebMCP tools are loaded via JavaScript on the frontend. Check the page source to verify the script is enqueued:"
-msgstr ""
-
-#: includes/admin/settings-page.php:435
-msgid "Note: WebMCP requires Chrome with the experimental AI features enabled."
-msgstr ""
-
+#. translators: %s: date/time of the last scan.
 #: includes/admin/settings-page.php:442
-msgid "Check robots.txt for Content-Signals:"
-msgstr ""
-
-#: includes/admin/settings-page.php:454
-msgid "Details"
-msgstr ""
-
-#: includes/admin/settings-page.php:456
-msgid "What each feature actually does behind the scenes when its checkbox is enabled."
-msgstr ""
-
-#. translators: 1: well-known URL path. 2: MIME type.
-#: includes/admin/settings-page.php:468
 #, php-format
-msgid "Serves %1$s as %2$s per RFC 9727."
+msgid "Last verified by scan: %s"
 msgstr ""
 
-#: includes/admin/settings-page.php:474
-msgid "Each linkset entry advertises service-desc (OpenAPI spec), service-doc (WordPress REST API handbook), and status (REST root)."
+#: includes/admin/settings-page.php:447
+msgid "Open Dashboard"
 msgstr ""
 
-#. translators: %s: HTTP Link header example, code-formatted.
+#: includes/admin/settings-page.php:449
+msgid "No scan yet — your real agent-readiness Level is measured on the Dashboard, not by counting toggles."
+msgstr ""
+
+#: includes/admin/settings-page.php:469
+msgid "Training"
+msgstr ""
+
+#: includes/admin/settings-page.php:470
+msgid "AI search"
+msgstr ""
+
+#: includes/admin/settings-page.php:471
+msgid "User requests"
+msgstr ""
+
+#: includes/admin/settings-page.php:476
+msgid "Per-crawler policy (applies when the toggle above is on). Purpose: Training = model training crawls; AI search = answer-engine indexing; User requests = fetches made for a live user."
+msgstr ""
+
 #: includes/admin/settings-page.php:479
-#, php-format
-msgid "Also emits %s on every frontend response so agents discover the catalog without having to know about /.well-known/."
+msgid "Allow all"
 msgstr ""
 
-#. translators: %s: well-known URL path, code-formatted.
-#: includes/admin/settings-page.php:492
-#, php-format
-msgid "Serves %s per the SEP-1649 draft so MCP-aware agents can discover the site."
+#: includes/admin/settings-page.php:480
+msgid "Allow search & user requests, block training"
 msgstr ""
 
-#: includes/admin/settings-page.php:497
-msgid "serverInfo (name, version, description, websiteUrl) is generated dynamically from get_bloginfo() so it stays accurate per subsite."
+#: includes/admin/settings-page.php:481
+msgid "Block all"
+msgstr ""
+
+#: includes/admin/settings-page.php:486
+msgid "Crawler"
+msgstr ""
+
+#: includes/admin/settings-page.php:487
+msgid "Purpose"
+msgstr ""
+
+#: includes/admin/settings-page.php:488
+msgid "Policy"
 msgstr ""
 
 #: includes/admin/settings-page.php:498
-msgid "Declares transport, MCP capability flag objects, protocolVersion, and instructions pointing agents at the API catalog and OpenAPI spec."
+msgid "Allow"
 msgstr ""
 
-#. translators: %s: well-known URL path, code-formatted.
-#: includes/admin/settings-page.php:507
-#, php-format
-msgid "Serves %s listing 6 skills (content-query, posts-read, pages-read, media-library, categories, tags) per Agent Skills Discovery RFC v0.2.0."
+#: includes/admin/settings-page.php:499
+msgid "Block"
 msgstr ""
 
-#. translators: %s: URL pattern for SKILL.md artifacts, code-formatted.
-#: includes/admin/settings-page.php:516
-#, php-format
-msgid "For each skill, also serves a deterministic SKILL.md artifact at %s with a how-to-use guide."
+#: includes/admin/settings-page.php:519
+msgid "AI training (ai-train)"
+msgstr ""
+
+#: includes/admin/settings-page.php:520
+msgid "Search (search)"
 msgstr ""
 
 #: includes/admin/settings-page.php:521
-msgid "Each index entry includes a real sha256 digest of the served SKILL.md bytes so agents can verify the artifact has not been tampered with."
+msgid "AI input / grounding (ai-input)"
 msgstr ""
 
-#. translators: %s: URL path of /llms.txt, code-formatted.
+#: includes/admin/settings-page.php:529
+msgid "yes"
+msgstr ""
+
 #: includes/admin/settings-page.php:530
-#, php-format
-msgid "Serves %s — a curated, Markdown index of the site that LLMs read to find your most important pages, per llmstxt.org."
+msgid "no"
 msgstr ""
 
 #: includes/admin/settings-page.php:535
-msgid "Generated dynamically per site/subsite from get_bloginfo() plus your top-level published pages and recent posts (excerpts cleaned, read-more markers stripped)."
+msgid "Emitted as e.g. \"Content-Signal: ai-train=no, search=yes, ai-input=no\". A declaration of preference, not enforcement."
 msgstr ""
 
-#: includes/admin/settings-page.php:536
-msgid "A Discovery section auto-links every other plugin endpoint that is currently enabled (API Catalog, OpenAPI, Skills Index, MCP Card) so an LLM can crawl from llms.txt to everything else."
-msgstr ""
-
-#. translators: %s: IndexNow API endpoint URL, code-formatted.
-#: includes/admin/settings-page.php:545
-#, php-format
-msgid "Hooks transition_post_status; when a post moves to publish, fires a non-blocking POST to %s."
-msgstr ""
-
-#. translators: %s: JSON payload shape, code-formatted.
-#: includes/admin/settings-page.php:554
-#, php-format
-msgid "Payload is exactly %s — Bing and Yandex begin re-crawling the URL within minutes."
-msgstr ""
-
-#: includes/admin/settings-page.php:559
-msgid "Skips revisions, autosaves, and post types that are not public. The ping is non-blocking so page saves stay fast."
-msgstr ""
-
-#. translators: %s: URL pattern for the IndexNow key file, code-formatted.
-#: includes/admin/settings-page.php:564
-#, php-format
-msgid "Reads the key from the IndexNow API Key field above; also serves the key file at %s so search engines can verify ownership."
-msgstr ""
-
-#: includes/admin/settings-page.php:575
-msgid "Watches every page request for the Accept: text/markdown header; browsers asking for HTML get the normal response."
-msgstr ""
-
-#: includes/admin/settings-page.php:576
-msgid "Buffers the rendered HTML, extracts the main content region, and converts it to clean Markdown."
-msgstr ""
-
-#. translators: 1: response Content-Type header. 2: X-Markdown-Tokens header name.
-#: includes/admin/settings-page.php:581
-#, php-format
-msgid "Returns %1$s and emits %2$s (≈ chars/4) so AI agents can budget context size."
-msgstr ""
-
-#. translators: %s: HTML script tag opening, code-formatted.
-#: includes/admin/settings-page.php:595
-#, php-format
-msgid "Outputs %s in the head on every page so search engines and LLMs understand the content."
-msgstr ""
-
-#: includes/admin/settings-page.php:600
-msgid "Always includes WebSite (with SearchAction) and Organization (logo resolved from theme custom logo or site icon)."
-msgstr ""
-
-#: includes/admin/settings-page.php:601
-msgid "On singular posts/pages of public REST-enabled post types, adds Article (cleaned excerpt, author, datePublished/dateModified, image, mainEntityOfPage)."
-msgstr ""
-
-#: includes/admin/settings-page.php:602
-msgid "On non-front singular pages, adds BreadcrumbList (Home → Category → Post)."
-msgstr ""
-
-#: includes/admin/settings-page.php:603
-msgid "Auto-detects FAQ content (definition-list pairs or question-shaped headings) and emits FAQPage with Question/Answer pairs."
-msgstr ""
-
-#: includes/admin/settings-page.php:604
-msgid "Auto-suppresses when an SEO plugin (Yoast, Rank Math, AIOSEO, etc.) is active to prevent duplicate structured data."
-msgstr ""
-
-#. translators: %s: query string parameter, code-formatted.
-#: includes/admin/settings-page.php:613
-#, php-format
-msgid "Intercepts %s and returns a complete OpenAPI 3.0.3 document as application/json."
-msgstr ""
-
-#. translators: %s: WordPress function name, code-formatted.
-#: includes/admin/settings-page.php:622
-#, php-format
-msgid "Iterates every route from %s (filtered through rest_endpoints to honor show_in_index), so plugin-registered routes appear automatically."
-msgstr ""
-
-#. translators: 1: regex named-capture pattern. 2: OpenAPI templated-path pattern.
-#: includes/admin/settings-page.php:631
-#, php-format
-msgid "Converts WordPress regex placeholders such as %1$s into OpenAPI templated paths like %2$s and splits args into path parameters, query parameters, and requestBody for write methods."
-msgstr ""
-
-#: includes/admin/settings-page.php:637
-msgid "Includes Post, Page, Media, Term, and User component schemas, with info pulled from site name, description, and WordPress version."
-msgstr ""
-
-#: includes/admin/settings-page.php:642
-msgid "Enqueues a frontend script that registers tools via navigator.modelContext.provideContext() — the W3C WebMCP draft API."
-msgstr ""
-
-#: includes/admin/settings-page.php:643
-msgid "Exposes 4 tools to AI agents: search_content, get_posts, get_pages, get_site_info — each with name, description, JSON-Schema inputSchema, and an execute callback that wraps the WP REST API."
-msgstr ""
-
-#: includes/admin/settings-page.php:644
-msgid "Subsite-aware via wp_localize_script — the script reads the right REST URL for whichever site it is running on."
-msgstr ""
-
-#: includes/admin/settings-page.php:645
-msgid "The tools only register in browsers with the experimental WebMCP feature enabled (currently Chrome behind a flag). Other browsers no-op silently."
-msgstr ""
-
-#. translators: %s: /robots.txt path, code-formatted.
-#: includes/admin/settings-page.php:656
-#, php-format
-msgid "Intercepts %s (and any subsite path ending in it) and serves WordPress-default robots rules plus a Content-Signal directive."
-msgstr ""
-
-#: includes/admin/settings-page.php:661
-msgid "Composes with SEO plugins: Yoast/Rank Math/AIOSEO additions are preserved, our Content-Signal is appended last."
-msgstr ""
-
-#: includes/admin/settings-page.php:662
-msgid "Honors the \"Discourage search engines\" reading setting (switches to Disallow: / when that is on)."
-msgstr ""
-
-#: includes/admin/wizard.php:68
+#: includes/admin/wizard.php:81
 msgid "You do not have permission to run the AJ Agent Crawl Optimizer setup wizard."
 msgstr ""
 
-#: includes/admin/wizard.php:116
+#: includes/admin/wizard.php:143
 msgid "Recommended AJ Agent Crawl Optimizer settings applied."
 msgstr ""
 
-#: includes/admin/wizard.php:117
+#: includes/admin/wizard.php:144
 msgid "Tweak any toggle below if you want to deviate from the defaults."
 msgstr ""
 
-#: includes/admin/wizard.php:144
+#: includes/admin/wizard.php:171
 msgid "/.well-known/api-catalog manifest plus a Link header on every response (RFC 9727)."
 msgstr ""
 
-#: includes/admin/wizard.php:145
+#: includes/admin/wizard.php:172
 msgid "/.well-known/mcp/server-card.json descriptor for MCP-aware agents."
 msgstr ""
 
-#: includes/admin/wizard.php:146
+#: includes/admin/wizard.php:173
 msgid "/.well-known/agent-skills/index.json plus per-skill SKILL.md artifacts."
 msgstr ""
 
-#: includes/admin/wizard.php:147
+#: includes/admin/wizard.php:174
 msgid "A curated, LLM-readable index at /llms.txt (per llmstxt.org)."
 msgstr ""
 
-#: includes/admin/wizard.php:148
+#: includes/admin/wizard.php:175
 msgid "Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later."
 msgstr ""
 
-#: includes/admin/wizard.php:149
+#: includes/admin/wizard.php:176
+msgid "/auth.md documenting Application Password authentication for agents."
+msgstr ""
+
+#: includes/admin/wizard.php:177
 msgid "Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected."
 msgstr ""
 
-#: includes/admin/wizard.php:150
+#: includes/admin/wizard.php:178
 msgid "WebSite, Organization, Article, BreadcrumbList, FAQPage structured data."
 msgstr ""
 
-#: includes/admin/wizard.php:151
-msgid "OpenAPI 3.0.3 document at /?format=openapi, generated from REST routes."
+#: includes/admin/wizard.php:179
+msgid "OpenAPI 3.0.3 document at /openapi.json, generated from REST routes."
 msgstr ""
 
-#: includes/admin/wizard.php:152
+#: includes/admin/wizard.php:180
 msgid "Frontend script registering tools via navigator.modelContext (Chrome experimental)."
 msgstr ""
 
-#: includes/admin/wizard.php:153
+#: includes/admin/wizard.php:181
+msgid "Explicit robots.txt User-agent groups for the 15 AI crawlers scanners check."
+msgstr ""
+
+#: includes/admin/wizard.php:182
 msgid "Adds a Content-Signal directive to robots.txt declaring AI-usage preferences."
 msgstr ""
 
-#: includes/admin/wizard.php:165
+#: includes/admin/wizard.php:194
 msgid "Welcome to AJ Agent Crawl Optimizer"
 msgstr ""
 
-#: includes/admin/wizard.php:169
+#: includes/admin/wizard.php:198
 msgid "One-time setup. The toggles below are pre-selected based on your environment — review, adjust, then apply. You can change anything later from the regular settings page."
 msgstr ""
 
 #. translators: %s: detected SEO plugin name.
-#: includes/admin/wizard.php:178
+#: includes/admin/wizard.php:207
 #, php-format
 msgid "Detected %s — JSON-LD Schema is unchecked below to avoid duplicate structured data. Our schema auto-suppresses anyway when an SEO plugin is active."
 msgstr ""
 
-#: includes/admin/wizard.php:210
+#: includes/admin/wizard.php:241
 msgid "Apply Recommended Settings"
 msgstr ""
 
-#: includes/admin/wizard.php:213
+#: includes/admin/wizard.php:244
 msgid "Skip — Configure Manually"
+msgstr ""
+
+#: includes/features/llms-config.php:74
+msgid "Pages"
+msgstr ""
+
+#: includes/features/llms-config.php:82
+msgid "Recent Posts"
+msgstr ""
+
+#: includes/features/llms-editor.php:103
+#: assets/js/llms-editor.js:173
+msgid "Agent Ready (llms.txt)"
+msgstr ""
+
+#: includes/features/llms-editor.php:133
+#: assets/js/llms-editor.js:102
+msgid "Include in llms.txt"
+msgstr ""
+
+#: includes/features/llms-editor.php:137
+msgid "Excluded entries stay out of both /llms.txt and /llms-full.txt."
+msgstr ""
+
+#: includes/features/llms-editor.php:142
+#: assets/js/llms-editor.js:139
+msgid "Summary for AI agents"
+msgstr ""
+
+#. translators: %d: maximum number of characters allowed in the summary.
+#: includes/features/llms-editor.php:156
+#, php-format
+msgid "Overrides the excerpt in llms.txt (max %d characters). Write it for a model deciding whether to fetch the page, not for a human skimming. Leave it empty to use the post excerpt."
+msgstr ""
+
+#: includes/scan/class-check-info.php:55
+msgid "Publish /robots.txt with clear crawl rules"
+msgstr ""
+
+#: includes/scan/class-check-info.php:61
+msgid "Publish a sitemap and reference it from robots.txt"
+msgstr ""
+
+#: includes/scan/class-check-info.php:67
+msgid "Include Link response headers for agent discovery (RFC 8288)"
+msgstr ""
+
+#: includes/scan/class-check-info.php:73
+msgid "Publish DNS for AI Discovery (DNS-AID) records"
+msgstr ""
+
+#: includes/scan/class-check-info.php:79
+msgid "Return HTML responses as markdown when agents request it"
+msgstr ""
+
+#: includes/scan/class-check-info.php:85
+msgid "Add User-agent rules for AI crawlers like GPTBot and Claude-Web"
+msgstr ""
+
+#: includes/scan/class-check-info.php:91
+msgid "Declare AI content usage preferences with Content Signals in robots.txt"
+msgstr ""
+
+#: includes/scan/class-check-info.php:97
+msgid "Let your site identify itself as a bot with Web Bot Auth"
+msgstr ""
+
+#: includes/scan/class-check-info.php:103
+msgid "Publish an API catalog for automated API discovery (RFC 9727)"
+msgstr ""
+
+#: includes/scan/class-check-info.php:109
+msgid "Publish OAuth/OIDC discovery metadata so agents can authenticate"
+msgstr ""
+
+#: includes/scan/class-check-info.php:115
+msgid "Publish OAuth Protected Resource Metadata (RFC 9728)"
+msgstr ""
+
+#: includes/scan/class-check-info.php:121
+msgid "Publish Auth.md metadata for agent registration"
+msgstr ""
+
+#: includes/scan/class-check-info.php:127
+msgid "Publish an MCP Server Card for agent discovery"
+msgstr ""
+
+#: includes/scan/class-check-info.php:133
+msgid "Publish an A2A Agent Card for agent-to-agent discovery"
+msgstr ""
+
+#: includes/scan/class-check-info.php:139
+msgid "Publish an agent skills discovery index"
+msgstr ""
+
+#: includes/scan/class-check-info.php:145
+msgid "Support WebMCP to expose site tools to AI agents via the browser"
+msgstr ""
+
+#: includes/scan/class-check-info.php:151
+msgid "Support x402 protocol for agent-native HTTP payments"
+msgstr ""
+
+#: includes/scan/class-check-info.php:157
+msgid "Support MPP (Machine Payment Protocol) for agent-native HTTP payments"
+msgstr ""
+
+#: includes/scan/class-check-info.php:163
+msgid "Enable content payments via Universal Commerce Protocol"
+msgstr ""
+
+#: includes/scan/class-check-info.php:169
+msgid "Publish ACP discovery metadata so agents can discover your commerce API"
+msgstr ""
+
+#: includes/scan/class-check-info.php:175
+msgid "AP2 agent payments (requires an A2A Agent Card)"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:36
+msgid "Enable API Catalog + Link header"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:37
+msgid "Emits Link: rel=\"api-catalog\" on every response and serves the catalog."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:41
+msgid "Enable Markdown Negotiation"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:42
+msgid "Serves markdown with Vary: Accept when agents send Accept: text/markdown."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:46
+msgid "Enable AI bot rules in robots.txt"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:47
+msgid "Adds explicit User-agent groups for the 15 AI crawlers scanners check for."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:51
+msgid "Enable Content Signals"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:52
+msgid "Declares ai-train / search / ai-input preferences in robots.txt."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:56
+msgid "Enable API Catalog"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:57
+msgid "Serves an RFC 9727 linkset at /.well-known/api-catalog."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:61
+msgid "Enable Agent Skills index"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:62
+msgid "Publishes /.well-known/agent-skills/index.json with verifiable SKILL.md artifacts."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:66
+msgid "Enable MCP Server Card"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:67
+msgid "Publishes /.well-known/mcp/server-card.json."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:71
+msgid "Enable WebMCP tools"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:72
+msgid "Registers in-page tools on navigator.modelContext (experimental browser API)."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:76
+msgid "Publish auth.md"
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:77
+msgid "Serves /auth.md documenting Application Password authentication for agents."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:105
+msgid "No automatic fix is available for this check."
+msgstr ""
+
+#: includes/scan/class-fix-registry.php:125
+msgid "Feature was already enabled — re-scanning. If the check still fails, a page cache or server rule is likely intercepting the endpoint."
+msgstr ""
+
+#. translators: 1: endpoint path.
+#: includes/scan/class-hosting-diagnosis.php:281
+#, php-format
+msgid "%s is enabled in the plugin but the server returns 403 — a dot-path deny rule (common nginx security snippet) is blocking it before WordPress runs."
+msgstr ""
+
+#. translators: 1: endpoint path.
+#: includes/scan/class-hosting-diagnosis.php:285
+#, php-format
+msgid "%s is enabled in the plugin but the server returns 404 — the request is not being routed to WordPress (usually a static-file location block without try_files, or an aggressive page cache)."
+msgstr ""
+
+#. translators: 1: endpoint path, 2: HTTP status code.
+#: includes/scan/class-hosting-diagnosis.php:288
+#, php-format
+msgid "%1$s is enabled in the plugin but the live probe returned HTTP %2$d — the response did not come from the plugin."
+msgstr ""
+
+#: includes/scan/class-level.php:41
+msgid "Not Ready"
+msgstr ""
+
+#: includes/scan/class-level.php:42
+msgid "Basic Web Presence"
+msgstr ""
+
+#: includes/scan/class-level.php:43
+msgid "Bot-Aware"
+msgstr ""
+
+#: includes/scan/class-level.php:44
+msgid "Agent-Readable"
+msgstr ""
+
+#: includes/scan/class-level.php:45
+msgid "Agent-Integrated"
+msgstr ""
+
+#: includes/scan/class-level.php:46
+msgid "Agent-Native"
+msgstr ""
+
+#. translators: %d: number of checks still needed.
+#: includes/scan/class-level.php:129
+#, php-format
+msgid "Pass %d more of these basics."
+msgid_plural "Pass %d more of these basics."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/scan/class-level.php:133
+msgid "Both checks are required."
+msgstr ""
+
+#: includes/scan/class-level.php:141
+msgid "Passing any one of these unlocks Level 4."
+msgstr ""
+
+#: includes/scan/class-level.php:159
+msgid "Level 5 needs 2 of 3 arms: Web Bot Auth, all four integrations, and auth metadata (any OAuth/auth.md check)."
+msgstr ""
+
+#: assets/js/llms-editor.js:105
+msgid "Excluded — this entry stays out of both /llms.txt and /llms-full.txt."
+msgstr ""
+
+#: assets/js/llms-editor.js:106
+msgid "Included — this entry can appear in /llms.txt and /llms-full.txt."
+msgstr ""
+
+#: assets/js/llms-editor.js:116
+msgid "Empty — the post excerpt will be used. Anything you write here overrides it."
+msgstr ""
+
+#: assets/js/llms-editor.js:117
+msgid "This overrides the excerpt in llms.txt."
+msgstr ""
+
+#: assets/js/llms-editor.js:119
+msgid "Write it for a model deciding whether to fetch the page, not for a human skimming."
+msgstr ""
+
+#. translators: 1: number of characters used. 2: maximum number of characters allowed.
+#: assets/js/llms-editor.js:123
+#, js-format
+msgid "%1$d / %2$d characters"
+msgstr ""
+
+#: assets/js/llms-editor.js:135
+msgid "Agents never see this entry, so it needs no summary. Turn inclusion back on to write one."
+msgstr ""
+
+#: assets/js/llms-editor.js:153
+msgid "llms.txt is turned off right now, so nothing is published yet. Turn it on under Agent Ready → Settings."
+msgstr ""
+
+#: assets/js/llms-editor.js:164
+msgid "View /llms.txt"
 msgstr ""

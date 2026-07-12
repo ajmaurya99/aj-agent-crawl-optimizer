@@ -48,15 +48,31 @@ function flush_llms_txt_cache(): void {
 }
 
 /**
- * Flush the cache when an `ajaco_*_enabled` option is updated. The
- * Discovery section auto-includes only enabled features, so a toggle change
- * means the cached body is stale.
+ * Flush the cache when an option that affects the llms.txt body changes.
+ *
+ * Only feature toggles (the Discovery section lists enabled features), the
+ * curation config, and the bot/signal settings change the output. It must NOT
+ * match ajaco_last_scan (written on every scan and every fix) or the wizard
+ * flags — matching those threw away the hour-long cache on every dashboard
+ * scan, forcing a cold rebuild of /llms-full.txt on the next request.
  *
  * @param string $option Option name.
  * @return void
  */
 function maybe_flush_llms_txt_on_setting_change( string $option ): void {
-	if ( strpos( $option, 'ajaco_' ) === 0 ) {
+	// Volatile options that have nothing to do with the file body.
+	$ignore = array( 'ajaco_last_scan', 'ajaco_show_wizard', 'ajaco_wizard_done' );
+	if ( in_array( $option, $ignore, true ) ) {
+		return;
+	}
+
+	$affects_body = ( '_enabled' === substr( $option, -8 ) )
+		|| 'ajaco_llms_config' === $option
+		|| 'ajaco_ai_bot_policy' === $option
+		|| 'ajaco_content_signal_prefs' === $option
+		|| 'ajaco_indexnow_key' === $option;
+
+	if ( $affects_body ) {
 		flush_llms_txt_cache();
 	}
 }

@@ -37,7 +37,7 @@ Most plugins generate `llms.txt` from fixed rules and hand you the result. This 
 * **Per-post control** — every post and page gets an "Agent Ready (llms.txt)" panel in the editor: keep an entry out of the agent indexes entirely, or write a **Summary for AI agents** that overrides the excerpt. An excerpt is written for a human skimming; that line is written for a model deciding whether to fetch the page — and it is the single highest-leverage field in the whole plugin.
 * **`/llms-full.txt`** serves the full content of the same curated entries. Password-protected content is always excluded from both.
 
-Defaults reproduce the previous automatic output exactly, so upgrading changes nothing until you decide to edit something.
+The defaults keep the same sections and ordering as the previous automatic output (2.0 adds a one-line pointer to /llms-full.txt), so upgrading needs no attention until you decide to curate.
 
 = Discovery — help agents find what your site offers =
 
@@ -129,7 +129,7 @@ The plugin never creates files: every endpoint (/.well-known/*, /llms.txt, /open
 
 Yes — it is curated, not auto-generated from fixed rules. Under **Agent Ready → llms.txt** you write the intro, pick which post types appear (custom post types and WooCommerce products show up automatically), and set each section's heading, item count and order, plus your own Markdown block. A live preview shows the file as you edit, before you save.
 
-Individual entries are steered from the editor: the "Agent Ready (llms.txt)" panel has an **Include in llms.txt** toggle (excluded pages stay out of both `/llms.txt` and `/llms-full.txt`) and a **Summary for AI agents** field that overrides the excerpt for that entry — write it for a model deciding whether to fetch the page. Defaults reproduce the previous automatic output, so upgrading changes nothing until you edit something.
+Individual entries are steered from the editor: the "Agent Ready (llms.txt)" panel has an **Include in llms.txt** toggle (excluded pages stay out of both `/llms.txt` and `/llms-full.txt`) and a **Summary for AI agents** field that overrides the excerpt for that entry — write it for a model deciding whether to fetch the page. The defaults keep the same sections and ordering as before, so upgrading needs no attention until you decide to curate.
 
 = Can I run scans from the command line or scripts? =
 
@@ -209,12 +209,14 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * NEW: AI Bot Rules — explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check, with per-bot allow/block policy.
 * NEW: /auth.md — agent authentication documentation for Application Passwords.
 * NEW: /llms-full.txt — full recent content as Markdown alongside /llms.txt; password-protected content excluded from all agent-facing endpoints.
-* NEW: Curated llms.txt — a dedicated **Agent Ready → llms.txt** screen with a custom intro, per-post-type sections (custom post types and WooCommerce products included) with heading/count/order controls, a custom Markdown block, and a live preview of the file before you save. Defaults reproduce the previous automatic output exactly.
+* NEW: Curated llms.txt — a dedicated **Agent Ready → llms.txt** screen with a custom intro, per-post-type sections (custom post types and WooCommerce products included) with heading/count/order controls, a custom Markdown block, and a live preview of the file before you save. The defaults keep the same sections and ordering as the 1.x output (plus a pointer to the new /llms-full.txt).
 * NEW: Per-post curation — an "Agent Ready (llms.txt)" panel in the block editor (with a classic-editor fallback): "Include in llms.txt" excludes an entry from both agent files, and "Summary for AI agents" overrides its excerpt. Stored as the `_ajaco_llms_exclude` / `_ajaco_llms_summary` post meta (REST-exposed, so WP-CLI and the REST API can set them).
 * NEW: Hosting diagnosis — when a feature is enabled but the server blocks its endpoint (nginx dot-path 403s, static-file 404s), the scan flags it and the Dashboard offers copy-paste nginx/Apache fixes.
 * Settings page moved under Agent Ready → Settings and streamlined: the toggle-count score card is replaced by the scan-verified Level banner (one source of truth with the Dashboard), a per-bot AI crawler policy table with presets ("Allow search & user requests, block training"), Content-Signal yes/no selectors, inline dependency warnings (keyless IndexNow, catalog without OpenAPI), and live "View" links to every endpoint the plugin is serving.
 * Feature documentation moved into the contextual Help tab, reachable from a "Read more" link on every toggle (which opens the guide at that feature's notes).
+* FIXED: a settings page left open across a plugin update could silently switch features off. WordPress saves every registered option in a submitted group and treats one missing from the form as "unchecked" — so a form rendered before a new toggle existed would disable that toggle (and could wipe the per-bot AI crawler policy) on the next Save, without the user touching it. Our forms now declare which fields they rendered, and the save handlers leave everything else alone. The Quick Setup wizard had the same flaw and is fixed the same way.
 * New filter hooks: ajaco_ai_bot_list, ajaco_ai_bot_policy, ajaco_auth_md_content, ajaco_llms_full_txt_content, ajaco_llms_post_types, ajaco_llms_exclude_post, ajaco_commerce_signals, ajaco_scan_sslverify.
+* Translation template (.pot) regenerated for all 2.0 strings.
 
 = 1.0.1 =
 * Agent Skills index now validates against the Agent Skills Discovery RFC v0.2.0: entries use `type: skill-md` and a `digest` field with `sha256:` prefix (previously `type: information-retrieval` and a `sha256` key, which external scanners rejected); `$schema` corrected to the published schema URI.

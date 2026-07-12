@@ -74,9 +74,15 @@ class Hosting_Diagnosis {
 	 * blocked or failed to route to WordPress.
 	 *
 	 * @param array<string, array<string, array>> $checks_by_category Scan 'checks' member.
+	 * @param bool                                 $probe              Whether to make live probes of the
+	 *                                                                 uncovered endpoints. Skipped during
+	 *                                                                 single-check re-verify to avoid firing
+	 *                                                                 unrelated loopback requests on every fix.
+	 * @param array                                $carry              Previously computed unchecked-endpoint
+	 *                                                                 issues to reuse when $probe is false.
 	 * @return array{issues: array<int, array>, snippets: array<string, string>}
 	 */
-	public static function analyze( array $checks_by_category ): array {
+	public static function analyze( array $checks_by_category, bool $probe = true, array $carry = array() ): array {
 		$flat = array();
 		foreach ( $checks_by_category as $cat_checks ) {
 			foreach ( $cat_checks as $id => $result ) {
@@ -100,15 +106,16 @@ class Hosting_Diagnosis {
 
 			$http_status = self::endpoint_http_status( $result, $endpoint['path'] );
 
-			// The smoking gun: WE serve this endpoint, yet the live probe got
-			// 403/404 — the request never reached the plugin.
+			// Only a 403/404 means the server intercepted the request before it
+			// reached the plugin. A 2xx/3xx that failed the check is a
+			// content-level failure (already reported as an ordinary fail) — NOT
+			// a hosting block, and the server-config snippets wouldn't help it.
 			if ( 403 === $http_status ) {
 				$cause = 'denied';
 			} elseif ( 404 === $http_status ) {
 				$cause = 'not-routed';
 			} else {
-				// 5xx / unexpected — still worth surfacing, generically.
-				$cause = 'unknown';
+				continue;
 			}
 
 			$issues[] = array(
@@ -124,8 +131,14 @@ class Hosting_Diagnosis {
 		// Endpoints the plugin serves that NO readiness check covers (the 21
 		// checks come from the external scanner's list, which has no llms.txt
 		// or /openapi.json check). Without this, a static-file rule that 404s
-		// /llms.txt would be completely invisible — probe them directly.
-		$issues = array_merge( $issues, self::probe_unchecked_endpoints() );
+		// /llms.txt would be completely invisible — probe them directly. These
+		// probes are check-independent, so a single-check re-verify reuses the
+		// last full scan's result instead of re-probing (see $probe/$carry).
+		if ( $probe ) {
+			$issues = array_merge( $issues, self::probe_unchecked_endpoints() );
+		} else {
+			$issues = array_merge( $issues, self::carried_unchecked_issues( $carry ) );
+		}
 
 		return array(
 			'issues'   => $issues,
@@ -134,6 +147,24 @@ class Hosting_Diagnosis {
 				'apache' => self::apache_snippet(),
 			),
 		);
+	}
+
+	/**
+	 * The unchecked-endpoint issues (`check` === '') from a prior hosting
+	 * result, reused when a single-check re-verify skips live probing.
+	 *
+	 * @param array $carry Prior scan's `hosting` member, or `issues` list.
+	 * @return array<int, array>
+	 */
+	private static function carried_unchecked_issues( array $carry ): array {
+		$issues = isset( $carry['issues'] ) && is_array( $carry['issues'] ) ? $carry['issues'] : $carry;
+		$out    = array();
+		foreach ( (array) $issues as $issue ) {
+			if ( is_array( $issue ) && isset( $issue['check'] ) && '' === $issue['check'] ) {
+				$out[] = $issue;
+			}
+		}
+		return $out;
 	}
 
 	/**
@@ -181,6 +212,9 @@ class Hosting_Diagnosis {
 					'timeout'     => 10,
 					'redirection' => 3,
 					'user-agent'  => 'AJACO-Scanner/' . AJACO_VERSION . ' (+' . home_url( '/' ) . ')',
+					// Same-origin probe only — TLS verification relaxed so a scan
+					// works on a local/staging site with a self-signed cert; the
+					// filter re-enables it. External requests are never made here.
 					'sslverify'   => apply_filters( 'ajaco_scan_sslverify', false ),
 				)
 			);

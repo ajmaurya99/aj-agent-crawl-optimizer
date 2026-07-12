@@ -166,7 +166,7 @@ class Scanner {
 			'nextLevel'       => Level::next_level( $level, $statuses ),
 			'isCommerce'      => $is_commerce,
 			'commerceSignals' => $commerce['signals'],
-			'hosting'         => Hosting_Diagnosis::analyze( $categories ),
+			'hosting'         => Hosting_Diagnosis::analyze( $categories, true ),
 			'enabledChecks'   => $enabled,
 			'scannerVersion'  => AJACO_VERSION,
 		);
@@ -226,7 +226,12 @@ class Scanner {
 		$stored['isCommerce']      = $commerce['is_commerce'];
 		$stored['commerceSignals'] = $commerce['signals'];
 		$stored['scores']          = $this->rescore_stored( $stored['checks'] );
-		$stored['hosting']         = Hosting_Diagnosis::analyze( $stored['checks'] );
+		// Single-check re-verify: recompute the checked-endpoint issues (they
+		// depend on the just-updated check results) but reuse the last full
+		// scan's live probes of the uncovered endpoints, so a fix doesn't fire
+		// unrelated loopback requests (and risk a gateway timeout) each time.
+		$prior_hosting             = isset( $stored['hosting'] ) && is_array( $stored['hosting'] ) ? $stored['hosting'] : array();
+		$stored['hosting']         = Hosting_Diagnosis::analyze( $stored['checks'], false, $prior_hosting );
 
 		update_option( self::LAST_SCAN_OPTION, $stored, false );
 

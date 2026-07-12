@@ -7,7 +7,7 @@ Then publish everything agents need — Markdown negotiation, MCP server card, A
 [![WordPress plugin](https://img.shields.io/wordpress/plugin/v/aj-agent-crawl-optimizer)](https://wordpress.org/plugins/aj-agent-crawl-optimizer/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 
-> **Branches:** `main` = released 1.0.x line · `v2-dev` = the 2.0 scan→fix→verify engine described below (in development).
+> **Version 2.0** — the scan → fix → verify engine described below — is the current stable release on wordpress.org.
 
 ## The scan → fix → verify loop (2.0)
 

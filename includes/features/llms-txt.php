@@ -361,7 +361,10 @@ function format_llms_full_txt_entry( \WP_Post $p ): string {
 	// Truncate the rendered HTML BEFORE conversion — html_to_markdown runs
 	// ~25 full-string regex passes, so feeding it a megabyte page-builder
 	// document on a cold cache is a CPU trap.
-	$html = (string) apply_filters( 'the_content', $p->post_content );
+	// Rendering post content (shortcodes, blocks, embeds) requires WordPress'
+	// own `the_content` filter — this is a deliberate core-hook application, not
+	// a plugin-owned hook, so the missing-prefix warning does not apply.
+	$html = (string) apply_filters( 'the_content', $p->post_content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	if ( mb_strlen( $html ) > 100000 ) {
 		$html = mb_substr( $html, 0, 100000 );
 	}

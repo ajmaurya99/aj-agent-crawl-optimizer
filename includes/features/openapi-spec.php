@@ -110,8 +110,10 @@ function build_openapi_document(): string {
 	$site_description = get_bloginfo( 'description' );
 	$site_version     = get_bloginfo( 'version' );
 
-	$server    = rest_get_server();
-	$endpoints = apply_filters( 'rest_endpoints', $server->get_routes() );
+	$server = rest_get_server();
+	// WP_REST_Server::get_routes() already applies the core `rest_endpoints`
+	// filter internally, so re-applying it here would double-filter the list.
+	$endpoints = $server->get_routes();
 
 	$paths = array();
 	foreach ( $endpoints as $route => $handlers ) {

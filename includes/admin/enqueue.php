@@ -181,7 +181,7 @@ function enqueue_dashboard_assets(): void {
 
 				// Hosting diagnosis.
 				/* translators: %s: number of blocked endpoints. Singular|plural. */
-				'hostingTitle' => __( 'Your host is blocking %s agent endpoint|Your host is blocking %s agent endpoints', 'aj-agent-crawl-optimizer' ),
+				'hostingTitle' => __( 'Your host is blocking %1$s agent endpoint|Your host is blocking %1$s agent endpoints', 'aj-agent-crawl-optimizer' ),
 				'hostingBody'  => __( 'These features are enabled and served by the plugin (no files involved), but the web server intercepts the request before WordPress runs. Add the matching rule to your server config — or send it to your hosting support — then re-scan.', 'aj-agent-crawl-optimizer' ),
 				'copyNginx'    => __( 'Copy nginx fix', 'aj-agent-crawl-optimizer' ),
 				'copyApache'   => __( 'Copy Apache .htaccess fix', 'aj-agent-crawl-optimizer' ),
@@ -204,7 +204,7 @@ function enqueue_dashboard_assets(): void {
 				// Fix sheet.
 				'improveReadiness' => __( 'Improve readiness', 'aj-agent-crawl-optimizer' ),
 				/* translators: %s: number of failing checks. Singular|plural. */
-				'issuesFound'      => __( '%s issue found|%s issues found', 'aj-agent-crawl-optimizer' ),
+				'issuesFound'      => __( '%1$s issue found|%1$s issues found', 'aj-agent-crawl-optimizer' ),
 				'oneClickFix'      => __( '(one-click fix)', 'aj-agent-crawl-optimizer' ),
 				/* translators: %s: number of one-click-fixable checks. */
 				'fixAllSafe'       => __( 'Fix all safe items (%s)', 'aj-agent-crawl-optimizer' ),

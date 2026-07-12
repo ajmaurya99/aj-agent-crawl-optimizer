@@ -1,10 +1,10 @@
 === AJ Agent Crawl Optimizer ===
 Contributors:      ajmaurya
 Tags:              ai, mcp, openapi, structured-data, llms-txt
-Requires at least: 5.5
+Requires at least: 5.6
 Tested up to:      7.0
 Requires PHP:      7.4
-Stable tag:        1.0.1
+Stable tag:        2.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,8 +13,6 @@ Agent-readiness scanner and fixer: audit 21 AI-agent standards, fix failures in 
 == Description ==
 
 **AJ Agent Crawl Optimizer** makes your site legible to AI agents — and, since 2.0, *proves* it. The built-in **readiness scanner** runs the same 21 checks as Cloudflare's isitagentready.com against your live site, grades you on the **Level 0–5 agent-readiness ladder** (Not Ready → Basic Web Presence → Bot-Aware → Agent-Readable → Agent-Integrated → Agent-Native), and shows the full evidence trail — every request and response — behind every verdict. Failing checks get a **Fix now** button that enables the right feature and re-scans that single check to prove it went green; anything the plugin can't fix in WordPress (DNS records, server config) gets a copy-paste prompt for your coding agent.
-
-**Release status:** the scanner described below is part of **2.0, currently in development on the `v2-dev` branch** (github.com/ajmaurya99/aj-agent-crawl-optimizer). The current stable release is the 1.0.x publishing toolkit described from "Discovery" onward.
 
 = The scan → fix → verify loop (new in 2.0) =
 
@@ -200,7 +198,7 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 
 == Changelog ==
 
-= 2.0.0-alpha (in development on the v2-dev branch; not yet released) =
+= 2.0.0 =
 * NEW: Built-in agent-readiness scanner — runs the same 21 checks as Cloudflare's isitagentready.com against your live site, with per-check evidence timelines (request/response snapshots) and the Level 0–5 maturity ladder with next-level guidance.
 * NEW: Dashboard under a top-level "Agent Ready" menu — segmented category gauge, Level badge, check cards with Fix now / Copy agent prompt / Audit details, and a bulk fix sheet.
 * NEW: One-click fixes with verification — 9 failing checks fixable in one click; the fixed check is re-scanned immediately to prove it passes.
@@ -246,6 +244,9 @@ Yes. Every feature is an independent toggle. Uncheck what you don't want and Sav
 * Translation-ready (.pot file shipped) and accessibility-ready (screen-reader h1, dynamic SVG aria-label, aria-live success announcements).
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+Major update: adds an agent-readiness scanner (21 checks, Level 0–5, evidence trails), one-click fixes, a curated llms.txt editor, REST API and WP-CLI. All features stay opt-in and your existing settings are preserved. The menu moves to a new top-level Agent Ready.
 
 = 1.0.1 =
 Spec-compliance fixes: Agent Skills index and MCP Server Card now validate against external agent-readiness scanners; markdown negotiation is cache-safe (Vary: Accept); OpenAPI at /openapi.json.

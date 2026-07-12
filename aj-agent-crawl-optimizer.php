@@ -3,8 +3,8 @@
  * Plugin Name:       AJ Agent Crawl Optimizer
  * Plugin URI:        https://github.com/ajmaurya99/aj-agent-crawl-optimizer
  * Description:       The agent-readiness scanner and fixer for WordPress — run the 21-check readiness scan (Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more.
- * Version:           2.0.0-alpha
- * Requires at least: 5.5
+ * Version:           2.0.0
+ * Requires at least: 5.6
  * Tested up to:      7.0
  * Requires PHP:      7.4
  * Author:            Ajay Maurya
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AJACO_VERSION', '2.0.0-alpha' );
+define( 'AJACO_VERSION', '2.0.0' );
 define( 'AJACO_FILE', __FILE__ );
 define( 'AJACO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AJACO_URL', plugin_dir_url( __FILE__ ) );

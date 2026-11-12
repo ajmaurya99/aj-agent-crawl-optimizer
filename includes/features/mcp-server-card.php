@@ -37,6 +37,34 @@ function handle_mcp_server_card_request(): void {
 	header( 'Content-Type: application/json; charset=utf-8' );
 
 	$api_url = rest_url( '/' );
+	$server  = detect_mcp_server();
+
+	if ( $server ) {
+		// A real MCP server is installed: advertise it, and say how to log in.
+		$transport    = array(
+			'type'     => 'streamable-http',
+			'endpoint' => $server['endpoint'],
+		);
+		$instructions = sprintf(
+			'%1$s — Model Context Protocol server (Streamable HTTP) at %2$s. Authenticate with WordPress Application Passwords over HTTP Basic; see %3$s. The REST API at %4$s is described by /.well-known/api-catalog and /openapi.json.',
+			$server['name'],
+			$server['endpoint'],
+			home_url( '/auth.md' ),
+			$api_url
+		);
+	} else {
+		// No MCP wire-protocol server on this site. The card still identifies
+		// the site to MCP-aware agents, and says plainly that the only machine
+		// interface is the REST API.
+		$transport    = array(
+			'type'     => 'streamable-http',
+			'endpoint' => $api_url,
+		);
+		$instructions = sprintf(
+			'This WordPress site does not run an MCP server. Its machine interface is the REST API at %s: discover endpoints via /.well-known/api-catalog or fetch the OpenAPI spec at /openapi.json.',
+			$api_url
+		);
+	}
 
 	$server_card = array(
 		'serverInfo'      => array(
@@ -46,29 +74,23 @@ function handle_mcp_server_card_request(): void {
 			'websiteUrl'  => home_url( '/' ),
 		),
 		'protocolVersion' => '2025-06-18',
-		'transport'       => array(
-			'type'     => 'streamable-http',
-			'endpoint' => $api_url,
-		),
+		'transport'       => $transport,
 		'capabilities'    => array(
 			'resources' => (object) array(),
 			'tools'     => (object) array(),
 		),
-		'instructions'    => sprintf(
-			'WordPress site exposing a REST API at %s. Discover endpoints via /.well-known/api-catalog or fetch the OpenAPI spec at /openapi.json.',
-			$api_url
-		),
+		'instructions'    => $instructions,
 	);
 
 	/**
 	 * Filter the MCP server card before serialization.
 	 *
 	 * The card follows SEP-1649/SEP-2127 structure (`serverInfo`, `transport`
-	 * with an `endpoint`, `capabilities`). Note: vanilla WP does not speak the
-	 * MCP wire protocol — the advertised endpoint is the REST API root and the
-	 * capability objects are empty. Plugins that run a real MCP server (e.g.
-	 * the official WordPress MCP Adapter) should override `transport.endpoint`
-	 * and populate `capabilities` here.
+	 * with an `endpoint`, `capabilities`). When the WordPress MCP Adapter (or
+	 * any plugin registering routes under the `mcp` REST namespace) is active
+	 * the endpoint is its real server; otherwise it is the REST API root and
+	 * the instructions say so. Use `ajaco_mcp_endpoint` to declare a server
+	 * this plugin cannot detect, and this filter to populate `capabilities`.
 	 *
 	 * @param array $server_card
 	 */

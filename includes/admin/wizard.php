@@ -64,6 +64,9 @@ function recommended_settings(): array {
 		'ajaco_webmcp_enabled'             => true,
 		// Discovery/auth — on: a truthful, static document.
 		'ajaco_auth_md_enabled'            => true,
+		'ajaco_ai_catalog_enabled'         => true,
+		'ajaco_sitemap_lastmod_enabled'    => true,
+		'ajaco_meta_tags_enabled'          => ! $seo_active,
 		// Declarations — on.
 		'ajaco_content_signals_enabled'    => true,
 		'ajaco_ai_bot_rules_enabled'       => true,
@@ -174,11 +177,14 @@ function render_wizard(): void {
 		array( 'discovery', __( 'llms.txt', 'aj-agent-crawl-optimizer' ), 'ajaco_llms_txt_enabled', __( 'A curated, LLM-readable index at /llms.txt (per llmstxt.org).', 'aj-agent-crawl-optimizer' ) ),
 		array( 'discovery', __( 'IndexNow', 'aj-agent-crawl-optimizer' ), 'ajaco_indexnow_enabled', __( 'Pings Bing/Yandex on publish. Requires a key from bing.com/webmasters/indexnow — leave off for now and configure later.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'discovery', __( 'auth.md', 'aj-agent-crawl-optimizer' ), 'ajaco_auth_md_enabled', __( '/auth.md documenting Application Password authentication for agents.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'AI Catalog', 'aj-agent-crawl-optimizer' ), 'ajaco_ai_catalog_enabled', __( '/.well-known/ard.json (and ai-catalog.json) listing every enabled agent-facing endpoint, linked from every page.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'discovery', __( 'Sitemap lastmod', 'aj-agent-crawl-optimizer' ), 'ajaco_sitemap_lastmod_enabled', __( 'Adds <lastmod> dates to the WordPress core sitemap so crawlers know what changed.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'Markdown Negotiation', 'aj-agent-crawl-optimizer' ), 'ajaco_markdown_enabled', __( 'Returns clean Markdown when an agent sends Accept: text/markdown. Browsers are unaffected.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'JSON-LD Schema', 'aj-agent-crawl-optimizer' ), 'ajaco_json_ld_enabled', __( 'WebSite, Organization, Article, BreadcrumbList, FAQPage structured data.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'Identity meta tags', 'aj-agent-crawl-optimizer' ), 'ajaco_meta_tags_enabled', __( 'Canonical link and Open Graph basics (og:type, og:image, og:title, og:url). Auto-suppressed when an SEO plugin is active.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'presentation', __( 'OpenAPI Spec', 'aj-agent-crawl-optimizer' ), 'ajaco_openapi_enabled', __( 'OpenAPI 3.0.3 document at /openapi.json, generated from REST routes.', 'aj-agent-crawl-optimizer' ) ),
-		array( 'presentation', __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'ajaco_webmcp_enabled', __( 'Frontend script registering tools via navigator.modelContext (Chrome experimental).', 'aj-agent-crawl-optimizer' ) ),
-		array( 'declarations', __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ), 'ajaco_ai_bot_rules_enabled', __( 'Explicit robots.txt User-agent groups for the 15 AI crawlers scanners check.', 'aj-agent-crawl-optimizer' ) ),
+		array( 'presentation', __( 'WebMCP Tools', 'aj-agent-crawl-optimizer' ), 'ajaco_webmcp_enabled', __( 'Frontend script registering four read-only tools via document.modelContext (W3C WebMCP draft, Chrome origin trial).', 'aj-agent-crawl-optimizer' ) ),
+		array( 'declarations', __( 'AI Bot Rules', 'aj-agent-crawl-optimizer' ), 'ajaco_ai_bot_rules_enabled', __( 'Explicit robots.txt User-agent groups for 20 AI crawlers, each allowed or blocked per your policy.', 'aj-agent-crawl-optimizer' ) ),
 		array( 'declarations', __( 'Content-Signals', 'aj-agent-crawl-optimizer' ), 'ajaco_content_signals_enabled', __( 'Adds a Content-Signal directive to robots.txt declaring AI-usage preferences.', 'aj-agent-crawl-optimizer' ) ),
 	);
 

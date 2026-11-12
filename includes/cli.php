@@ -47,11 +47,18 @@ class Agent_Ready_Command {
 	 *   - agent
 	 * ---
 	 *
+	 * [--min-score=<n>]
+	 * : Exit non-zero when the 0-100 score is below n (CI gate).
+	 *
+	 * [--min-level=<n>]
+	 * : Exit non-zero when the readiness Level is below n (0-5).
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp agent-ready scan
 	 *     wp agent-ready scan --format=agent
 	 *     wp agent-ready scan --checks=robotsTxt,sitemap --format=json
+	 *     wp agent-ready scan --min-score=70 --quiet
 	 *
 	 * @param array $args       Positional args (unused).
 	 * @param array $assoc_args Named args.
@@ -79,6 +86,7 @@ class Agent_Ready_Command {
 		$scan    = $scanner->run( $enabled );
 
 		$this->output_scan( $scan, $format );
+		$this->enforce_thresholds( $scan, $assoc_args );
 	}
 
 	/**
@@ -92,6 +100,12 @@ class Agent_Ready_Command {
 	 * default: summary
 	 * ---
 	 *
+	 * [--min-score=<n>]
+	 * : Exit non-zero when the stored 0-100 score is below n.
+	 *
+	 * [--min-level=<n>]
+	 * : Exit non-zero when the stored readiness Level is below n (0-5).
+	 *
 	 * @param array $args       Positional args (unused).
 	 * @param array $assoc_args Named args.
 	 * @return void
@@ -103,6 +117,32 @@ class Agent_Ready_Command {
 			\WP_CLI::error( 'No scan stored yet. Run: wp agent-ready scan' );
 		}
 		$this->output_scan( $scan, isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'summary' );
+		$this->enforce_thresholds( $scan, $assoc_args );
+	}
+
+	/**
+	 * CI gate: exit 1 when the scan is below --min-score / --min-level.
+	 *
+	 * @param array $scan       Scan array.
+	 * @param array $assoc_args Named args.
+	 * @return void
+	 */
+	private function enforce_thresholds( array $scan, array $assoc_args ): void {
+		$score = isset( $scan['score']['score'] ) ? (int) $scan['score']['score'] : 0;
+		$level = isset( $scan['level'] ) ? (int) $scan['level'] : 0;
+
+		if ( isset( $assoc_args['min-score'] ) && '' !== $assoc_args['min-score'] ) {
+			$min = (int) $assoc_args['min-score'];
+			if ( $score < $min ) {
+				\WP_CLI::error( sprintf( 'Score %d is below the required minimum of %d.', $score, $min ) );
+			}
+		}
+		if ( isset( $assoc_args['min-level'] ) && '' !== $assoc_args['min-level'] ) {
+			$min = (int) $assoc_args['min-level'];
+			if ( $level < $min ) {
+				\WP_CLI::error( sprintf( 'Level %d is below the required minimum of %d.', $level, $min ) );
+			}
+		}
 	}
 
 	/**
@@ -158,6 +198,12 @@ class Agent_Ready_Command {
 		$scanner = new Scanner();
 		foreach ( $targets as $id ) {
 			if ( ! Fix_Registry::can_fix( $id ) ) {
+				$link = Fix_Registry::link_fix( $id );
+				if ( null !== $link ) {
+					\WP_CLI::log( "$id: manual step — " . $link['label'] . ': ' . $link['url'] );
+					\WP_CLI::log( '  ' . $link['note'] );
+					continue;
+				}
 				if ( ! $all_safe ) {
 					// Explicit single target: hard error (exit 1) so scripted
 					// fleet usage can detect the failure.
@@ -205,7 +251,8 @@ class Agent_Ready_Command {
 		}
 
 		\WP_CLI::log( '' );
-		\WP_CLI::log( sprintf( 'Level %d — %s   (%s)', $scan['level'], $scan['levelName'], $scan['url'] ) );
+		\WP_CLI::log( $this->score_line( $scan ) . '   (' . $scan['url'] . ')' );
+		\WP_CLI::log( sprintf( 'Level %d — %s', $scan['level'], $scan['levelName'] ) );
 		\WP_CLI::log( sprintf( 'Scored checks passed: %d/%d', $scan['scores']['passed'], $scan['scores']['total'] ) );
 		\WP_CLI::log( '' );
 
@@ -241,7 +288,8 @@ class Agent_Ready_Command {
 	 */
 	private function agent_report( array $scan ): string {
 		$out  = '# Site Analysis: ' . $scan['url'] . "\n\n";
-		$out .= 'Score: ' . $scan['level'] . '/5 (' . $scan['levelName'] . ")\n\n";
+		$out .= $this->score_line( $scan ) . "\n";
+		$out .= 'Level: ' . $scan['level'] . '/5 (' . $scan['levelName'] . ")\n\n";
 
 		$failing = array();
 		foreach ( $scan['checks'] as $cat_checks ) {
@@ -266,6 +314,8 @@ class Agent_Ready_Command {
 			}
 			if ( Fix_Registry::can_fix( $id ) ) {
 				$out .= 'One-click fix: wp agent-ready fix ' . $id . "\n";
+			} elseif ( null !== Fix_Registry::link_fix( $id ) ) {
+				$out .= 'Manual step: ' . Fix_Registry::link_fix( $id )['label'] . ' — ' . Fix_Registry::link_fix( $id )['url'] . "\n";
 			}
 			if ( '' !== $info['skillUrl'] ) {
 				$out .= 'Implementation guide: ' . $info['skillUrl'] . "\n";
@@ -273,6 +323,24 @@ class Agent_Ready_Command {
 			$out .= "\n";
 		}
 		return $out;
+	}
+
+	/**
+	 * "Score: 74/100 (B — Competitive)" for a scan; tolerates scans stored
+	 * before the score model existed.
+	 *
+	 * @param array $scan Scan array.
+	 * @return string
+	 */
+	private function score_line( array $scan ): string {
+		if ( ! isset( $scan['score']['score'] ) ) {
+			return 'Score: n/a (re-scan to compute)';
+		}
+		$s = $scan['score'];
+		if ( '' === $s['grade'] ) {
+			return 'Score: n/a (no scored checks ran)';
+		}
+		return sprintf( 'Score: %d/100 (%s — %s)', $s['score'], $s['grade'], $s['gradeLabel'] );
 	}
 }
 

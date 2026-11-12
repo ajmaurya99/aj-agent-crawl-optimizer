@@ -55,6 +55,11 @@ function ajaco_uninstall_cleanup() {
 		'ajaco_llms_txt_enabled',
 		'ajaco_ai_bot_rules_enabled',
 		'ajaco_auth_md_enabled',
+		'ajaco_ai_catalog_enabled',
+		'ajaco_sitemap_lastmod_enabled',
+		'ajaco_meta_tags_enabled',
+		'ajaco_badge_enabled',
+		'ajaco_org_schema',
 		'ajaco_ai_bot_policy',
 		'ajaco_content_signal_prefs',
 		'ajaco_indexnow_key',
@@ -63,6 +68,7 @@ function ajaco_uninstall_cleanup() {
 		'ajaco_wizard_done',
 		// v2: the stored self-scan result.
 		'ajaco_last_scan',
+		'ajaco_scan_history',
 		// v2: the llms.txt curation config (sections, intro, custom markdown).
 		'ajaco_llms_config',
 	);
@@ -77,6 +83,7 @@ function ajaco_uninstall_cleanup() {
 	$transients = array(
 		'ajaco_reset_notice',
 		'ajaco_openapi_cache',
+		'ajaco_external_scores',
 		'ajaco_llms_txt_cache',
 		'ajaco_llms_full_txt_cache',
 		// Pre-1.0.1 installs stored wizard state in transients.

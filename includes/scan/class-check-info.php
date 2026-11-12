@@ -77,13 +77,13 @@ class Check_Info {
 			),
 			'markdownNegotiation'    => array(
 				'description' => __( 'Return HTML responses as markdown when agents request it', 'aj-agent-crawl-optimizer' ),
-				'specUrls'    => array( 'https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/' ),
+				'specUrls'    => array( 'https://www.rfc-editor.org/rfc/rfc9110#section-12.5.1', 'https://agentready.org/' ),
 				'prompt'      => 'Serve a markdown representation when a request includes Accept: text/markdown, with Content-Type: text/markdown and a Vary: Accept header. HTML stays the default for browsers.',
 				'skillUrl'    => self::SKILL_BASE . '/markdown-negotiation/SKILL.md',
 			),
 			'robotsTxtAiRules'       => array(
 				'description' => __( 'Add User-agent rules for AI crawlers like GPTBot and Claude-Web', 'aj-agent-crawl-optimizer' ),
-				'specUrls'    => array( 'https://www.rfc-editor.org/rfc/rfc9309', 'https://developers.cloudflare.com/ai-crawl-control/' ),
+				'specUrls'    => array( 'https://www.rfc-editor.org/rfc/rfc9309' ),
 				'prompt'      => 'Add explicit User-agent entries for AI crawlers (GPTBot, Claude-Web, Google-Extended, PerplexityBot, CCBot, …) with allow/disallow rules that match your policy.',
 				'skillUrl'    => self::SKILL_BASE . '/ai-rules/SKILL.md',
 			),
@@ -95,7 +95,7 @@ class Check_Info {
 			),
 			'webBotAuth'             => array(
 				'description' => __( 'Let your site identify itself as a bot with Web Bot Auth', 'aj-agent-crawl-optimizer' ),
-				'specUrls'    => array( 'https://datatracker.ietf.org/wg/webbotauth/about/', 'https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/' ),
+				'specUrls'    => array( 'https://datatracker.ietf.org/wg/webbotauth/about/', 'https://datatracker.ietf.org/doc/draft-meunier-web-bot-auth-architecture/' ),
 				'prompt'      => 'Publish a JWKS at /.well-known/http-message-signatures-directory so your site can identify itself when it sends bot or agent requests.',
 				'skillUrl'    => self::SKILL_BASE . '/web-bot-auth/SKILL.md',
 			),
@@ -144,7 +144,7 @@ class Check_Info {
 			'webMcp'                 => array(
 				'description' => __( 'Support WebMCP to expose site tools to AI agents via the browser', 'aj-agent-crawl-optimizer' ),
 				'specUrls'    => array( 'https://webmachinelearning.github.io/webmcp/', 'https://developer.chrome.com/blog/webmcp-epp' ),
-				'prompt'      => 'Implement the WebMCP API by registering tools on navigator.modelContext with a name, description, inputSchema (JSON Schema), and an execute callback.',
+				'prompt'      => 'Implement the WebMCP API: call document.modelContext.registerTool() for each tool with a name, description, inputSchema (JSON Schema), an execute callback, and annotations (readOnlyHint for read-only tools, consequentialHint for actions that need confirmation).',
 				'skillUrl'    => self::SKILL_BASE . '/webmcp/SKILL.md',
 			),
 			'x402'                   => array(
@@ -175,6 +175,81 @@ class Check_Info {
 				'description' => __( 'AP2 agent payments (requires an A2A Agent Card)', 'aj-agent-crawl-optimizer' ),
 				'specUrls'    => array(),
 				'prompt'      => '',
+				'skillUrl'    => '',
+			),
+
+			// Checks added in 2.1 — modelled on the ora.ai / is-agentic.com
+			// catalog and the AgentReady.org standard; no Cloudflare skill.
+			'sitemapLastmod'         => array(
+				'description' => __( 'Include <lastmod> dates in the sitemap so crawlers know what changed', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://www.sitemaps.org/protocol.html#lastmoddef' ),
+				'prompt'      => 'Add a <lastmod> element (W3C datetime) to every <url> in the sitemap from the content\'s modification date. For WordPress core sitemaps, filter wp_sitemaps_posts_entry and set $entry["lastmod"] from $post->post_modified_gmt.',
+				'skillUrl'    => '',
+			),
+			'metadata'               => array(
+				'description' => __( 'Declare page identity: html lang, canonical URL, og:type and og:image', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://ogp.me/', 'https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls' ),
+				'prompt'      => 'In the document head output <link rel="canonical">, <meta property="og:type">, <meta property="og:image"> (site logo or featured image) and ensure <html lang="…"> is set. If an SEO plugin is active, enable its Open Graph output instead of adding duplicate tags.',
+				'skillUrl'    => '',
+			),
+			'organizationSchema'     => array(
+				'description' => __( 'Give the Organization schema sameAs profiles and a contact point or address', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://schema.org/Organization', 'https://schema.org/ContactPoint' ),
+				'prompt'      => 'In the homepage JSON-LD Organization node add sameAs (array of official profile URLs: LinkedIn, GitHub, Wikidata, X), a contactPoint (ContactPoint with contactType and email or telephone) and, where applicable, a PostalAddress. Keep the same facts visible as text on the contact/about pages.',
+				'skillUrl'    => '',
+			),
+			'trustPages'             => array(
+				'description' => __( 'Publish real privacy, about and contact pages', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://agentready.org/' ),
+				'prompt'      => 'Create and publish a Privacy Policy page and select it under Settings → Privacy, plus an About and/or Contact page (slugs /about, /contact) linked from the site footer.',
+				'skillUrl'    => '',
+			),
+			'markdownAlternate'      => array(
+				'description' => __( 'Advertise the Markdown version of each page with rel="alternate" type="text/markdown"', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://agentready.org/', 'https://www.rfc-editor.org/rfc/rfc8288' ),
+				'prompt'      => 'Add <link rel="alternate" type="text/markdown" href="<page url>"> to the head of every page and a matching Link response header; the href must return text/markdown when requested with Accept: text/markdown.',
+				'skillUrl'    => '',
+			),
+			'markdownFrontmatter'    => array(
+				'description' => __( 'Open served Markdown with a frontmatter metadata block', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://agentready.org/' ),
+				'prompt'      => 'Prefix every Markdown response with a YAML frontmatter block (--- … ---) carrying at least title and url, plus modified and site where known.',
+				'skillUrl'    => '',
+			),
+			'agentFriendly404'       => array(
+				'description' => __( 'Return real 404s, as Markdown when an agent asks for it', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://agentready.org/' ),
+				'prompt'      => 'Missing paths must return HTTP 404 (or 410), never 200. When the request carries Accept: text/markdown, serve the error page as text/markdown with a short explanation and links to the homepage and llms.txt.',
+				'skillUrl'    => '',
+			),
+			'contentNoJs'            => array(
+				'description' => __( 'Serve the homepage content in raw HTML without JavaScript', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://agentready.org/' ),
+				'prompt'      => 'Server-render (or prerender) the homepage so at least 500 characters of meaningful text, a single <h1>, and a <main> landmark are present in the initial HTML without executing JavaScript.',
+				'skillUrl'    => '',
+			),
+			'llmsTxt'                => array(
+				'description' => __( 'Publish a well-formed /llms.txt whose links resolve', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://llmstxt.org/' ),
+				'prompt'      => 'Serve /llms.txt as text/markdown: an H1 with the site name, a blockquote summary, and H2 sections of described Markdown links to key pages. Every link must return 200.',
+				'skillUrl'    => '',
+			),
+			'robotsAgentUserPolicy'  => array(
+				'description' => __( 'Allow user-request agents (ChatGPT-User, Claude-User, Perplexity-User) in robots.txt', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://www.rfc-editor.org/rfc/rfc9309', 'https://agentready.org/' ),
+				'prompt'      => 'Make sure no robots.txt group that applies to ChatGPT-User, Claude-User or Perplexity-User contains Disallow: /. Blocking training crawlers (GPTBot, ClaudeBot, CCBot) is fine; user-fetch agents must stay allowed or answer engines cannot cite the site.',
+				'skillUrl'    => '',
+			),
+			'mcpServer'              => array(
+				'description' => __( 'Run a Model Context Protocol server so agents can act on the site, not just read it', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://modelcontextprotocol.io/specification/latest', 'https://wordpress.org/plugins/mcp-adapter/', 'https://agentready.org/' ),
+				'prompt'      => 'Install and activate the official WordPress MCP Adapter plugin (slug mcp-adapter, WordPress 6.9+). It serves a Streamable HTTP MCP server at /wp-json/mcp/mcp-adapter-default-server, authenticated with Application Passwords, exposing the site\'s Abilities as tools. Then re-scan: the server card, catalogs, llms.txt and auth.md pick the endpoint up automatically.',
+				'skillUrl'    => '',
+			),
+			'aiCatalog'              => array(
+				'description' => __( 'Publish an agent resource catalog (ARD / AI Catalog) at /.well-known/ard.json', 'aj-agent-crawl-optimizer' ),
+				'specUrls'    => array( 'https://github.com/Agent-Card/ai-catalog', 'https://agentready.org/' ),
+				'prompt'      => 'Serve /.well-known/ard.json (and the predecessor /.well-known/ai-catalog.json) as JSON with specVersion "1.0" and an entries array; each entry has identifier, type (media type) and url for an agent-facing artifact (MCP server card, agent skills index, OpenAPI, llms.txt). Link it from the homepage with <link rel="ard"> and <link rel="ai-catalog">.',
 				'skillUrl'    => '',
 			),
 		);

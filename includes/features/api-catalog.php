@@ -72,6 +72,26 @@ function handle_api_catalog_request(): void {
 
 	$linkset = array( $entry );
 
+	// A real MCP server gets its own anchor so API-catalog consumers see it.
+	$mcp = detect_mcp_server();
+	if ( $mcp ) {
+		$linkset[] = array(
+			'anchor'      => $mcp['endpoint'],
+			'service-doc' => array(
+				array(
+					'href' => is_feature_enabled( 'auth_md' ) ? home_url( '/auth.md' ) : 'https://wordpress.org/plugins/mcp-adapter/',
+					'type' => is_feature_enabled( 'auth_md' ) ? 'text/markdown' : 'text/html',
+				),
+			),
+			'status'      => array(
+				array(
+					'href' => rest_url( 'ajaco/v1/health' ),
+					'type' => 'application/json',
+				),
+			),
+		);
+	}
+
 	/**
 	 * Filter the RFC 9727 linkset before it's serialized.
 	 *

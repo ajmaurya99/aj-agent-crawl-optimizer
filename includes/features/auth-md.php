@@ -94,6 +94,15 @@ function build_auth_md(): string {
 	$out .= 'The account owner can revoke an Application Password at any time by deleting it from the same '
 		. "Application Passwords section of the profile screen ({$profile_url}). Revocation takes effect immediately.\n\n";
 
+	$mcp = detect_mcp_server();
+	if ( $mcp ) {
+		$mcp_url = esc_url_raw( $mcp['endpoint'] );
+		$out    .= "## MCP server\n\n";
+		$out    .= "This site also runs a Model Context Protocol server (Streamable HTTP) at {$mcp_url}. "
+			. 'It accepts the same Application Password over HTTP Basic: send `Authorization: Basic <base64 user:app-password>` '
+			. "with each JSON-RPC request. Unauthenticated requests receive HTTP 401.\n\n";
+	}
+
 	$out .= "REST API root: {$rest_url}\n";
 
 	/**

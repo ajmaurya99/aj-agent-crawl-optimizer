@@ -3,9 +3,10 @@
  * Scan check: WebMCP (W3C WebMCP draft / Chrome EPP).
  *
  * The external scanner loads the page in a real browser and observes
- * navigator.modelContext tool registrations. No browser is available
+ * document.modelContext tool registrations. No browser is available
  * server-side, so this check applies a static heuristic instead: it searches
- * the homepage HTML for `navigator.modelContext` usage and for same-origin
+ * the homepage HTML for `modelContext` usage (document.modelContext, or the
+ * earlier navigator.modelContext preview) and for same-origin
  * script URLs containing "webmcp" (fetching up to two of those scripts and
  * searching their bodies). A pass therefore means "WebMCP indicators found",
  * not "registration observed".
@@ -66,7 +67,7 @@ class Check_Web_Mcp extends Check {
 		$evidence[] = Evidence::parse(
 			'Static WebMCP heuristic',
 			'neutral',
-			'This server-side scanner cannot execute JavaScript, so it searches the page source for navigator.modelContext usage and same-origin webmcp scripts — a static approximation of the external scanner\'s real-browser detection.'
+			'This server-side scanner cannot execute JavaScript, so it searches the page source for document.modelContext / navigator.modelContext usage and same-origin webmcp scripts — a static approximation of the external scanner\'s real-browser detection.'
 		);
 
 		$r = $this->http_get( $this->origin() . '/', 'GET / (homepage HTML)', $evidence );
@@ -75,11 +76,11 @@ class Check_Web_Mcp extends Check {
 			return $this->unable( 'Could not reach the homepage — ' . $r['error'], $evidence );
 		}
 
-		// Indicator 1: navigator.modelContext in the page source (inline scripts).
-		if ( false !== strpos( $r['body'], 'navigator.modelContext' ) ) {
-			$evidence[] = Evidence::parse( 'Search inline scripts', 'positive', 'Found `navigator.modelContext` in the page source.' );
+		// Indicator 1: modelContext in the page source (inline scripts).
+		if ( $this->mentions_model_context( $r['body'] ) ) {
+			$evidence[] = Evidence::parse( 'Search inline scripts', 'positive', 'Found a `modelContext` registration reference in the page source.' );
 			return $this->pass(
-				'WebMCP indicator found: navigator.modelContext appears in the page source (detected via static heuristic — registration confirmed only by a browser-based scan)',
+				'WebMCP indicator found: modelContext appears in the page source (detected via static heuristic — registration confirmed only by a browser-based scan)',
 				$evidence,
 				array(
 					'heuristic' => true,
@@ -88,7 +89,7 @@ class Check_Web_Mcp extends Check {
 			);
 		}
 
-		$evidence[] = Evidence::parse( 'Search inline scripts', 'neutral', 'No `navigator.modelContext` reference in the page source.' );
+		$evidence[] = Evidence::parse( 'Search inline scripts', 'neutral', 'No `modelContext` reference in the page source.' );
 
 		// Indicator 2: same-origin script src URLs containing "webmcp".
 		$srcs = $this->find_webmcp_script_srcs( $r['body'] );
@@ -122,17 +123,17 @@ class Check_Web_Mcp extends Check {
 				continue;
 			}
 
-			if ( false !== strpos( $sr['body'], 'navigator.modelContext' ) ) {
+			if ( $this->mentions_model_context( $sr['body'] ) ) {
 				$confirmed  = true;
-				$evidence[] = Evidence::parse( 'Search script body', 'positive', 'Script body references `navigator.modelContext`.' );
+				$evidence[] = Evidence::parse( 'Search script body', 'positive', 'Script body references `modelContext` (registerTool / provideContext).' );
 				break;
 			}
 
-			$evidence[] = Evidence::parse( 'Search script body', 'neutral', 'Script fetched but its body has no `navigator.modelContext` reference.' );
+			$evidence[] = Evidence::parse( 'Search script body', 'neutral', 'Script fetched but its body has no `modelContext` reference.' );
 		}
 
 		$message = $confirmed
-			? 'WebMCP indicator found: a same-origin webmcp script references navigator.modelContext (detected via static heuristic — registration confirmed only by a browser-based scan)'
+			? 'WebMCP indicator found: a same-origin webmcp script references modelContext (detected via static heuristic — registration confirmed only by a browser-based scan)'
 			: 'WebMCP indicator found: same-origin webmcp script on the page (detected via static heuristic — registration confirmed only by a browser-based scan)';
 
 		return $this->pass(
@@ -143,6 +144,18 @@ class Check_Web_Mcp extends Check {
 				'indicator' => 'script',
 			)
 		);
+	}
+
+	/**
+	 * Whether a body references the WebMCP entry point: the current
+	 * document.modelContext.registerTool surface or the earlier
+	 * navigator.modelContext.provideContext preview.
+	 *
+	 * @param string $body HTML or JS.
+	 * @return bool
+	 */
+	private function mentions_model_context( string $body ): bool {
+		return (bool) preg_match( '/(document|navigator)\s*\.\s*modelContext|[\'"]modelContext[\'"]\s*in\s*document/', $body );
 	}
 
 	/**

@@ -88,16 +88,16 @@
   .ring{
     width:56px;height:56px;border-radius:50%;flex:none;
     background:
-      conic-gradient(from -90deg, var(--pass) 0turn .66turn, rgba(255,255,255,.10) .66turn 1turn);
+      conic-gradient(from -90deg, var(--pass) 0turn .89turn, rgba(255,255,255,.10) .89turn 1turn);
     display:flex;align-items:center;justify-content:center;
   }
   .ring i{
     width:42px;height:42px;border-radius:50%;background:#0f2418;
     display:flex;align-items:center;justify-content:center;
-    font-style:normal;font-size:16px;font-weight:800;color:var(--white);
+    font-style:normal;font-size:15px;font-weight:800;color:var(--white);letter-spacing:-.02em;
   }
-  .lvl-name{font-size:13px;font-weight:700;line-height:1.2}
-  .lvl-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .lvl-name{font-size:12.5px;font-weight:700;line-height:1.2;white-space:nowrap}
+  .lvl-sub{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap}
   .row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:3px 0;color:rgba(232,245,234,.86)}
   .tick{
     width:14px;height:14px;border-radius:50%;flex:none;background:var(--pass);
@@ -132,11 +132,11 @@
     </div>
     <div class="eyebrow">Is your site ready for AI agents?</div>
     <h1>Scan. Fix. <span class="accent">Verify.</span></h1>
-    <p class="tag">Audit your site against 21 agent-readiness standards, then fix what fails — in one click, with the proof to show for it.</p>
+    <p class="tag">Audit your site against 33 agent-readiness checks, then fix what fails — in one click, with the proof to show for it.</p>
     <div class="beats">
-      <span class="beat">21 checks</span>
+      <span class="beat">33 checks</span>
       <span class="arrow">→</span>
-      <span class="beat">Level 0–5</span>
+      <span class="beat">Score 0–100</span>
       <span class="arrow">→</span>
       <span class="beat">One-click fixes</span>
     </div>
@@ -144,17 +144,17 @@
 
   <div class="card">
     <div class="gauge">
-      <div class="ring"><i>L4</i></div>
+      <div class="ring"><i>89</i></div>
       <div>
-        <div class="lvl-name">Agent-Integrated</div>
-        <div class="lvl-sub">12 of 14 checks verified</div>
+        <div class="lvl-name">Agent-ready · Grade A</div>
+        <div class="lvl-sub">Level 4 · 20/26 checks verified</div>
       </div>
     </div>
     <div class="row"><span class="tick">✓</span><code>robots.txt</code></div>
     <div class="row"><span class="tick">✓</span><code>llms.txt</code></div>
     <div class="row"><span class="tick">✓</span><code>.well-known/*</code></div>
-    <div class="row"><span class="tick">✓</span><code>MCP server card</code></div>
-    <div class="row"><span class="tick warn">!</span><code>markdown</code><span class="fixnow">Fix now</span></div>
+    <div class="row"><span class="tick">✓</span><code>MCP server</code></div>
+    <div class="row"><span class="tick warn">!</span><code>og:image</code><span class="fixnow">Fix now</span></div>
   </div>
 </body>
 </html>

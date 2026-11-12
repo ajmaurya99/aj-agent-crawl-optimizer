@@ -27,6 +27,16 @@ class Scanner {
 	const LAST_SCAN_OPTION = 'ajaco_last_scan';
 
 	/**
+	 * Option storing the score history (one entry per full scan, newest last).
+	 */
+	const HISTORY_OPTION = 'ajaco_scan_history';
+
+	/**
+	 * Maximum number of history entries kept.
+	 */
+	const HISTORY_MAX = 30;
+
+	/**
 	 * Check ids hidden from the default preset (mirrors the external
 	 * scanner's "All Checks" behavior).
 	 *
@@ -43,17 +53,29 @@ class Scanner {
 		return array(
 			'robotsTxt'              => __NAMESPACE__ . '\\Checks\\Check_Robots_Txt',
 			'sitemap'                => __NAMESPACE__ . '\\Checks\\Check_Sitemap',
+			'sitemapLastmod'         => __NAMESPACE__ . '\\Checks\\Check_Sitemap_Lastmod',
 			'linkHeaders'            => __NAMESPACE__ . '\\Checks\\Check_Link_Headers',
+			'metadata'               => __NAMESPACE__ . '\\Checks\\Check_Metadata',
+			'trustPages'             => __NAMESPACE__ . '\\Checks\\Check_Trust_Pages',
+			'organizationSchema'     => __NAMESPACE__ . '\\Checks\\Check_Organization_Schema',
 			'dnsAid'                 => __NAMESPACE__ . '\\Checks\\Check_Dns_Aid',
 			'markdownNegotiation'    => __NAMESPACE__ . '\\Checks\\Check_Markdown_Negotiation',
+			'markdownAlternate'      => __NAMESPACE__ . '\\Checks\\Check_Markdown_Alternate',
+			'markdownFrontmatter'    => __NAMESPACE__ . '\\Checks\\Check_Markdown_Frontmatter',
+			'agentFriendly404'       => __NAMESPACE__ . '\\Checks\\Check_Agent_Friendly_404',
+			'contentNoJs'            => __NAMESPACE__ . '\\Checks\\Check_Content_No_Js',
+			'llmsTxt'                => __NAMESPACE__ . '\\Checks\\Check_Llms_Txt',
 			'robotsTxtAiRules'       => __NAMESPACE__ . '\\Checks\\Check_Robots_Txt_Ai_Rules',
+			'robotsAgentUserPolicy'  => __NAMESPACE__ . '\\Checks\\Check_Robots_Agent_User_Policy',
 			'contentSignals'         => __NAMESPACE__ . '\\Checks\\Check_Content_Signals',
 			'webBotAuth'             => __NAMESPACE__ . '\\Checks\\Check_Web_Bot_Auth',
 			'apiCatalog'             => __NAMESPACE__ . '\\Checks\\Check_Api_Catalog',
+			'aiCatalog'              => __NAMESPACE__ . '\\Checks\\Check_Ai_Catalog',
 			'oauthDiscovery'         => __NAMESPACE__ . '\\Checks\\Check_Oauth_Discovery',
 			'oauthProtectedResource' => __NAMESPACE__ . '\\Checks\\Check_Oauth_Protected_Resource',
 			'authMd'                 => __NAMESPACE__ . '\\Checks\\Check_Auth_Md',
 			'mcpServerCard'          => __NAMESPACE__ . '\\Checks\\Check_Mcp_Server_Card',
+			'mcpServer'              => __NAMESPACE__ . '\\Checks\\Check_Mcp_Server',
 			'a2aAgentCard'           => __NAMESPACE__ . '\\Checks\\Check_A2a_Agent_Card',
 			'agentSkills'            => __NAMESPACE__ . '\\Checks\\Check_Agent_Skills',
 			'webMcp'                 => __NAMESPACE__ . '\\Checks\\Check_Web_Mcp',
@@ -86,7 +108,7 @@ class Scanner {
 	}
 
 	/**
-	 * Default check ids for a full scan (19 — hidden ones excluded).
+	 * Default check ids for a full scan (hidden ones excluded).
 	 *
 	 * @return string[]
 	 */
@@ -163,6 +185,7 @@ class Scanner {
 			'levelName'       => isset( $names[ $level ] ) ? $names[ $level ] : '',
 			'checks'          => $categories,
 			'scores'          => $this->score_categories( $checks, $results ),
+			'score'           => Score::compute( $categories ),
 			'nextLevel'       => Level::next_level( $level, $statuses ),
 			'isCommerce'      => $is_commerce,
 			'commerceSignals' => $commerce['signals'],
@@ -172,6 +195,7 @@ class Scanner {
 		);
 
 		update_option( self::LAST_SCAN_OPTION, $scan, false );
+		$this->record_history( $scan );
 
 		return $scan;
 	}
@@ -226,6 +250,7 @@ class Scanner {
 		$stored['isCommerce']      = $commerce['is_commerce'];
 		$stored['commerceSignals'] = $commerce['signals'];
 		$stored['scores']          = $this->rescore_stored( $stored['checks'] );
+		$stored['score']           = Score::compute( $stored['checks'] );
 		// Single-check re-verify: recompute the checked-endpoint issues (they
 		// depend on the just-updated check results) but reuse the last full
 		// scan's live probes of the uncovered endpoints, so a fix doesn't fire
@@ -234,6 +259,9 @@ class Scanner {
 		$stored['hosting']         = Hosting_Diagnosis::analyze( $stored['checks'], false, $prior_hosting );
 
 		update_option( self::LAST_SCAN_OPTION, $stored, false );
+		// History records full scans only: a single-check re-verify changes
+		// the live score, and the dashboard shows that change against the
+		// last full scan until the next one is recorded.
 
 		return array(
 			'scan'  => $stored,
@@ -249,6 +277,42 @@ class Scanner {
 	public static function get_last_scan(): ?array {
 		$stored = get_option( self::LAST_SCAN_OPTION );
 		return is_array( $stored ) ? $stored : null;
+	}
+
+	/**
+	 * Score history: compact snapshots, oldest first (one per full scan).
+	 *
+	 * @return array<int, array{scannedAt: string, score: int, grade: string, level: int, passed: int, total: int}>
+	 */
+	public static function get_history(): array {
+		$history = get_option( self::HISTORY_OPTION );
+		return is_array( $history ) ? array_values( $history ) : array();
+	}
+
+	/**
+	 * Append a full scan's snapshot to the history.
+	 *
+	 * @param array $scan Scan array with `score`, `level`, `scores`.
+	 * @return void
+	 */
+	private function record_history( array $scan ): void {
+		$history = self::get_history();
+		$entry   = array(
+			'scannedAt' => isset( $scan['scannedAt'] ) ? (string) $scan['scannedAt'] : gmdate( 'c' ),
+			'score'     => isset( $scan['score']['score'] ) ? (int) $scan['score']['score'] : 0,
+			'grade'     => isset( $scan['score']['grade'] ) ? (string) $scan['score']['grade'] : '',
+			'level'     => isset( $scan['level'] ) ? (int) $scan['level'] : 0,
+			'passed'    => isset( $scan['scores']['passed'] ) ? (int) $scan['scores']['passed'] : 0,
+			'total'     => isset( $scan['scores']['total'] ) ? (int) $scan['scores']['total'] : 0,
+		);
+
+		$history[] = $entry;
+
+		if ( count( $history ) > self::HISTORY_MAX ) {
+			$history = array_slice( $history, -self::HISTORY_MAX );
+		}
+
+		update_option( self::HISTORY_OPTION, $history, false );
 	}
 
 	/**

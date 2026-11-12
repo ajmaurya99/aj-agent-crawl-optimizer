@@ -50,6 +50,10 @@ function render_settings_page(): void {
 	$llms_txt_enabled           = (bool) get_option( 'ajaco_llms_txt_enabled', false );
 	$ai_bot_rules_enabled       = (bool) get_option( 'ajaco_ai_bot_rules_enabled', false );
 	$auth_md_enabled            = (bool) get_option( 'ajaco_auth_md_enabled', false );
+	$ai_catalog_enabled         = (bool) get_option( 'ajaco_ai_catalog_enabled', false );
+	$sitemap_lastmod_enabled    = (bool) get_option( 'ajaco_sitemap_lastmod_enabled', false );
+	$meta_tags_enabled          = (bool) get_option( 'ajaco_meta_tags_enabled', false );
+	$badge_enabled              = (bool) get_option( 'ajaco_badge_enabled', false );
 	?>
 	<div class="wrap">
 		<h1 class="ajaco-screen-reader-text"><?php esc_html_e( 'Agent Ready Settings', 'aj-agent-crawl-optimizer' ); ?></h1>
@@ -115,6 +119,39 @@ function render_settings_page(): void {
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="auth-md"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php render_view_links( array( '/auth.md' ), $auth_md_enabled ); ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'AI Catalog', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_ai_catalog_enabled">
+							<input type="checkbox" id="ajaco_ai_catalog_enabled" name="ajaco_ai_catalog_enabled" value="1" <?php checked( $ai_catalog_enabled, true ); ?> />
+							<?php esc_html_e( 'Publish an agent resource catalog at /.well-known/ard.json (and /.well-known/ai-catalog.json) — one index of every agent-facing endpoint this plugin serves — linked from every page.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="ai-catalog"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/.well-known/ard.json', '/.well-known/ai-catalog.json' ), $ai_catalog_enabled ); ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Sitemap lastmod', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_sitemap_lastmod_enabled">
+							<input type="checkbox" id="ajaco_sitemap_lastmod_enabled" name="ajaco_sitemap_lastmod_enabled" value="1" <?php checked( $sitemap_lastmod_enabled, true ); ?> />
+							<?php esc_html_e( 'Add <lastmod> dates to the WordPress core sitemap (/wp-sitemap.xml) so crawlers and agents know what changed. No-op where core or an SEO plugin already provides them.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="sitemap-lastmod"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/wp-sitemap.xml' ), $sitemap_lastmod_enabled ); ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Public score badge', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_badge_enabled">
+							<input type="checkbox" id="ajaco_badge_enabled" name="ajaco_badge_enabled" value="1" <?php checked( $badge_enabled, true ); ?> />
+							<?php esc_html_e( 'Serve the score badge publicly at /agent-ready-badge.svg so it can be embedded on other sites or a README. The [agent_ready_badge] shortcode works on this site regardless.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="score-badge"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php render_view_links( array( '/agent-ready-badge.svg' ), $badge_enabled ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -231,6 +268,28 @@ function render_settings_page(): void {
 								?>
 							</p>
 						<?php endif; ?>
+						<?php render_org_schema_fields(); ?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Identity meta tags', 'aj-agent-crawl-optimizer' ); ?></th>
+					<td>
+						<label for="ajaco_meta_tags_enabled">
+							<input type="checkbox" id="ajaco_meta_tags_enabled" name="ajaco_meta_tags_enabled" value="1" <?php checked( $meta_tags_enabled, true ); ?> />
+							<?php esc_html_e( 'Output a canonical link on non-singular views and Open Graph basics (og:type, og:image, og:title, og:url, og:description) so agents can identify and cite pages.', 'aj-agent-crawl-optimizer' ); ?>
+						</label>
+						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="meta-tags"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
+						<?php if ( null !== active_seo_plugin() ) : ?>
+							<p class="description ajaco-warn">
+								<?php
+								printf(
+									/* translators: %s: SEO plugin display name. */
+									esc_html__( '%s is active and emits its own canonical and Open Graph tags, so this output is automatically suppressed regardless of this toggle.', 'aj-agent-crawl-optimizer' ),
+									'<strong>' . esc_html( (string) active_seo_plugin() ) . '</strong>'
+								);
+								?>
+							</p>
+						<?php endif; ?>
 					</td>
 				</tr>
 				<tr>
@@ -264,7 +323,7 @@ function render_settings_page(): void {
 					<td>
 						<label for="ajaco_ai_bot_rules_enabled">
 							<input type="checkbox" id="ajaco_ai_bot_rules_enabled" name="ajaco_ai_bot_rules_enabled" value="1" <?php checked( $ai_bot_rules_enabled, true ); ?> />
-							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for the 15 AI crawlers readiness scanners check for, using the per-bot policy below.', 'aj-agent-crawl-optimizer' ); ?>
+							<?php esc_html_e( 'Add explicit robots.txt User-agent groups for 20 AI crawlers (the 15 readiness scanners check for, plus the newer user-request and AI-search agents), using the per-bot policy below.', 'aj-agent-crawl-optimizer' ); ?>
 						</label>
 						<a class="ajaco-open-help ajaco-read-more" href="#" data-tab="ajaco-features" data-feature="ai-bot-rules"><?php esc_html_e( 'Read more', 'aj-agent-crawl-optimizer' ); ?></a>
 						<?php render_view_links( array( '/robots.txt' ), $ai_bot_rules_enabled ); ?>
@@ -340,11 +399,16 @@ function ajaco_settings_form_options(): array {
 		'ajaco_mcp_server_card_enabled',
 		'ajaco_agent_skills_index_enabled',
 		'ajaco_auth_md_enabled',
+		'ajaco_ai_catalog_enabled',
+		'ajaco_sitemap_lastmod_enabled',
+		'ajaco_badge_enabled',
 		'ajaco_llms_txt_enabled',
 		'ajaco_indexnow_enabled',
 		'ajaco_indexnow_key',
 		'ajaco_markdown_enabled',
 		'ajaco_json_ld_enabled',
+		'ajaco_org_schema',
+		'ajaco_meta_tags_enabled',
 		'ajaco_openapi_enabled',
 		'ajaco_webmcp_enabled',
 		'ajaco_ai_bot_rules_enabled',
@@ -428,6 +492,12 @@ function render_settings_level_banner(): void {
 	<div class="ajaco-level-banner">
 		<?php if ( is_array( $scan ) && isset( $scan['level'], $scan['levelName'] ) ) : ?>
 			<?php $level = (int) $scan['level']; ?>
+			<?php if ( isset( $scan['score']['grade'] ) && '' !== $scan['score']['grade'] ) : ?>
+				<span class="ajaco-score-pill">
+					<strong><?php echo esc_html( (string) (int) $scan['score']['score'] ); ?></strong>/100
+					<span class="ajaco-score-grade"><?php echo esc_html( $scan['score']['grade'] ); ?></span>
+				</span>
+			<?php endif; ?>
 			<span class="ajaco-level-pill" style="background: <?php echo esc_attr( isset( $colors[ $level ] ) ? $colors[ $level ] : '#8c8f94' ); ?>;">
 				<?php
 				/* translators: %d: readiness level 0-5. */
@@ -535,5 +605,43 @@ function render_content_signal_fields(): void {
 			<?php esc_html_e( 'Emitted as e.g. "Content-Signal: ai-train=no, search=yes, ai-input=no". A declaration of preference, not enforcement.', 'aj-agent-crawl-optimizer' ); ?>
 		</p>
 	</div>
+	<?php
+}
+
+/**
+ * Organization details that enrich the JSON-LD Organization node (sameAs,
+ * contact point, postal address). Rendered whether or not JSON-LD is on so
+ * a save never wipes them. Fields use one array option.
+ *
+ * @return void
+ */
+function render_org_schema_fields(): void {
+	$org    = org_schema_settings();
+	$field  = static function ( string $key, string $label, string $type = 'text', string $placeholder = '' ) use ( $org ): void {
+		$id = 'ajaco_org_' . $key;
+		echo '<label class="ajaco-org-field" for="' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span>';
+		echo '<input type="' . esc_attr( $type ) . '" id="' . esc_attr( $id ) . '" name="ajaco_org_schema[' . esc_attr( $key ) . ']" value="' . esc_attr( (string) ( $org[ $key ] ?? '' ) ) . '" placeholder="' . esc_attr( $placeholder ) . '" class="regular-text" /></label>';
+	};
+	?>
+	<details class="ajaco-org-schema" id="ajaco-org-schema" <?php echo ( ! empty( $org['same_as'] ) || '' !== $org['email'] || '' !== $org['street'] ) ? 'open' : ''; ?>>
+		<summary><?php esc_html_e( 'Organization details (sameAs, contact, address)', 'aj-agent-crawl-optimizer' ); ?></summary>
+		<p class="description"><?php esc_html_e( 'Agents and answer engines trust an organisation they can cross-reference and reach. These fields are added to the Organization node of the JSON-LD above.', 'aj-agent-crawl-optimizer' ); ?></p>
+		<label class="ajaco-org-field ajaco-org-field-wide" for="ajaco_org_same_as">
+			<span><?php esc_html_e( 'Official profiles (sameAs), one URL per line', 'aj-agent-crawl-optimizer' ); ?></span>
+			<textarea id="ajaco_org_same_as" name="ajaco_org_schema[same_as]" rows="3" class="large-text" placeholder="https://www.linkedin.com/company/example&#10;https://github.com/example&#10;https://www.wikidata.org/wiki/Q…"><?php echo esc_textarea( implode( "\n", (array) $org['same_as'] ) ); ?></textarea>
+		</label>
+		<div class="ajaco-org-grid">
+			<?php
+			$field( 'email', __( 'Contact email', 'aj-agent-crawl-optimizer' ), 'email', 'hello@example.com' );
+			$field( 'phone', __( 'Contact phone', 'aj-agent-crawl-optimizer' ), 'text', '+1 555 010 0000' );
+			$field( 'contact_type', __( 'Contact type', 'aj-agent-crawl-optimizer' ), 'text', 'customer service' );
+			$field( 'street', __( 'Street address', 'aj-agent-crawl-optimizer' ) );
+			$field( 'locality', __( 'City', 'aj-agent-crawl-optimizer' ) );
+			$field( 'region', __( 'Region / state', 'aj-agent-crawl-optimizer' ) );
+			$field( 'postal', __( 'Postal code', 'aj-agent-crawl-optimizer' ) );
+			$field( 'country', __( 'Country', 'aj-agent-crawl-optimizer' ) );
+			?>
+		</div>
+	</details>
 	<?php
 }

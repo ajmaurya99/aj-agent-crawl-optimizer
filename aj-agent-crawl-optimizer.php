@@ -2,10 +2,9 @@
 /**
  * Plugin Name:       AJ Agent Crawl Optimizer – AI Readiness Scanner & llms.txt for WordPress
  * Plugin URI:        https://github.com/ajmaurya99/aj-agent-crawl-optimizer
- * Description:       The agent-readiness scanner and fixer for WordPress — run the 21-check readiness scan (Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more.
- * Version:           2.0.0
+ * Description:       The agent-readiness scanner and fixer for WordPress — run the 33-check readiness scan (0-100 score, grade, Level 0-5) with evidence, fix failures in one click, and publish Markdown negotiation, llms.txt, MCP server card, agent skills, AI bot rules, and more.
+ * Version:           2.1.0
  * Requires at least: 5.6
- * Tested up to:      7.0
  * Requires PHP:      7.4
  * Author:            Ajay Maurya
  * Author URI:        https://x.com/aalootechie
@@ -21,13 +20,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AJACO_VERSION', '2.0.0' );
+define( 'AJACO_VERSION', '2.1.0' );
 define( 'AJACO_FILE', __FILE__ );
 define( 'AJACO_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AJACO_URL', plugin_dir_url( __FILE__ ) );
 
 // Shared helpers.
 require_once AJACO_DIR . 'includes/helpers.php';
+require_once AJACO_DIR . 'includes/features/mcp-server.php';
 
 // Feature handlers — each file registers its own hooks and gates on its toggle.
 require_once AJACO_DIR . 'includes/features/markdown-negotiation.php';
@@ -44,6 +44,11 @@ require_once AJACO_DIR . 'includes/features/llms-txt.php';
 require_once AJACO_DIR . 'includes/features/llms-editor.php';
 require_once AJACO_DIR . 'includes/features/ai-bot-rules.php';
 require_once AJACO_DIR . 'includes/features/auth-md.php';
+require_once AJACO_DIR . 'includes/features/ai-catalog.php';
+require_once AJACO_DIR . 'includes/features/sitemap-lastmod.php';
+require_once AJACO_DIR . 'includes/features/meta-tags.php';
+require_once AJACO_DIR . 'includes/features/discovery-links.php';
+require_once AJACO_DIR . 'includes/features/badge.php';
 
 // Scan engine — self-scan with evidence, Level 0-5 ladder, one-click fixes.
 require_once AJACO_DIR . 'includes/scan/class-check-result.php';
@@ -51,9 +56,11 @@ require_once AJACO_DIR . 'includes/scan/class-evidence.php';
 require_once AJACO_DIR . 'includes/scan/class-check.php';
 require_once AJACO_DIR . 'includes/scan/class-check-info.php';
 require_once AJACO_DIR . 'includes/scan/class-level.php';
+require_once AJACO_DIR . 'includes/scan/class-score.php';
 require_once AJACO_DIR . 'includes/scan/class-scanner.php';
 require_once AJACO_DIR . 'includes/scan/class-fix-registry.php';
 require_once AJACO_DIR . 'includes/scan/class-hosting-diagnosis.php';
+require_once AJACO_DIR . 'includes/scan/class-external-scanners.php';
 $ajaco_check_files = glob( AJACO_DIR . 'includes/scan/checks/class-check-*.php' );
 if ( is_array( $ajaco_check_files ) ) {
 	foreach ( $ajaco_check_files as $ajaco_check_file ) {

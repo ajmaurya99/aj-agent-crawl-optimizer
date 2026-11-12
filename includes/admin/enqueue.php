@@ -16,6 +16,7 @@ namespace Ajaco;
 use Ajaco\Scan\Check_Info;
 use Ajaco\Scan\Fix_Registry;
 use Ajaco\Scan\Scanner;
+use Ajaco\Scan\Score;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -117,6 +118,7 @@ function enqueue_dashboard_assets(): void {
 	foreach ( $checks as $id => $check ) {
 		$info        = Check_Info::get( $id );
 		$fixes       = Fix_Registry::all();
+		$weight      = Score::weight( $id );
 		$meta[ $id ] = array(
 			'name'        => $check->get_name(),
 			'category'    => $check->get_category(),
@@ -127,6 +129,9 @@ function enqueue_dashboard_assets(): void {
 			'fixable'     => isset( $fixes[ $id ] ),
 			'fixLabel'    => isset( $fixes[ $id ] ) ? $fixes[ $id ]['label'] : '',
 			'fixNote'     => isset( $fixes[ $id ] ) ? $fixes[ $id ]['note'] : '',
+			'points'      => $weight['points'],
+			'bonus'       => $weight['bonus'],
+			'fixLink'     => Fix_Registry::link_fix( $id ),
 		);
 	}
 
@@ -139,9 +144,13 @@ function enqueue_dashboard_assets(): void {
 			'homeUrl'        => home_url( '/' ),
 			'settingsUrl'    => settings_page_url(),
 			'scan'           => Scanner::get_last_scan(),
+			'history'        => Scanner::get_history(),
+			'badgeUrl'       => home_url( '/agent-ready-badge.svg' ),
+			'badgePublic'    => is_feature_enabled( 'badge' ),
 			'checkMeta'      => $meta,
 			'defaultChecks'  => Scanner::default_check_ids(),
 			'levelNames'     => \Ajaco\Scan\Level::names(),
+			'grades'         => Score::grades(),
 			'categoryLabels' => array(
 				'discoverability'      => __( 'Discoverability', 'aj-agent-crawl-optimizer' ),
 				'contentAccessibility' => __( 'Content Accessibility', 'aj-agent-crawl-optimizer' ),
@@ -169,6 +178,55 @@ function enqueue_dashboard_assets(): void {
 				'emptyTitle'  => __( 'Is this site agent-ready?', 'aj-agent-crawl-optimizer' ),
 				'emptyBody'   => __( 'Run the readiness scan — the same checks Cloudflare’s isitagentready.com runs — against this site, with full request/response evidence and one-click fixes.', 'aj-agent-crawl-optimizer' ),
 				'runFirst'    => __( 'Run your first scan', 'aj-agent-crawl-optimizer' ),
+
+				// Score hero.
+				/* translators: 1: score 0-100, 2: letter grade. */
+				'scoreOf100'   => __( 'Score %1$s of 100, grade %2$s', 'aj-agent-crawl-optimizer' ),
+				'scoreTitle'   => __( 'Agent-readiness score', 'aj-agent-crawl-optimizer' ),
+				'noScore'      => __( 'No scored checks ran', 'aj-agent-crawl-optimizer' ),
+				'rescanScore'  => __( 'Re-scan to compute the score', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: signed point change, e.g. +12. */
+				'sinceLast'    => __( '%s since last scan', 'aj-agent-crawl-optimizer' ),
+				'noChange'     => __( 'No change since last scan', 'aj-agent-crawl-optimizer' ),
+				'firstScan'    => __( 'First scan — re-scan after fixes to track progress', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: bonus points, e.g. 3. */
+				'bonusPts'     => __( '+%s bonus', 'aj-agent-crawl-optimizer' ),
+				'layersTitle'  => __( 'Score by layer', 'aj-agent-crawl-optimizer' ),
+				/* translators: 1: earned points, 2: available points. */
+				'ptsOf'        => __( '%1$s / %2$s pts', 'aj-agent-crawl-optimizer' ),
+				'layerNa'      => __( 'Not applicable', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: points a fix would add. */
+				'plusPts'      => __( '+%s pts', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: points a passing check earns. */
+				'pts'          => __( '%s pts', 'aj-agent-crawl-optimizer' ),
+				'bonusTag'     => __( 'Bonus', 'aj-agent-crawl-optimizer' ),
+				'filterAll'    => __( 'All checks', 'aj-agent-crawl-optimizer' ),
+				'filterFail'   => __( 'Failing', 'aj-agent-crawl-optimizer' ),
+				'filterFix'    => __( 'One-click fixes', 'aj-agent-crawl-optimizer' ),
+				'filterBonus'  => __( 'Bonus', 'aj-agent-crawl-optimizer' ),
+				'filterEmpty'  => __( 'Nothing matches this filter.', 'aj-agent-crawl-optimizer' ),
+				'sortedImpact' => __( 'Sorted by impact', 'aj-agent-crawl-optimizer' ),
+
+				// Share & verify.
+				'badgeTitle'       => __( 'Score badge', 'aj-agent-crawl-optimizer' ),
+				'badgeBody'        => __( 'A static SVG of the last scan. Place it anywhere on this site with the shortcode.', 'aj-agent-crawl-optimizer' ),
+				'copyShortcode'    => __( 'Copy shortcode', 'aj-agent-crawl-optimizer' ),
+				'copyEmbed'        => __( 'Copy embed HTML', 'aj-agent-crawl-optimizer' ),
+				'badgePrivate'     => __( 'To embed the badge on another site or a README, enable “Public score badge” in Settings.', 'aj-agent-crawl-optimizer' ),
+				'badgeAlt'         => __( 'Agent-readiness score badge', 'aj-agent-crawl-optimizer' ),
+				'externalTitle'    => __( 'Hosted scanners', 'aj-agent-crawl-optimizer' ),
+				'externalBody'     => __( 'Cross-check this site on the two public agent-readiness scanners. Their APIs never start a scan — run one on their site first, then check here.', 'aj-agent-crawl-optimizer' ),
+				'externalCheck'    => __( 'Check hosted scanners', 'aj-agent-crawl-optimizer' ),
+				'externalRefresh'  => __( 'Refresh', 'aj-agent-crawl-optimizer' ),
+				'externalChecking' => __( 'Checking…', 'aj-agent-crawl-optimizer' ),
+				'externalNone'     => __( 'Not scanned yet', 'aj-agent-crawl-optimizer' ),
+				'externalError'    => __( 'Could not reach', 'aj-agent-crawl-optimizer' ),
+				'externalOpen'     => __( 'Open report', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: scanner name. */
+				'externalScanOn'   => __( 'Scan on %s', 'aj-agent-crawl-optimizer' ),
+				/* translators: %s: date/time. */
+				'externalChecked'  => __( 'Checked %s', 'aj-agent-crawl-optimizer' ),
+				'externalLocal'    => __( 'Hosted scanners can only see public sites — this one looks local or private.', 'aj-agent-crawl-optimizer' ),
 
 				// Gauge + next level.
 				/* translators: 1: level number 0-5, 2: level name. */

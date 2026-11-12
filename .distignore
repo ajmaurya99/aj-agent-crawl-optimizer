@@ -49,10 +49,12 @@
 /.prettierrc.json
 /.stylelintrc
 
-# OS / IDE junk
+# OS / IDE / tool junk
 /.DS_Store
 /.idea
 /.vscode
+/.webflow
+/.claude
 
 # This file itself
 /.distignore

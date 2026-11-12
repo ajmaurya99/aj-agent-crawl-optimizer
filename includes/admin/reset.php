@@ -47,11 +47,17 @@ function handle_reset_request(): void {
 		'ajaco_llms_txt_enabled',
 		'ajaco_ai_bot_rules_enabled',
 		'ajaco_auth_md_enabled',
+		'ajaco_ai_catalog_enabled',
+		'ajaco_sitemap_lastmod_enabled',
+		'ajaco_meta_tags_enabled',
+		'ajaco_badge_enabled',
+		'ajaco_org_schema',
 		'ajaco_ai_bot_policy',
 		'ajaco_content_signal_prefs',
 		'ajaco_indexnow_key',
 		// The stored self-scan — reset must not leave a stale score behind.
 		'ajaco_last_scan',
+		'ajaco_scan_history',
 		// The llms.txt curation config — sections, intro, custom markdown.
 		'ajaco_llms_config',
 	);

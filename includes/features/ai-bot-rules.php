@@ -25,10 +25,12 @@ add_filter( 'robots_txt', __NAMESPACE__ . '\\append_ai_bot_rules', PHP_INT_MAX -
 /**
  * Registry of AI crawlers: canonical User-agent token => purpose label.
  *
- * Tokens and set match the 15 bots checked by the isitagentready.com
- * `robotsTxtAiRules` scan. Purpose labels: `training` (model training),
- * `search` (AI search/answer engines), `user-action` (fetches on behalf of a
- * live user request).
+ * The first 15 match the bots checked by the isitagentready.com
+ * `robotsTxtAiRules` scan; the rest are the user-request and AI-search
+ * agents that ora.ai / is-agentic.com verify are allowed (an answer engine
+ * cannot cite a page its user-fetch agent is blocked from). Purpose labels:
+ * `training` (model training), `search` (AI search/answer engines),
+ * `user-action` (fetches on behalf of a live user request).
  *
  * @return array<string,string>
  */
@@ -49,6 +51,11 @@ function ai_bot_list(): array {
 		'FacebookBot'        => 'search',
 		'omgilibot'          => 'training',
 		'Diffbot'            => 'search',
+		'ClaudeBot'          => 'training',
+		'Claude-User'        => 'user-action',
+		'Claude-SearchBot'   => 'search',
+		'OAI-SearchBot'      => 'search',
+		'Perplexity-User'    => 'user-action',
 	);
 
 	/**
@@ -68,8 +75,10 @@ function ai_bot_list(): array {
 /**
  * Resolve the effective per-bot policy: User-agent token => allow|block.
  *
- * Reads the `ajaco_ai_bot_policy` option; every registered bot missing from
- * the stored option (or holding an unknown value) defaults to `allow`.
+ * Reads the `ajaco_ai_bot_policy` option. A bot missing from the stored
+ * option inherits the stored majority decision for bots of the same purpose
+ * (so an upgrade never un-blocks a category the owner blocked); with no
+ * stored policy at all every bot defaults to `allow`.
  *
  * @return array<string,string>
  */
@@ -79,9 +88,33 @@ function ai_bot_policy(): array {
 		$stored = array();
 	}
 
+	$bots = ai_bot_list();
+
+	// A crawler added in a later release has no stored value. Rather than
+	// silently allowing it, inherit the owner's existing decision for that
+	// purpose: if they blocked every stored training crawler, a new training
+	// crawler is blocked too. With no stored policy at all, everything is
+	// allowed (the historical default).
+	$purpose_default = array();
+	if ( ! empty( $stored ) ) {
+		$tally = array();
+		foreach ( $bots as $token => $purpose ) {
+			if ( isset( $stored[ $token ] ) && in_array( $stored[ $token ], array( 'allow', 'block' ), true ) ) {
+				$tally[ $purpose ][ $stored[ $token ] ] = ( $tally[ $purpose ][ $stored[ $token ] ] ?? 0 ) + 1;
+			}
+		}
+		foreach ( $tally as $purpose => $counts ) {
+			$purpose_default[ $purpose ] = ( $counts['block'] ?? 0 ) > ( $counts['allow'] ?? 0 ) ? 'block' : 'allow';
+		}
+	}
+
 	$policy = array();
-	foreach ( ai_bot_list() as $token => $purpose ) {
-		$value            = isset( $stored[ $token ] ) ? $stored[ $token ] : 'allow';
+	foreach ( $bots as $token => $purpose ) {
+		if ( isset( $stored[ $token ] ) ) {
+			$value = $stored[ $token ];
+		} else {
+			$value = $purpose_default[ $purpose ] ?? 'allow';
+		}
 		$policy[ $token ] = ( 'block' === $value ) ? 'block' : 'allow';
 	}
 

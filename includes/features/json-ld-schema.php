@@ -162,6 +162,7 @@ function output_json_ld_schema(): void {
 	if ( $logo_block ) {
 		$organization['logo'] = $logo_block;
 	}
+	$organization = array_merge( $organization, organization_schema_properties() );
 
 	$schema = array(
 		'@context' => 'https://schema.org',
@@ -357,4 +358,46 @@ function output_json_ld_schema(): void {
 	// the many URLs in the graph stay readable.
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG ) . '</script>' . "\n";
+}
+
+/**
+ * Organization properties from the Settings → Organization details fields:
+ * sameAs profiles, a ContactPoint, and a PostalAddress. Empty when unset.
+ *
+ * @return array<string, mixed>
+ */
+function organization_schema_properties(): array {
+	$org = function_exists( __NAMESPACE__ . '\\org_schema_settings' ) ? org_schema_settings() : array();
+	$out = array();
+
+	if ( ! empty( $org['same_as'] ) ) {
+		$out['sameAs'] = array_values( $org['same_as'] );
+	}
+	if ( ! empty( $org['email'] ) || ! empty( $org['phone'] ) ) {
+		$contact = array(
+			'@type'       => 'ContactPoint',
+			'contactType' => '' !== $org['contact_type'] ? $org['contact_type'] : 'customer service',
+		);
+		if ( ! empty( $org['email'] ) ) {
+			$contact['email'] = $org['email'];
+		}
+		if ( ! empty( $org['phone'] ) ) {
+			$contact['telephone'] = $org['phone'];
+		}
+		$out['contactPoint'] = array( $contact );
+	}
+	$address = array_filter(
+		array(
+			'streetAddress'   => $org['street'] ?? '',
+			'addressLocality' => $org['locality'] ?? '',
+			'addressRegion'   => $org['region'] ?? '',
+			'postalCode'      => $org['postal'] ?? '',
+			'addressCountry'  => $org['country'] ?? '',
+		)
+	);
+	if ( ! empty( $address ) ) {
+		$out['address'] = array( '@type' => 'PostalAddress' ) + $address;
+	}
+
+	return $out;
 }

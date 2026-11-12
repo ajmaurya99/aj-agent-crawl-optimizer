@@ -65,6 +65,16 @@ class Hosting_Diagnosis {
 				'path'   => '/auth.md',
 				'kind'   => 'static-ext',
 			),
+			'aiCatalog'     => array(
+				'option' => 'ajaco_ai_catalog_enabled',
+				'path'   => '/.well-known/ard.json',
+				'kind'   => 'dot-path',
+			),
+			'llmsTxt'       => array(
+				'option' => 'ajaco_llms_txt_enabled',
+				'path'   => '/llms.txt',
+				'kind'   => 'static-ext',
+			),
 		);
 	}
 
@@ -176,10 +186,6 @@ class Hosting_Diagnosis {
 	 */
 	public static function unchecked_endpoint_map(): array {
 		return array(
-			'/llms.txt'      => array(
-				'option' => 'ajaco_llms_txt_enabled',
-				'kind'   => 'static-ext',
-			),
 			'/llms-full.txt' => array(
 				'option' => 'ajaco_llms_txt_enabled',
 				'kind'   => 'static-ext',

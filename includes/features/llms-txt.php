@@ -61,7 +61,7 @@ function flush_llms_txt_cache(): void {
  */
 function maybe_flush_llms_txt_on_setting_change( string $option ): void {
 	// Volatile options that have nothing to do with the file body.
-	$ignore = array( 'ajaco_last_scan', 'ajaco_show_wizard', 'ajaco_wizard_done' );
+	$ignore = array( 'ajaco_last_scan', 'ajaco_scan_history', 'ajaco_show_wizard', 'ajaco_wizard_done' );
 	if ( in_array( $option, $ignore, true ) ) {
 		return;
 	}
@@ -159,6 +159,11 @@ function build_llms_txt( ?array $config = null ): string {
 	// esc_url_raw (not esc_url) — display escaping would entity-encode
 	// ampersands inside a text/markdown body.
 	$discovery = array();
+	$mcp       = detect_mcp_server();
+	if ( $mcp ) {
+		$discovery[] = '[MCP server](' . esc_url_raw( $mcp['endpoint'] )
+			. '): Model Context Protocol server (Streamable HTTP) for agents that act on this site; authenticate with an Application Password.';
+	}
 	if ( is_feature_enabled( 'api_catalog' ) ) {
 		$discovery[] = '[API Catalog](' . esc_url_raw( home_url( '/.well-known/api-catalog' ) )
 			. '): RFC 9727 link set advertising REST endpoints, documentation, and health.';
@@ -174,6 +179,10 @@ function build_llms_txt( ?array $config = null ): string {
 	if ( is_feature_enabled( 'mcp_server_card' ) ) {
 		$discovery[] = '[MCP Server Card](' . esc_url_raw( home_url( '/.well-known/mcp/server-card.json' ) )
 			. '): SEP-1649 server descriptor.';
+	}
+	if ( is_feature_enabled( 'ai_catalog' ) ) {
+		$discovery[] = '[Agent Resource Catalog](' . esc_url_raw( home_url( '/.well-known/ard.json' ) )
+			. '): index of every agent-facing resource on this site.';
 	}
 
 	if ( ! empty( $discovery ) ) {

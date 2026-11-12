@@ -2,8 +2,9 @@
 /**
  * Feature: WebMCP Tools.
  *
- * Enqueues a frontend script that registers tools via
- * `navigator.modelContext.provideContext()` — the W3C WebMCP draft API.
+ * Enqueues a frontend script that registers read-only tools via
+ * `document.modelContext.registerTool()` — the W3C WebMCP draft API — with a
+ * fallback to the earlier `navigator.modelContext.provideContext()` preview.
  *
  * @see https://webmachinelearning.github.io/webmcp/
  *
@@ -47,7 +48,17 @@ function enqueue_webmcp_script(): void {
 		'ajaco-webmcp',
 		'AjacoWebMCP',
 		array(
-			'apiUrl' => rest_url( '/' ),
+			'apiUrl'    => rest_url( '/' ),
+			'siteName'  => get_bloginfo( 'name' ),
+			'language'  => get_bloginfo( 'language' ),
+			'resources' => array_filter(
+				array(
+					'rest'    => rest_url( '/' ),
+					'llmsTxt' => is_feature_enabled( 'llms_txt' ) ? home_url( '/llms.txt' ) : '',
+					'openapi' => is_feature_enabled( 'openapi' ) ? home_url( '/openapi.json' ) : '',
+					'authMd'  => is_feature_enabled( 'auth_md' ) ? home_url( '/auth.md' ) : '',
+				)
+			),
 		)
 	);
 }

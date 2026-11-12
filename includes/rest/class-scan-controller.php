@@ -10,6 +10,7 @@
 
 namespace Ajaco\Rest;
 
+use Ajaco\Scan\External_Scanners;
 use Ajaco\Scan\Fix_Registry;
 use Ajaco\Scan\Scanner;
 
@@ -90,6 +91,22 @@ class Scan_Controller {
 
 		register_rest_route(
 			self::REST_NAMESPACE,
+			'/external',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'external' ),
+				'permission_callback' => array( __CLASS__, 'can_manage' ),
+				'args'                => array(
+					'refresh' => array(
+						'type'     => 'boolean',
+						'required' => false,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::REST_NAMESPACE,
 			'/health',
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
@@ -116,7 +133,8 @@ class Scan_Controller {
 	public static function get_latest_scan(): \WP_REST_Response {
 		return rest_ensure_response(
 			array(
-				'scan' => Scanner::get_last_scan(),
+				'scan'    => Scanner::get_last_scan(),
+				'history' => Scanner::get_history(),
 			)
 		);
 	}
@@ -148,7 +166,12 @@ class Scan_Controller {
 		$scanner = new Scanner();
 		$scan    = $scanner->run( $enabled );
 
-		return rest_ensure_response( array( 'scan' => $scan ) );
+		return rest_ensure_response(
+			array(
+				'scan'    => $scan,
+				'history' => Scanner::get_history(),
+			)
+		);
 	}
 
 	/**
@@ -166,6 +189,8 @@ class Scan_Controller {
 		if ( null === $result ) {
 			return new \WP_Error( 'ajaco_unknown_check', sprintf( 'Unknown check: %s', $check_id ), array( 'status' => 400 ) );
 		}
+
+		$result['history'] = Scanner::get_history();
 
 		return rest_ensure_response( $result );
 	}
@@ -194,11 +219,23 @@ class Scan_Controller {
 
 		return rest_ensure_response(
 			array(
-				'fix'   => $fix,
-				'check' => null !== $result ? $result['check'] : null,
-				'scan'  => null !== $result ? $result['scan'] : null,
+				'fix'     => $fix,
+				'check'   => null !== $result ? $result['check'] : null,
+				'scan'    => null !== $result ? $result['scan'] : null,
+				'history' => Scanner::get_history(),
 			)
 		);
+	}
+
+	/**
+	 * GET /external — this site's scores on the hosted scanners (ora.ai,
+	 * is-agentic.com), cached for an hour; `refresh=1` re-fetches.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public static function external( \WP_REST_Request $request ): \WP_REST_Response {
+		return rest_ensure_response( External_Scanners::get( (bool) $request->get_param( 'refresh' ) ) );
 	}
 
 	/**

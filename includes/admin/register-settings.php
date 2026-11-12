@@ -113,6 +113,10 @@ function register_settings(): void {
 		'ajaco_llms_txt_enabled',
 		'ajaco_ai_bot_rules_enabled',
 		'ajaco_auth_md_enabled',
+		'ajaco_ai_catalog_enabled',
+		'ajaco_sitemap_lastmod_enabled',
+		'ajaco_meta_tags_enabled',
+		'ajaco_badge_enabled',
 	);
 
 	foreach ( $boolean_options as $option ) {
@@ -153,6 +157,16 @@ function register_settings(): void {
 
 	register_setting(
 		'ajaco_settings',
+		'ajaco_org_schema',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => guard_sanitizer( 'ajaco_org_schema', __NAMESPACE__ . '\\sanitize_org_schema' ),
+			'default'           => array(),
+		)
+	);
+
+	register_setting(
+		'ajaco_settings',
 		'ajaco_content_signal_prefs',
 		array(
 			'type'              => 'array',
@@ -175,4 +189,51 @@ function register_settings(): void {
 			'default'           => array(),
 		)
 	);
+}
+
+/**
+ * Sanitize the Organization schema details (`ajaco_org_schema`).
+ *
+ * @param mixed $value Raw option value.
+ * @return array<string, mixed>
+ */
+function sanitize_org_schema( $value ): array {
+	if ( ! is_array( $value ) ) {
+		return array();
+	}
+
+	$text = static function ( string $key ) use ( $value ): string {
+		return isset( $value[ $key ] ) ? sanitize_text_field( (string) $value[ $key ] ) : '';
+	};
+
+	$same_as = array();
+	$raw     = isset( $value['same_as'] ) ? $value['same_as'] : '';
+	$lines   = is_array( $raw ) ? $raw : preg_split( '/[\r\n,]+/', (string) $raw );
+	foreach ( (array) $lines as $line ) {
+		$url = esc_url_raw( trim( (string) $line ), array( 'http', 'https' ) );
+		if ( '' !== $url && ! in_array( $url, $same_as, true ) ) {
+			$same_as[] = $url;
+		}
+	}
+
+	return array(
+		'same_as'      => array_slice( $same_as, 0, 20 ),
+		'email'        => isset( $value['email'] ) ? sanitize_email( (string) $value['email'] ) : '',
+		'phone'        => $text( 'phone' ),
+		'contact_type' => $text( 'contact_type' ),
+		'street'       => $text( 'street' ),
+		'locality'     => $text( 'locality' ),
+		'region'       => $text( 'region' ),
+		'postal'       => $text( 'postal' ),
+		'country'      => $text( 'country' ),
+	);
+}
+
+/**
+ * Stored Organization details, normalised.
+ *
+ * @return array<string, mixed>
+ */
+function org_schema_settings(): array {
+	return sanitize_org_schema( get_option( 'ajaco_org_schema', array() ) );
 }
